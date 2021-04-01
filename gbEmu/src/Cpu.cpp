@@ -1,4 +1,5 @@
 #include "../include/Cpu.h"
+#include "../include/MMU.h"
 
 namespace gbEmu {
 
@@ -7,6 +8,7 @@ namespace gbEmu {
 		/*
 			Opcode table setup
 		*/
+		table.resize(0x100);
 		table[0x00] = { "NOP", bind(&Cpu::opcode0x01, this), 4 };
 
 		reset();
@@ -37,13 +39,26 @@ namespace gbEmu {
 			byte opcode = read(PC);
 			PC++;
 
-			//Get instruction associated with that opcode
-			Instruction ins = table[opcode];
+			//Handle 0xCB table of opcodes
+			if (opcode == 0xCB) {
 
-			//Base number of cycles required
-			cycles = ins.cycles;
-			//May require more cycles based on certain conditions
-			cycles += ins.execute();
+				byte cb_table_opcode = read(PC);
+				Instruction ins = cbTable[cb_table_opcode];
+
+				cycles = ins.cycles;
+				cycles += ins.execute();
+			}
+			else {
+				//Handle Regular table of opcodes
+
+				//Get instruction associated with that opcode
+				Instruction ins = table[opcode];
+
+				//Base number of cycles required
+				cycles = ins.cycles;
+				//May require more cycles based on certain conditions
+				cycles += ins.execute();
+			}
 		}
 		cycles--;
 	}
@@ -56,6 +71,17 @@ namespace gbEmu {
 	void Cpu::write(byte value)
 	{
 
+	}
+
+	void Cpu::connectMMU(MMU* mmu)
+	{
+		this->mmu = mmu;
+	}
+
+	uint8_t Cpu::getFlag(eFlag flag)
+	{
+		uint8_t f = AF.lo;
+		return ((f & (uint8_t)flag) > 0 ? 1 : 0);
 	}
 
 	uint8_t Cpu::opcode0x01()

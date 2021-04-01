@@ -142,6 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\DebugUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\imgui\imgui-SFML.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
@@ -149,9 +150,13 @@
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Cpu.cpp" />
+    <ClCompile Include="src\MMU.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Cpu.h" />
+    <ClInclude Include="include\DebugUI.h" />
+    <ClInclude Include="include\MMU.h" />
+    <ClInclude Include="include\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

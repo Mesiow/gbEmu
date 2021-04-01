@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include "Utils.h"
 #include <unordered_map>
 #include <functional>
 #include <vector>
@@ -13,8 +13,8 @@
 */
 
 namespace gbEmu {
-	using byte = uint8_t;
-	using word = uint16_t;
+	
+	struct MMU;
 
 	union Register {
 		struct {
@@ -44,6 +44,13 @@ namespace gbEmu {
 		byte read(word address);
 		void write(byte value);
 
+		void connectMMU(MMU* mmu);
+
+		/*
+			Returns the state of a status flag
+		*/
+		uint8_t getFlag(eFlag flag);
+
 		/*
 			*Instruction implementations.
 			*Returns extra cycles if needed
@@ -70,6 +77,9 @@ namespace gbEmu {
 		};
 
 		//Opcode associated with function pointer to implementation of instruction
-		std::unordered_map<word, Instruction> table;
+		std::vector<Instruction> table;
+		std::unordered_map<byte, Instruction> cbTable;
+
+		MMU* mmu;
 	};
 }
