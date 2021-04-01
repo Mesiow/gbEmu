@@ -5,12 +5,7 @@ namespace gbEmu {
 
 	Cpu::Cpu()
 	{
-		/*
-			Opcode table setup
-		*/
-		table.resize(0x100);
-		table[0x00] = { "NOP", bind(&Cpu::opcode0x01, this), 4 };
-
+		mapOpcodes();
 		reset();
 	}
 
@@ -84,13 +79,42 @@ namespace gbEmu {
 		return ((f & (uint8_t)flag) > 0 ? 1 : 0);
 	}
 
-	uint8_t Cpu::opcode0x01()
+	uint8_t Cpu::op0x00()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x01()
 	{
 		return 0;
 	}
 
-	uint8_t Cpu::opcode0x06()
+	uint8_t Cpu::op0x02()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x03()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x04()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x05()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x06()
 	{
 		return 0;
+	}
+	uint8_t Cpu::op0x07()
+	{
+		return uint8_t();
 	}
 }

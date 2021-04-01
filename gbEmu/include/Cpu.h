@@ -52,10 +52,18 @@ namespace gbEmu {
 		uint8_t getFlag(eFlag flag);
 
 		/*
+			Maps all opcodes to their instruction
+		*/
+		void mapOpcodes();
+
+		/*
 			*Instruction implementations.
 			*Returns extra cycles if needed
 		*/
-		uint8_t opcode0x01(); uint8_t opcode0x06();
+		uint8_t op0x00(); uint8_t op0x01();
+		uint8_t op0x02(); uint8_t op0x03();
+		uint8_t op0x04(); uint8_t op0x05();
+		uint8_t op0x06(); uint8_t op0x07();
 
 		Register AF;
 		Register BC;

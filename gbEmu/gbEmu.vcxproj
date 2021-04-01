@@ -151,12 +151,16 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Cpu.cpp" />
     <ClCompile Include="src\MMU.cpp" />
+    <ClCompile Include="src\Opcodes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Cpu.h" />
     <ClInclude Include="include\DebugUI.h" />
     <ClInclude Include="include\MMU.h" />
     <ClInclude Include="include\Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="roms\DMG_ROM.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
