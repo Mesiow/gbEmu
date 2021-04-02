@@ -86,5 +86,86 @@ namespace gbEmu {
 		table[0x7A] = { "LD", bind(&Cpu::op0x7A), 4 };  table[0x7B] = { "LD", bind(&Cpu::op0x7B), 4 };
 		table[0x7C] = { "LD", bind(&Cpu::op0x7C), 4 };  table[0x7D] = { "LD", bind(&Cpu::op0x7D), 4 };
 		table[0x7E] = { "LD", bind(&Cpu::op0x7E), 8 };  table[0x7F] = { "LD", bind(&Cpu::op0x7F), 4 };
+
+		/* Ninth row */
+		table[0x80] = { "ADD", bind(&Cpu::op0x80), 4 };  table[0x81] = { "ADD", bind(&Cpu::op0x81), 4 };
+		table[0x82] = { "ADD", bind(&Cpu::op0x82), 4 };  table[0x83] = { "ADD", bind(&Cpu::op0x83), 4 };
+		table[0x84] = { "ADD", bind(&Cpu::op0x84), 4 };  table[0x85] = { "ADD", bind(&Cpu::op0x85), 4 };
+		table[0x86] = { "ADD", bind(&Cpu::op0x86), 8 };table[0x87] = { "ADD", bind(&Cpu::op0x87), 4 };
+		table[0x88] = { "ADC", bind(&Cpu::op0x88), 4 };  table[0x89] = { "ADC", bind(&Cpu::op0x89), 4 };
+		table[0x8A] = { "ADC", bind(&Cpu::op0x8A), 4 };  table[0x8B] = { "ADC", bind(&Cpu::op0x8B), 4 };
+		table[0x8C] = { "ADC", bind(&Cpu::op0x8C), 4 };  table[0x8D] = { "ADC", bind(&Cpu::op0x8D), 4 };
+		table[0x8E] = { "ADC", bind(&Cpu::op0x8E), 8 };  table[0x8F] = { "ADC", bind(&Cpu::op0x8F), 4 };
+
+		/* Tenth row */
+		table[0x90] = { "SUB", bind(&Cpu::op0x90), 4 };  table[0x91] = { "SUB", bind(&Cpu::op0x91), 4 };
+		table[0x92] = { "SUB", bind(&Cpu::op0x92), 4 };  table[0x93] = { "SUB", bind(&Cpu::op0x93), 4 };
+		table[0x94] = { "SUB", bind(&Cpu::op0x94), 4 };  table[0x95] = { "SUB", bind(&Cpu::op0x95), 4 };
+		table[0x96] = { "SUB", bind(&Cpu::op0x96), 8 };  table[0x97] = { "SUB", bind(&Cpu::op0x97), 4 };
+		table[0x98] = { "SBC", bind(&Cpu::op0x98), 4 };  table[0x99] = { "SBC", bind(&Cpu::op0x99), 4 };
+		table[0x9A] = { "SBC", bind(&Cpu::op0x9A), 4 };  table[0x9B] = { "SBC", bind(&Cpu::op0x9B), 4 };
+		table[0x9C] = { "SBC", bind(&Cpu::op0x9C), 4 };  table[0x9D] = { "SBC", bind(&Cpu::op0x9D), 4 };
+		table[0x9E] = { "SBC", bind(&Cpu::op0x9E), 8 };  table[0x9F] = { "SBC", bind(&Cpu::op0x9F), 4 };
+
+		/* Tenth row */
+		table[0xA0] = { "AND", bind(&Cpu::op0xA0), 4 };  table[0xA1] = { "AND", bind(&Cpu::op0xA1), 4 };
+		table[0xA2] = { "AND", bind(&Cpu::op0xA2), 4 };  table[0xA3] = { "AND", bind(&Cpu::op0xA3), 4 };
+		table[0xA4] = { "AND", bind(&Cpu::op0xA4), 4 };  table[0xA5] = { "AND", bind(&Cpu::op0xA5), 4 };
+		table[0xA6] = { "AND", bind(&Cpu::op0xA6), 8 };  table[0xA7] = { "AND", bind(&Cpu::op0xA7), 4 };
+		table[0xA8] = { "XOR", bind(&Cpu::op0xA8), 4 };  table[0xA9] = { "XOR", bind(&Cpu::op0xA9), 4 };
+		table[0xAA] = { "XOR", bind(&Cpu::op0xAA), 4 };  table[0xAB] = { "XOR", bind(&Cpu::op0xAB), 4 };
+		table[0xAC] = { "XOR", bind(&Cpu::op0xAC), 4 };  table[0xAD] = { "XOR", bind(&Cpu::op0xAD), 4 };
+		table[0xAE] = { "XOR", bind(&Cpu::op0xAE), 8 };  table[0xAF] = { "XOR", bind(&Cpu::op0xAF), 4 };
+
+		/* Eleventh row */
+		table[0xB0] = { "OR", bind(&Cpu::op0xB0), 4 };  table[0xB1] = { "OR", bind(&Cpu::op0xB1), 4 };
+		table[0xB2] = { "OR", bind(&Cpu::op0xB2), 4 };  table[0xB3] = { "OR", bind(&Cpu::op0xB3), 4 };
+		table[0xB4] = { "OR", bind(&Cpu::op0xB4), 4 };  table[0xB5] = { "OR", bind(&Cpu::op0xB5), 4 };
+		table[0xB6] = { "OR", bind(&Cpu::op0xB6), 8 };  table[0xB7] = { "OR", bind(&Cpu::op0xB7), 4 };
+		table[0xB8] = { "CP", bind(&Cpu::op0xB8), 4 };  table[0xB9] = { "CP", bind(&Cpu::op0xB9), 4 };
+		table[0xBA] = { "CP", bind(&Cpu::op0xBA), 4 };  table[0xBB] = { "CP", bind(&Cpu::op0xBB), 4 };
+		table[0xBC] = { "CP", bind(&Cpu::op0xBC), 4 };  table[0xBD] = { "CP", bind(&Cpu::op0xBD), 4 };
+		table[0xBE] = { "CP", bind(&Cpu::op0xBE), 8 };  table[0xBF] = { "CP", bind(&Cpu::op0xBF), 4 };
+
+		/* Twelfth row */
+		table[0xC0] = { "RET", bind(&Cpu::op0xC0), 8 };  table[0xC1] = { "POP", bind(&Cpu::op0xC1), 12 };
+		table[0xC2] = { "JP", bind(&Cpu::op0xC2), 12 };  table[0xC3] = { "JP", bind(&Cpu::op0xC3), 16 };
+		table[0xC4] = { "CALL", bind(&Cpu::op0xC4), 12 };  table[0xC5] = { "PUSH", bind(&Cpu::op0xC5), 16 };
+		table[0xC6] = { "ADD", bind(&Cpu::op0xC6), 8 };  table[0xC7] = { "RST", bind(&Cpu::op0xC7), 16 };
+		table[0xC8] = { "RET", bind(&Cpu::op0xC8), 8 };  table[0xC9] = { "RET", bind(&Cpu::op0xC9), 16 };
+		table[0xCA] = { "JP", bind(&Cpu::op0xCA), 12 };  table[0xCB] = { "CB", bind(&Cpu::op0xCB), 4 };
+		table[0xCC] = { "CALL", bind(&Cpu::op0xCC), 12 };  table[0xCD] = { "CALL", bind(&Cpu::op0xCD), 24 };
+		table[0xCE] = { "ADC", bind(&Cpu::op0xCE), 8 };  table[0xCF] = { "RST", bind(&Cpu::op0xCF), 16 };
+
+		/* Thirteenth row */
+		table[0xD0] = { "RET", bind(&Cpu::op0xD0), 8 };  table[0xD1] = { "POP", bind(&Cpu::op0xD1), 12 };
+		table[0xD2] = { "JP", bind(&Cpu::op0xD2), 12 };  table[0xD3] = { "NONE", nullptr, 0 };
+		table[0xD4] = { "CALL", bind(&Cpu::op0xD4), 12 };table[0xD5] = { "PUSH", bind(&Cpu::op0xD5), 16 };
+		table[0xD6] = { "SUB", bind(&Cpu::op0xD6), 8 };  table[0xD7] = { "RST", bind(&Cpu::op0xD7), 16 };
+		table[0xD8] = { "RET", bind(&Cpu::op0xD8), 8 };  table[0xD9] = { "RET", bind(&Cpu::op0xD9), 16 };
+		table[0xDA] = { "JP", bind(&Cpu::op0xDA), 12 };  table[0xDB] = { "NONE", nullptr, 0 };
+		table[0xDC] = { "CALL", bind(&Cpu::op0xDC), 12 };table[0xDD] = { "NONE", nullptr, 0 };
+		table[0xDE] = { "SBC", bind(&Cpu::op0xDE), 8 };  table[0xDF] = { "RST", bind(&Cpu::op0xDF), 16 };
+
+		/* Fourteenth row */
+		table[0xE0] = { "LD", bind(&Cpu::op0xE0), 12 };  table[0xE1] = { "POP", bind(&Cpu::op0xE1), 12 };
+		table[0xE2] = { "LD", bind(&Cpu::op0xE2), 8 };   table[0xE3] = { "NONE", nullptr, 0 };
+		table[0xE4] = { "NONE", nullptr, 0 };            table[0xE5] = { "PUSH", bind(&Cpu::op0xE5), 16 };
+		table[0xE6] = { "AND", bind(&Cpu::op0xE6), 8 };  table[0xE7] = { "RST", bind(&Cpu::op0xE7), 16 };
+		table[0xE8] = { "ADD", bind(&Cpu::op0xE8), 16 }; table[0xE9] = { "JP", bind(&Cpu::op0xE9), 4 };
+		table[0xEA] = { "LD", bind(&Cpu::op0xEA), 16 };  table[0xEB] = { "NONE", nullptr, 0 };
+		table[0xEC] = { "NONE", nullptr, 0 };            table[0xED] = { "NONE", nullptr, 0 };
+		table[0xEE] = { "XOR", bind(&Cpu::op0xEE), 8 };  table[0xEF] = { "RST", bind(&Cpu::op0xEF), 16 };
+
+
+		/* Fifteenth row */
+		table[0xF0] = { "LD", bind(&Cpu::op0xF0), 12 };  table[0xF1] = { "POP", bind(&Cpu::op0xF1), 12 };
+		table[0xF2] = { "LD", bind(&Cpu::op0xF2), 8 };   table[0xF3] = { "DI", bind(&Cpu::op0xF3), 4 };
+		table[0xF4] = { "NONE", nullptr, 0 };            table[0xF5] = { "PUSH", bind(&Cpu::op0xF5), 16 };
+		table[0xF6] = { "OR", bind(&Cpu::op0xF6), 8 };   table[0xF7] = { "RST", bind(&Cpu::op0xF7), 16 };
+		table[0xF8] = { "LD", bind(&Cpu::op0xF8), 12 };  table[0xF9] = { "LD", bind(&Cpu::op0xF9), 8 };
+		table[0xFA] = { "LD", bind(&Cpu::op0xFA), 16 };  table[0xFB] = { "EI", bind(&Cpu::op0xFB), 4 };
+		table[0xFC] = { "NONE", nullptr, 0 };            table[0xFD] = { "NONE", nullptr, 0 };
+		table[0xFE] = { "CP", bind(&Cpu::op0xFE), 8 };   table[0xFF] = { "RST", bind(&Cpu::op0xFF), 16 };
 	}
 }

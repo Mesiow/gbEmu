@@ -645,4 +645,516 @@ namespace gbEmu {
 	{
 		return u8();
 	}
+	u8 Cpu::op0x80()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x81()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x82()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x83()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x84()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x85()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x86()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x87()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x88()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x89()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x8A()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x8B()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x8C()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x8D()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x8E()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x8F()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x90()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x91()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x92()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x93()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x94()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x95()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x96()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x97()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x98()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x99()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x9A()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x9B()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x9C()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x9D()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x9E()
+	{
+		return u8();
+	}
+	u8 Cpu::op0x9F()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA0()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA1()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA2()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA3()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA4()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA5()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA6()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA7()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA8()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xA9()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xAA()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xAB()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xAC()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xAD()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xAE()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xAF()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB0()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB1()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB2()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB3()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB4()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB5()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB6()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB7()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB8()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xB9()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xBA()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xBB()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xBC()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xBD()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xBE()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xBF()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC0()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC1()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC2()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC3()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC4()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC5()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC6()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC7()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC8()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xC9()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xCA()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xCB()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xCC()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xCD()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xCE()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xCF()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD0()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD1()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD2()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD3()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD4()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD5()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD6()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD7()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD8()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xD9()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xDA()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xDB()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xDC()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xDD()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xDE()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xDF()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE0()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE1()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE2()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE3()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE4()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE5()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE6()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE7()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE8()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xE9()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xEA()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xEB()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xEC()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xED()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xEE()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xEF()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF0()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF1()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF2()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF3()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF4()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF5()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF6()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF7()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF8()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xF9()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xFA()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xFB()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xFC()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xFD()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xFE()
+	{
+		return u8();
+	}
+	u8 Cpu::op0xFF()
+	{
+		return u8();
+	}
 }
