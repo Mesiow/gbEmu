@@ -79,8 +79,41 @@ namespace gbEmu {
         ImGui::Text("DE: 0x%04X", cpu->DE.value);
         ImGui::Text("HL: 0x%04X", cpu->HL.value);
         ImGui::Text("SP: 0x%04X", cpu->SP);
+        ImGui::NewLine();
+
+        const char* i = "LD BC,u16";
+        ImGui::Text("Instruction: %s", i);
+
+       
+        stepPressed = ImGui::Button("Step");
+        ImGui::SameLine();
+        runPressed = ImGui::Button("Run");
+        ImGui::SameLine();
+        haltPressed = ImGui::Button("Halt");
+        ImGui::SameLine();
+
         ed.DrawWindow("Memory Editor", mmu->memory, MAX_MEM);
 
         ImGui::End();
     }
+
+    void DebugUI::update()
+    {
+        handleButtonPresses();
+    }
+
+    void DebugUI::handleButtonPresses()
+    {
+        if (stepPressed) {
+            //Clock the cpu once
+            cpu->clock();
+        }
+        if (runPressed) {
+            printf("Running cpu emulation\n");
+        }
+        if (haltPressed) {
+            printf("Halting cpu emulation");
+        }
+    }
+
 }

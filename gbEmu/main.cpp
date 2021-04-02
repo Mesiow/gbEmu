@@ -15,9 +15,6 @@ int main(int arc, char* argv[]) {
     window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
 
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
-
    
    
     gbEmu::MMU mmu;
@@ -41,6 +38,7 @@ int main(int arc, char* argv[]) {
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
+        ui.update();
         ui.render();
 
         window.clear(sf::Color(100, 149, 237, 255));
