@@ -3,8 +3,10 @@
 
 namespace gbEmu {
 
-	Cpu::Cpu()
+	Cpu::Cpu(MMU* mmu)
 	{
+		connectMMU(mmu);
+
 		mapOpcodes();
 		reset();
 	}
@@ -24,6 +26,13 @@ namespace gbEmu {
 
 		PC = 0x0000;
 		SP = 0xFFFE;
+
+		//Test LD nn, n
+		//mmu->write(0x00, 0x01); //opcode
+		//mmu->write(0x01, 0x15); //16 bit values
+		//mmu->write(0x02, 0x32);
+
+		//clock();
 	}
 
 	void Cpu::clock()
@@ -60,12 +69,12 @@ namespace gbEmu {
 
 	byte Cpu::read(word address)
 	{
-		return byte();
+		return mmu->read(address);
 	}
 
-	void Cpu::write(byte value)
+	void Cpu::write(word address, byte value)
 	{
-
+		mmu->write(address, value);
 	}
 
 	void Cpu::connectMMU(MMU* mmu)
@@ -73,19 +82,37 @@ namespace gbEmu {
 		this->mmu = mmu;
 	}
 
-	uint8_t Cpu::getFlag(eFlag flag)
+	word Cpu::immediateU16()
 	{
-		uint8_t f = AF.lo;
-		return ((f & (uint8_t)flag) > 0 ? 1 : 0);
+		byte lo = read(PC++);
+		byte hi = read(PC++);
+		return ((hi << 8) | lo);
 	}
+
+	byte Cpu::immediateU8()
+	{
+		return byte();
+	}
+
+	byte Cpu::getFlag(eFlag flag)
+	{
+		byte f = AF.lo;
+		return ((f & (byte)flag) > 0 ? 1 : 0);
+	}
+
+
+	/*
+		Instruction Implementations
+	*/
 
 	uint8_t Cpu::op0x00()
 	{
-		return uint8_t();
+		return 0;
 	}
 
 	uint8_t Cpu::op0x01()
 	{
+		BC.value = immediateU16();
 		return 0;
 	}
 
@@ -113,7 +140,190 @@ namespace gbEmu {
 	{
 		return 0;
 	}
+
 	uint8_t Cpu::op0x07()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x08()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x09()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x0A()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x0B()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x0C()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x0D()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x0E()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x0F()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x10()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x11()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x12()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x13()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x14()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x15()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x16()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x17()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x18()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x19()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x1A()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x1B()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x1C()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x1D()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x1E()
+	{
+		return uint8_t();
+	}
+
+	uint8_t Cpu::op0x1F()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x20()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x21()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x22()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x23()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x24()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x25()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x26()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x27()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x28()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x29()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x2A()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x2B()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x2C()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x2D()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x2E()
+	{
+		return uint8_t();
+	}
+	uint8_t Cpu::op0x2F()
 	{
 		return uint8_t();
 	}

@@ -35,35 +35,77 @@ namespace gbEmu {
 	};
 
 	struct Cpu {
-		Cpu();
+		Cpu(MMU *mmu);
 		~Cpu();
 
 		void reset();
 		void clock();
 		
 		byte read(word address);
-		void write(byte value);
+		void write(word address, byte value);
 
 		void connectMMU(MMU* mmu);
+
+
+		word immediateU16();
+		byte immediateU8();
 
 		/*
 			Returns the state of a status flag
 		*/
-		uint8_t getFlag(eFlag flag);
+		byte getFlag(eFlag flag);
 
 		/*
 			Maps all opcodes to their instruction
 		*/
 		void mapOpcodes();
 
+
+
+
+
 		/*
 			*Instruction implementations.
 			*Returns extra cycles if needed
 		*/
-		uint8_t op0x00(); uint8_t op0x01();
+		uint8_t op0x00(); uint8_t op0x01();        
 		uint8_t op0x02(); uint8_t op0x03();
 		uint8_t op0x04(); uint8_t op0x05();
 		uint8_t op0x06(); uint8_t op0x07();
+		uint8_t op0x08(); uint8_t op0x09();
+		uint8_t op0x0A(); uint8_t op0x0B();
+		uint8_t op0x0C(); uint8_t op0x0D();
+		uint8_t op0x0E(); uint8_t op0x0F();
+
+		uint8_t op0x10(); uint8_t op0x11();
+		uint8_t op0x12(); uint8_t op0x13();
+		uint8_t op0x14(); uint8_t op0x15();
+		uint8_t op0x16(); uint8_t op0x17();
+		uint8_t op0x18(); uint8_t op0x19();
+		uint8_t op0x1A(); uint8_t op0x1B();
+		uint8_t op0x1C(); uint8_t op0x1D();
+		uint8_t op0x1E(); uint8_t op0x1F();
+
+		uint8_t op0x20(); uint8_t op0x21();
+		uint8_t op0x22(); uint8_t op0x23();
+		uint8_t op0x24(); uint8_t op0x25();
+		uint8_t op0x26(); uint8_t op0x27();
+		uint8_t op0x28(); uint8_t op0x29();
+		uint8_t op0x2A(); uint8_t op0x2B();
+		uint8_t op0x2C(); uint8_t op0x2D();
+		uint8_t op0x2E(); uint8_t op0x2F();
+
+
+
+
+
+
+
+
+
+
+
+
 
 		Register AF;
 		Register BC;

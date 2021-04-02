@@ -23,7 +23,7 @@ int main(int arc, char* argv[]) {
     gbEmu::MMU mmu;
     mmu.loadRom("DMG_ROM.bin", true);
 
-    gbEmu::Cpu cpu;
+    gbEmu::Cpu cpu(&mmu);
     gbEmu::DebugUI ui(&mmu, &cpu);
    
 
