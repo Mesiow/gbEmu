@@ -38,13 +38,13 @@ namespace gbEmu {
 		if (cycles == 0) {
 	
 			//Read opcode
-			byte opcode = read(PC);
+			u8 opcode = read(PC);
 			PC++;
 
 			//Handle 0xCB table of opcodes
 			if (opcode == 0xCB) {
 
-				byte cb_table_opcode = read(PC);
+				u8 cb_table_opcode = read(PC);
 				Instruction ins = cbTable[cb_table_opcode];
 
 				cycles = ins.cycles;
@@ -65,12 +65,12 @@ namespace gbEmu {
 		cycles--;
 	}
 
-	byte Cpu::read(word address)
+	u8 Cpu::read(u16 address)
 	{
 		return mmu->read(address);
 	}
 
-	void Cpu::write(word address, byte value)
+	void Cpu::write(u16 address, u8 value)
 	{
 		mmu->write(address, value);
 	}
@@ -80,22 +80,22 @@ namespace gbEmu {
 		this->mmu = mmu;
 	}
 
-	word Cpu::immediateU16()
+	u16 Cpu::immediateU16()
 	{
-		byte lo = read(PC++);
-		byte hi = read(PC++);
+		u8 lo = read(PC++);
+		u8 hi = read(PC++);
 		return ((hi << 8) | lo);
 	}
 
-	byte Cpu::immediateU8()
+	u8 Cpu::immediateU8()
 	{
-		return byte();
+		return u8();
 	}
 
-	byte Cpu::getFlag(eFlag flag)
+	u8 Cpu::getFlag(eFlag flag)
 	{
-		byte f = AF.lo;
-		return ((f & (byte)flag) > 0 ? 1 : 0);
+		u8 f = AF.lo;
+		return ((f & (u8)flag) > 0 ? 1 : 0);
 	}
 
 
@@ -103,546 +103,546 @@ namespace gbEmu {
 		Instruction Implementations
 	*/
 
-	uint8_t Cpu::op0x00()
+	u8 Cpu::op0x00()
 	{
 		return 0;
 	}
 
-	uint8_t Cpu::op0x01()
+	u8 Cpu::op0x01()
 	{
 		BC.value = immediateU16();
 		return 0;
 	}
 
-	uint8_t Cpu::op0x02()
+	u8 Cpu::op0x02()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x03()
+	u8 Cpu::op0x03()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x04()
+	u8 Cpu::op0x04()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x05()
+	u8 Cpu::op0x05()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x06()
+	u8 Cpu::op0x06()
 	{
 		return 0;
 	}
 
-	uint8_t Cpu::op0x07()
+	u8 Cpu::op0x07()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x08()
+	u8 Cpu::op0x08()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x09()
+	u8 Cpu::op0x09()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x0A()
+	u8 Cpu::op0x0A()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x0B()
+	u8 Cpu::op0x0B()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x0C()
+	u8 Cpu::op0x0C()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x0D()
+	u8 Cpu::op0x0D()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x0E()
+	u8 Cpu::op0x0E()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x0F()
+	u8 Cpu::op0x0F()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x10()
+	u8 Cpu::op0x10()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x11()
+	u8 Cpu::op0x11()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x12()
+	u8 Cpu::op0x12()
 	{
-		return uint8_t();
-	}
-
-	uint8_t Cpu::op0x13()
-	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x14()
+	u8 Cpu::op0x13()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x15()
+	u8 Cpu::op0x14()
 	{
-		return uint8_t();
-	}
-	uint8_t Cpu::op0x16()
-	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x17()
+	u8 Cpu::op0x15()
 	{
-		return uint8_t();
+		return u8();
+	}
+	u8 Cpu::op0x16()
+	{
+		return u8();
 	}
 
-	uint8_t Cpu::op0x18()
+	u8 Cpu::op0x17()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x19()
+	u8 Cpu::op0x18()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x1A()
+	u8 Cpu::op0x19()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x1B()
+	u8 Cpu::op0x1A()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x1C()
+	u8 Cpu::op0x1B()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x1D()
+	u8 Cpu::op0x1C()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x1E()
+	u8 Cpu::op0x1D()
 	{
-		return uint8_t();
+		return u8();
 	}
 
-	uint8_t Cpu::op0x1F()
+	u8 Cpu::op0x1E()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x20()
+
+	u8 Cpu::op0x1F()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x21()
+	u8 Cpu::op0x20()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x22()
+	u8 Cpu::op0x21()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x23()
+	u8 Cpu::op0x22()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x24()
+	u8 Cpu::op0x23()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x25()
+	u8 Cpu::op0x24()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x26()
+	u8 Cpu::op0x25()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x27()
+	u8 Cpu::op0x26()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x28()
+	u8 Cpu::op0x27()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x29()
+	u8 Cpu::op0x28()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x2A()
+	u8 Cpu::op0x29()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x2B()
+	u8 Cpu::op0x2A()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x2C()
+	u8 Cpu::op0x2B()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x2D()
+	u8 Cpu::op0x2C()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x2E()
+	u8 Cpu::op0x2D()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x2F()
+	u8 Cpu::op0x2E()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x30()
+	u8 Cpu::op0x2F()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x31()
+	u8 Cpu::op0x30()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x32()
+	u8 Cpu::op0x31()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x33()
+	u8 Cpu::op0x32()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x34()
+	u8 Cpu::op0x33()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x35()
+	u8 Cpu::op0x34()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x36()
+	u8 Cpu::op0x35()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x37()
+	u8 Cpu::op0x36()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x38()
+	u8 Cpu::op0x37()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x39()
+	u8 Cpu::op0x38()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x3A()
+	u8 Cpu::op0x39()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x3B()
+	u8 Cpu::op0x3A()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x3C()
+	u8 Cpu::op0x3B()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x3D()
+	u8 Cpu::op0x3C()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x3E()
+	u8 Cpu::op0x3D()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x3F()
+	u8 Cpu::op0x3E()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x40()
+	u8 Cpu::op0x3F()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x41()
+	u8 Cpu::op0x40()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x42()
+	u8 Cpu::op0x41()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x43()
+	u8 Cpu::op0x42()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x44()
+	u8 Cpu::op0x43()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x45()
+	u8 Cpu::op0x44()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x46()
+	u8 Cpu::op0x45()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x47()
+	u8 Cpu::op0x46()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x48()
+	u8 Cpu::op0x47()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x49()
+	u8 Cpu::op0x48()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x4A()
+	u8 Cpu::op0x49()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x4B()
+	u8 Cpu::op0x4A()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x4C()
+	u8 Cpu::op0x4B()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x4D()
+	u8 Cpu::op0x4C()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x4E()
+	u8 Cpu::op0x4D()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x4F()
+	u8 Cpu::op0x4E()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x50()
+	u8 Cpu::op0x4F()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x51()
+	u8 Cpu::op0x50()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x52()
+	u8 Cpu::op0x51()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x53()
+	u8 Cpu::op0x52()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x54()
+	u8 Cpu::op0x53()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x55()
+	u8 Cpu::op0x54()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x56()
+	u8 Cpu::op0x55()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x57()
+	u8 Cpu::op0x56()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x58()
+	u8 Cpu::op0x57()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x59()
+	u8 Cpu::op0x58()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x5A()
+	u8 Cpu::op0x59()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x5B()
+	u8 Cpu::op0x5A()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x5C()
+	u8 Cpu::op0x5B()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x5D()
+	u8 Cpu::op0x5C()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x5E()
+	u8 Cpu::op0x5D()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x5F()
+	u8 Cpu::op0x5E()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x60()
+	u8 Cpu::op0x5F()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x61()
+	u8 Cpu::op0x60()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x62()
+	u8 Cpu::op0x61()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x63()
+	u8 Cpu::op0x62()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x64()
+	u8 Cpu::op0x63()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x65()
+	u8 Cpu::op0x64()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x66()
+	u8 Cpu::op0x65()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x67()
+	u8 Cpu::op0x66()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x68()
+	u8 Cpu::op0x67()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x69()
+	u8 Cpu::op0x68()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x6A()
+	u8 Cpu::op0x69()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x6B()
+	u8 Cpu::op0x6A()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x6C()
+	u8 Cpu::op0x6B()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x6D()
+	u8 Cpu::op0x6C()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x6E()
+	u8 Cpu::op0x6D()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x6F()
+	u8 Cpu::op0x6E()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x70()
+	u8 Cpu::op0x6F()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x71()
+	u8 Cpu::op0x70()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x72()
+	u8 Cpu::op0x71()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x73()
+	u8 Cpu::op0x72()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x74()
+	u8 Cpu::op0x73()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x75()
+	u8 Cpu::op0x74()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x76()
+	u8 Cpu::op0x75()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x77()
+	u8 Cpu::op0x76()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x78()
+	u8 Cpu::op0x77()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x79()
+	u8 Cpu::op0x78()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x7A()
+	u8 Cpu::op0x79()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x7B()
+	u8 Cpu::op0x7A()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x7C()
+	u8 Cpu::op0x7B()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x7D()
+	u8 Cpu::op0x7C()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x7E()
+	u8 Cpu::op0x7D()
 	{
-		return uint8_t();
+		return u8();
 	}
-	uint8_t Cpu::op0x7F()
+	u8 Cpu::op0x7E()
 	{
-		return uint8_t();
+		return u8();
+	}
+	u8 Cpu::op0x7F()
+	{
+		return u8();
 	}
 }

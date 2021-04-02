@@ -10,9 +10,9 @@ namespace gbEmu {
 		MMU();
 
 		void loadRom(const std::string& file, bool isBootRom = false);
-		void write(word address, byte value);
-		byte read(word address);
+		void write(u16 address, u8 value);
+		u8 read(u16 address);
 
-		byte memory[MAX_MEM];
+		u8 memory[MAX_MEM];
 	};
 }

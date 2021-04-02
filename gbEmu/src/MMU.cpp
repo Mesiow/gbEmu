@@ -14,8 +14,8 @@ namespace gbEmu {
 
 		
 		if (rom.is_open()) {
-			size_t size = rom.tellg();
-			byte* buf = new byte[size];
+			u32 size = static_cast<u32>(rom.tellg());
+			u8* buf = new u8[size];
 
 			rom.seekg(0, std::ios::beg);
 			rom.read((char*)buf, size);
@@ -31,7 +31,7 @@ namespace gbEmu {
 					BB BB 67 63 6E 0E EC CC DD DC 99 9F BB B9 33 3E
 
 				*/
-				byte graphic[0x30];
+				u8 graphic[0x30];
 				graphic[0] = 0xCE; graphic[1] = 0xED; graphic[2] = 0x66;
 				graphic[3] = 0x66; graphic[4] = 0xCC; graphic[5] = 0x0D;
 				graphic[6] = 0x00; graphic[7] = 0x0B; graphic[8] = 0x03;
@@ -78,13 +78,13 @@ namespace gbEmu {
 
 	}
 
-	void MMU::write(word address, byte value)
+	void MMU::write(u16 address, u8 value)
 	{
 		assert(address >= 0 && address < MAX_MEM);
 		memory[address] = value;
 	}
 
-	byte MMU::read(word address)
+	u8 MMU::read(u16 address)
 	{
 		assert(address >= 0 && address < MAX_MEM);
 		return memory[address];

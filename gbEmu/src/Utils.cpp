@@ -2,25 +2,25 @@
 
 namespace gbEmu {
 
-	byte setBit(byte val, byte bitToSet)
+	u8 setBit(u8 val, u8 bitToSet)
 	{
-		byte bit = (1 << bitToSet);
+		u8 bit = (1 << bitToSet);
 		val |= bit;
 		return val;
 	}
 
-	byte resetBit(byte val, byte bitToReset)
+	u8 resetBit(u8 val, u8 bitToReset)
 	{
-		byte bit = (1 << bitToReset);
+		u8 bit = (1 << bitToReset);
 		if ((val & bit) == 0) return val; //bit is already reset
 
 		val &= ~(bit);
 		return val;
 	}
 
-	byte testBit(byte val, byte bitToTest)
+	u8 testBit(u8 val, u8 bitToTest)
 	{
-		byte bit = (1 << bitToTest);
+		u8 bit = (1 << bitToTest);
 		return ((val & bit) > 0 ? 1 : 0);
 	}
 }
