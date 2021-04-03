@@ -31,6 +31,18 @@ namespace gbEmu {
 		//mmu->write(0x00, 0x01); //opcode
 		//mmu->write(0x01, 0x15); //16 bit values
 		//mmu->write(0x02, 0x32);
+
+		////Test LD (BC), A
+		//AF.hi = 0x39;
+		//BC.value = 0x151;
+		//mmu->write(0x00, 0x02); //opcode
+		
+		//Test INC NN
+		//mmu->write(0x00, 0x03);
+
+		//Test INC N
+		BC.hi = 0xFF;
+		mmu->write(0x0, 0x04);
 	}
 
 	void Cpu::clock()
@@ -80,22 +92,57 @@ namespace gbEmu {
 		this->mmu = mmu;
 	}
 
-	u16 Cpu::immediateU16()
+	u16 Cpu::fetchU16()
 	{
 		u8 lo = read(PC++);
 		u8 hi = read(PC++);
 		return ((hi << 8) | lo);
 	}
 
-	u8 Cpu::immediateU8()
+	u8 Cpu::fetchU8()
 	{
-		return u8();
+		u8 data = read(PC++);
+		return data;
+	}
+
+	u16 Cpu::readU16()
+	{
+		u8 lo = read(PC);
+		u8 hi = read(PC + 1);
+		return ((hi << 8) | lo);
+	}
+
+	u8 Cpu::readU8()
+	{
+		u8 data = read(PC);
+		return data;
 	}
 
 	u8 Cpu::getFlag(eFlag flag)
 	{
 		u8 f = AF.lo;
 		return ((f & (u8)flag) > 0 ? 1 : 0);
+	}
+
+	void Cpu::setFlag(u8 flagBit, bool condition)
+	{
+		if (condition) {
+			eFlag flag = (eFlag)(1 << flagBit);
+			AF.lo |= flag;
+		}
+		else {
+			clearFlag(flagBit);
+		}
+	}
+
+	void Cpu::setFlag(u8 flagBit)
+	{
+		AF.lo = setBit(AF.lo, flagBit);
+	}
+
+	void Cpu::clearFlag(u8 flagBit)
+	{
+		AF.lo = resetBit(AF.lo, flagBit);
 	}
 
 
@@ -105,28 +152,38 @@ namespace gbEmu {
 
 	u8 Cpu::op0x00()
 	{
+		//NOP - do nothing
 		return 0;
 	}
 
 	u8 Cpu::op0x01()
 	{
-		BC.value = immediateU16();
+		BC.value = fetchU16();
 		return 0;
 	}
 
 	u8 Cpu::op0x02()
 	{
-		return u8();
+		mmu->write(BC.value, AF.hi);
+		return 0;
 	}
 
 	u8 Cpu::op0x03()
 	{
-		return u8();
+		BC.value++;
+		return 0;
 	}
 
 	u8 Cpu::op0x04()
 	{
-		return u8();
+		u8 result = BC.hi + 1;
+
+		setFlag(FLAG_BIT_Z, (result == 0));
+		clearFlag(FLAG_BIT_N);
+		setFlag(FLAG_BIT_H, (result > 0xF));
+
+		BC.hi++;
+		return 0;
 	}
 
 	u8 Cpu::op0x05()

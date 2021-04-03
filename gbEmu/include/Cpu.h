@@ -13,6 +13,11 @@
 */
 
 namespace gbEmu {
+
+#define FLAG_BIT_Z 7
+#define FLAG_BIT_N 6
+#define FLAG_BIT_H 5
+#define FLAG_BIT_C 4
 	
 	struct MMU;
 
@@ -27,7 +32,7 @@ namespace gbEmu {
 	/*
 		Flag Positions
 	*/
-	enum class eFlag : u8{
+	enum eFlag : u8{
 		Z = 0x80,  //Zero flag
 		N = 0x40,  //Subtract flag
 		H = 0x20,  //Half Carry flag
@@ -46,14 +51,31 @@ namespace gbEmu {
 
 		void connectMMU(MMU* mmu);
 
+		/*
+			Fetching returns the data but also steps
+			the program counter
+		*/
+		u16 fetchU16();
+		u8 fetchU8();
 
-		u16 immediateU16();
-		u8 immediateU8();
+		/*
+			Reading simply reads the data and does not modify
+			anything
+		*/
+		u16 readU16();
+		u8 readU8();
 
 		/*
 			Returns the state of a status flag
 		*/
 		u8 getFlag(eFlag flag);
+
+		/*
+			Set the flag if the condition is true
+		*/
+		void setFlag(u8 flagBit, bool condition);
+		void setFlag(u8 flagBit);
+		void clearFlag(u8 flagBit);
 
 		/*
 			Maps all opcodes to their instruction
