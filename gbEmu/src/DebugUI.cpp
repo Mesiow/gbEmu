@@ -18,7 +18,7 @@ namespace gbEmu {
         ImGui::Text("Status: ");
         ImGui::SameLine();
 
-        if (cpu->getFlag(eFlag::Z)) {
+        if (cpu->getFlag(FLAG_Z)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(133, 245, 29, 255)));
             ImGui::Text("%c", 'Z');
             ImGui::SameLine();
@@ -31,7 +31,7 @@ namespace gbEmu {
             ImGui::PopStyleColor(1);
         }
 
-        if (cpu->getFlag(eFlag::N)) {
+        if (cpu->getFlag(FLAG_N)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(133, 245, 29, 255)));
             ImGui::Text("%c", 'N');
             ImGui::SameLine();
@@ -44,7 +44,7 @@ namespace gbEmu {
             ImGui::PopStyleColor(1);
         }
 
-        if (cpu->getFlag(eFlag::H)) {
+        if (cpu->getFlag(FLAG_H)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(133, 245, 29, 255)));
             ImGui::Text("%c", 'H');
             ImGui::SameLine();
@@ -57,7 +57,7 @@ namespace gbEmu {
             ImGui::PopStyleColor(1);
         }
 
-        if (cpu->getFlag(eFlag::C)) {
+        if (cpu->getFlag(FLAG_C)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(133, 245, 29, 255)));
             ImGui::Text("%c", 'C');
             ImGui::SameLine();

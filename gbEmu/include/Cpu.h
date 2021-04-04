@@ -18,6 +18,11 @@ namespace gbEmu {
 #define FLAG_BIT_N 6
 #define FLAG_BIT_H 5
 #define FLAG_BIT_C 4
+
+#define FLAG_Z (1 << 7) //Zero flag
+#define FLAG_N (1 << 6) //Subtract flag
+#define FLAG_H (1 << 5) //Half Carry flag
+#define FLAG_C (1 << 4) //Carry flag
 	
 	struct MMU;
 
@@ -29,21 +34,17 @@ namespace gbEmu {
 		u16 value;
 	};
 
-	/*
-		Flag Positions
-	*/
-	enum eFlag : u8{
-		Z = 0x80,  //Zero flag
-		N = 0x40,  //Subtract flag
-		H = 0x20,  //Half Carry flag
-		C = 0x10   //Carry flag
-	};
-
 	struct Cpu {
 		Cpu(MMU *mmu);
 		~Cpu();
 
 		void reset();
+
+		/*
+			Area to test instructions
+		*/
+		void testFunc();
+
 		void clock();
 		
 		u8 read(u16 address);
@@ -51,6 +52,7 @@ namespace gbEmu {
 
 		void connectMMU(MMU* mmu);
 
+		
 		/*
 			Fetching returns the data but also steps
 			the program counter
@@ -68,14 +70,14 @@ namespace gbEmu {
 		/*
 			Returns the state of a status flag
 		*/
-		u8 getFlag(eFlag flag);
+		u8 getFlag(u8 flag);
 
 		/*
 			Set the flag if the condition is true
 		*/
-		void setFlag(u8 flagBit, bool condition);
-		void setFlag(u8 flagBit);
-		void clearFlag(u8 flagBit);
+		void setFlag(u8 flags, bool condition);
+		void setFlag(u8 flags);
+		void clearFlag(u8 flags);
 
 		/*
 			Maps all opcodes to their instruction

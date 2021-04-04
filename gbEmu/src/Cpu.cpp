@@ -27,7 +27,12 @@ namespace gbEmu {
 		PC = 0x0000;
 		SP = 0xFFFE;
 
-		//Test LD nn, n
+		testFunc();
+	}
+
+	void Cpu::testFunc()
+	{
+		//Test LD n, nn 
 		//mmu->write(0x00, 0x01); //opcode
 		//mmu->write(0x01, 0x15); //16 bit values
 		//mmu->write(0x02, 0x32);
@@ -36,13 +41,45 @@ namespace gbEmu {
 		//AF.hi = 0x39;
 		//BC.value = 0x151;
 		//mmu->write(0x00, 0x02); //opcode
-		
+
 		//Test INC NN
 		//mmu->write(0x00, 0x03);
 
 		//Test INC N
-		BC.hi = 0xFF;
-		mmu->write(0x0, 0x04);
+		//BC.hi = 0xF;
+		//mmu->write(0x0, 0x04);
+
+		//Test DEC N
+		//BC.hi = 0x0;
+		//mmu->write(0x0, 0x05);
+
+		//Test LD N, u8
+		//mmu->write(0x00, 0x06);
+		//mmu->write(0x01, 0x48);
+
+		//Test RLCA
+		//AF.hi = 0x80;
+		//mmu->write(0x00, 0x07);
+
+		//Test LD (u16), SP
+		//mmu->write(0x00, 0x08); //opcode
+		//mmu->write(0x01, 0x10);
+		//mmu->write(0x02, 0x01);
+
+		//Test ADD HL, NN
+		//HL.value = 0xFFFF;
+		//BC.value = 0x0001;
+		//mmu->write(0x0, 0x09);
+
+		//Test LD N, (NN)
+		//BC.value = 0x100;
+		//mmu->write(0x0, 0x0A);
+		//mmu->write(BC.value, 0x14);
+
+		//Test DEC NN
+		//BC.value = 0x0010;
+		//mmu->write(0x0, 0x0B);
+
 	}
 
 	void Cpu::clock()
@@ -92,6 +129,7 @@ namespace gbEmu {
 		this->mmu = mmu;
 	}
 
+	
 	u16 Cpu::fetchU16()
 	{
 		u8 lo = read(PC++);
@@ -118,31 +156,54 @@ namespace gbEmu {
 		return data;
 	}
 
-	u8 Cpu::getFlag(eFlag flag)
+	u8 Cpu::getFlag(u8 flag)
 	{
 		u8 f = AF.lo;
-		return ((f & (u8)flag) > 0 ? 1 : 0);
+		return ((f & flag) > 0 ? 1 : 0);
 	}
 
-	void Cpu::setFlag(u8 flagBit, bool condition)
+	void Cpu::setFlag(u8 flags, bool condition)
 	{
 		if (condition) {
-			eFlag flag = (eFlag)(1 << flagBit);
-			AF.lo |= flag;
+			setFlag(flags);
 		}
 		else {
-			clearFlag(flagBit);
+			clearFlag(flags);
 		}
 	}
 
-	void Cpu::setFlag(u8 flagBit)
+	void Cpu::setFlag(u8 flags)
 	{
-		AF.lo = setBit(AF.lo, flagBit);
+		u8 fl = flags & 0xF0;
+		if (fl & FLAG_Z) {
+			AF.lo = setBit(AF.lo, FLAG_BIT_Z);
+		}
+		if (fl & FLAG_N) {
+			AF.lo = setBit(AF.lo, FLAG_BIT_N);
+		}
+		if (fl & FLAG_H) {
+			AF.lo = setBit(AF.lo, FLAG_BIT_H);
+		}
+		if (fl & FLAG_C) {
+			AF.lo = setBit(AF.lo, FLAG_BIT_C);
+		}
 	}
 
-	void Cpu::clearFlag(u8 flagBit)
+	void Cpu::clearFlag(u8 flags)
 	{
-		AF.lo = resetBit(AF.lo, flagBit);
+		u8 fl = flags & 0xF0;
+		if (fl & FLAG_Z) {
+			AF.lo = resetBit(AF.lo, FLAG_BIT_Z);
+		}
+		if (fl & FLAG_N) {
+			AF.lo = resetBit(AF.lo, FLAG_BIT_N);
+		}
+		if (fl & FLAG_H) {
+			AF.lo = resetBit(AF.lo, FLAG_BIT_H);
+		}
+		if (fl & FLAG_C) {
+			AF.lo = resetBit(AF.lo, FLAG_BIT_C);
+		}
 	}
 
 
@@ -178,9 +239,9 @@ namespace gbEmu {
 	{
 		u8 result = BC.hi + 1;
 
-		setFlag(FLAG_BIT_Z, (result == 0));
-		clearFlag(FLAG_BIT_N);
-		setFlag(FLAG_BIT_H, (result > 0xF));
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag(FLAG_N);
+		setFlag(FLAG_H, ((BC.hi & 0xF) + 1) > 0xF);
 
 		BC.hi++;
 		return 0;
@@ -188,57 +249,126 @@ namespace gbEmu {
 
 	u8 Cpu::op0x05()
 	{
-		return u8();
+		s8 result = BC.hi - 1;
+
+		setFlag(FLAG_Z, (result == 0));
+		setFlag(FLAG_N);
+		setFlag(FLAG_H, ((BC.hi & 0xF) - 1) < 0);
+
+		BC.hi--;
+		return 0;
 	}
 
 	u8 Cpu::op0x06()
 	{
+		u8 data = fetchU8();
+		BC.hi = data;
 		return 0;
 	}
 
 	u8 Cpu::op0x07()
 	{
-		return u8();
+		u8 msb = ((AF.hi & 0x80) >> 7);
+		u8 result = (AF.hi << 1);
+
+		clearFlag(FLAG_Z);
+		clearFlag(FLAG_N);
+		clearFlag(FLAG_H);
+
+		//Carry will store old bit 7 data
+		if (msb)
+			setFlag(FLAG_C);
+		else
+			clearFlag(FLAG_C);
+
+		AF.hi <<= 1;
+		return 0;
 	}
 
 	u8 Cpu::op0x08()
 	{
-		return u8();
+		u16 addr = fetchU16();
+		
+		u8 lo = (SP & 0xFF);
+		u8 hi = ((SP >> 8) & 0xFF);
+
+		write(addr, lo);
+		write(addr + 1, hi);
+		return 0;
 	}
 
 	u8 Cpu::op0x09()
 	{
-		return u8();
+		u16 result = HL.value + BC.value;
+
+		clearFlag(FLAG_N);
+		setFlag(FLAG_H, (HL.value & 0xFFF) + (BC.value & 0xFFF) > 0xFFF); //set if overflow from bit 11
+		setFlag(FLAG_C, (HL.value & 0xFFFF) + (BC.value & 0xFFFF) > 0xFFFF); //set if overflow from bit 15
+
+		HL.value += BC.value;
+		return 0;
 	}
 
 	u8 Cpu::op0x0A()
 	{
-		return u8();
+		u8 data = read(BC.value);
+		AF.hi = data;
+		return 0;
 	}
 
 	u8 Cpu::op0x0B()
 	{
-		return u8();
+		BC.value--;
+		return 0;
 	}
 
 	u8 Cpu::op0x0C()
 	{
-		return u8();
+		u8 result = BC.lo + 1;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag(FLAG_N);
+		setFlag(FLAG_H, ((BC.lo & 0xF) + 1) > 0xF);
+
+		BC.lo++;
+		return 0;
 	}
 
 	u8 Cpu::op0x0D()
 	{
-		return u8();
+		s8 result = BC.lo - 1;
+
+		setFlag(FLAG_Z, (result == 0));
+		setFlag(FLAG_N);
+		setFlag(FLAG_H, ((BC.lo & 0xF) - 1) < 0);
+
+		BC.lo--;
+		return 0;
 	}
 
 	u8 Cpu::op0x0E()
 	{
-		return u8();
+		u8 data = fetchU8();
+		BC.lo = data;
+		return 0;
 	}
 
 	u8 Cpu::op0x0F()
 	{
-		return u8();
+		u8 lsb = (AF.hi & 0x1);
+		u8 result = (AF.hi >> 1) & 0xFF;
+
+		clearFlag(FLAG_Z);
+		clearFlag(FLAG_N);
+		clearFlag(FLAG_H);
+
+		if (lsb)
+			setFlag(FLAG_C);
+		else
+			clearFlag(FLAG_C);
+		
+		AF.hi >>= 1;
+		return 0;
 	}
 
 	u8 Cpu::op0x10()
