@@ -86,6 +86,17 @@ namespace gbEmu {
 
 
 
+		/*
+			Cpu helper functions
+		*/
+
+		//8 bit increment
+		u8 INC_N(u8& reg);
+		//8 bit decrement
+		u8 DEC_N(u8& reg);
+		//Add reg to HL
+		u8 ADD_HL_NN(u16& reg);
+
 
 
 		/*

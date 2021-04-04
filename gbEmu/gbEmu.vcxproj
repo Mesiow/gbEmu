@@ -142,7 +142,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\CpuTest.cpp" />
     <ClCompile Include="src\DebugUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\imgui\imgui-SFML.cpp" />
@@ -157,7 +156,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Cpu.h" />
-    <ClInclude Include="include\CpuTest.h" />
     <ClInclude Include="include\DebugUI.h" />
     <ClInclude Include="include\MMU.h" />
     <ClInclude Include="include\Utils.h" />

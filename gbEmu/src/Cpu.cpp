@@ -80,6 +80,17 @@ namespace gbEmu {
 		//BC.value = 0x0010;
 		//mmu->write(0x0, 0x0B);
 
+		//Test RRCA
+		//AF.hi = 0x19;
+		//mmu->write(0x0, 0x0F);
+
+		//Test RLA
+		//AF.hi = 0x25;
+		//mmu->write(0x0, 0x17);
+
+		//Test JR i8
+		mmu->write(0x0, 0x18);
+		mmu->write(0x1, 0x15);
 	}
 
 	void Cpu::clock()
@@ -208,6 +219,44 @@ namespace gbEmu {
 
 
 	/*
+		Cpu helper functions
+	*/
+	u8 Cpu::INC_N(u8& reg) {
+		u8 result = reg + 1;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag(FLAG_N);
+		setFlag(FLAG_H, ((reg & 0xF) + 1) > 0xF);
+
+		reg++;
+		return 0;
+	}
+
+	u8 Cpu::DEC_N(u8& reg) {
+		s8 result = reg - 1;
+
+		setFlag(FLAG_Z, (result == 0));
+		setFlag(FLAG_N);
+		setFlag(FLAG_H, ((reg & 0xF) - 1) < 0);
+
+		reg--;
+		return 0;
+	}
+
+	u8 Cpu::ADD_HL_NN(u16& reg)
+	{
+		u16 result = HL.value + reg;
+
+		clearFlag(FLAG_N);
+		setFlag(FLAG_H, (HL.value & 0xFFF) + (reg & 0xFFF) > 0xFFF); //set if overflow from bit 11
+		setFlag(FLAG_C, (HL.value & 0xFFFF) + (reg & 0xFFFF) > 0xFFFF); //set if overflow from bit 15
+
+		HL.value += reg;
+		return 0;
+	}
+
+
+	/*
 		Instruction Implementations
 	*/
 
@@ -225,7 +274,7 @@ namespace gbEmu {
 
 	u8 Cpu::op0x02()
 	{
-		mmu->write(BC.value, AF.hi);
+		write(BC.value, AF.hi);
 		return 0;
 	}
 
@@ -237,25 +286,13 @@ namespace gbEmu {
 
 	u8 Cpu::op0x04()
 	{
-		u8 result = BC.hi + 1;
-
-		setFlag(FLAG_Z, (result == 0));
-		clearFlag(FLAG_N);
-		setFlag(FLAG_H, ((BC.hi & 0xF) + 1) > 0xF);
-
-		BC.hi++;
+		INC_N(BC.hi);
 		return 0;
 	}
 
 	u8 Cpu::op0x05()
 	{
-		s8 result = BC.hi - 1;
-
-		setFlag(FLAG_Z, (result == 0));
-		setFlag(FLAG_N);
-		setFlag(FLAG_H, ((BC.hi & 0xF) - 1) < 0);
-
-		BC.hi--;
+		DEC_N(BC.hi);
 		return 0;
 	}
 
@@ -271,9 +308,7 @@ namespace gbEmu {
 		u8 msb = ((AF.hi & 0x80) >> 7);
 		u8 result = (AF.hi << 1);
 
-		clearFlag(FLAG_Z);
-		clearFlag(FLAG_N);
-		clearFlag(FLAG_H);
+		clearFlag((FLAG_Z | FLAG_N | FLAG_H));
 
 		//Carry will store old bit 7 data
 		if (msb)
@@ -299,13 +334,7 @@ namespace gbEmu {
 
 	u8 Cpu::op0x09()
 	{
-		u16 result = HL.value + BC.value;
-
-		clearFlag(FLAG_N);
-		setFlag(FLAG_H, (HL.value & 0xFFF) + (BC.value & 0xFFF) > 0xFFF); //set if overflow from bit 11
-		setFlag(FLAG_C, (HL.value & 0xFFFF) + (BC.value & 0xFFFF) > 0xFFFF); //set if overflow from bit 15
-
-		HL.value += BC.value;
+		ADD_HL_NN(BC.value);
 		return 0;
 	}
 
@@ -324,25 +353,13 @@ namespace gbEmu {
 
 	u8 Cpu::op0x0C()
 	{
-		u8 result = BC.lo + 1;
-
-		setFlag(FLAG_Z, (result == 0));
-		clearFlag(FLAG_N);
-		setFlag(FLAG_H, ((BC.lo & 0xF) + 1) > 0xF);
-
-		BC.lo++;
+		INC_N(BC.lo);
 		return 0;
 	}
 
 	u8 Cpu::op0x0D()
 	{
-		s8 result = BC.lo - 1;
-
-		setFlag(FLAG_Z, (result == 0));
-		setFlag(FLAG_N);
-		setFlag(FLAG_H, ((BC.lo & 0xF) - 1) < 0);
-
-		BC.lo--;
+		DEC_N(BC.lo);
 		return 0;
 	}
 
@@ -358,9 +375,7 @@ namespace gbEmu {
 		u8 lsb = (AF.hi & 0x1);
 		u8 result = (AF.hi >> 1) & 0xFF;
 
-		clearFlag(FLAG_Z);
-		clearFlag(FLAG_N);
-		clearFlag(FLAG_H);
+		clearFlag((FLAG_Z | FLAG_N | FLAG_H));
 
 		if (lsb)
 			setFlag(FLAG_C);
@@ -373,45 +388,73 @@ namespace gbEmu {
 
 	u8 Cpu::op0x10()
 	{
-		return u8();
+		PC++;
+		return 0;
 	}
 
 	u8 Cpu::op0x11()
 	{
-		return u8();
+		DE.value = fetchU16();
+		return 0;
 	}
 	u8 Cpu::op0x12()
 	{
-		return u8();
+		write(BC.value, AF.hi);
+		return 0;
 	}
 
 	u8 Cpu::op0x13()
 	{
-		return u8();
+		DE.value++;
+		return 0;
 	}
 
 	u8 Cpu::op0x14()
 	{
-		return u8();
+		INC_N(DE.hi);
+		return 0;
 	}
 
 	u8 Cpu::op0x15()
 	{
-		return u8();
+		DEC_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0x16()
 	{
-		return u8();
+		u8 data = fetchU8();
+		DE.hi = data;
+		return 0;
 	}
 
 	u8 Cpu::op0x17()
 	{
-		return u8();
+		u8 carry = ((AF.lo & FLAG_C) >> 4);
+		u8 msb = ((AF.hi & 0x80) >> 7);
+		u8 result = (AF.hi << 1);
+
+		clearFlag((FLAG_Z | FLAG_N | FLAG_H));
+
+		AF.hi <<= 1;
+
+		//Carry put into bit 0
+		(AF.hi |= carry);
+		//Msb put into carry
+		if (msb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+
+		return 0;
 	}
 
 	u8 Cpu::op0x18()
 	{
-		return u8();
+		s8 i8 = readU8();
+		PC = PC + i8;
+		return 0;
 	}
 
 	u8 Cpu::op0x19()
