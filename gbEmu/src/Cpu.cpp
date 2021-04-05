@@ -96,6 +96,16 @@ namespace gbEmu {
 		//AF.hi = 0x24;
 		//AF.lo = 0x10;
 		//mmu->write(0x0, 0x1F);
+
+		//Test JR NZ, i8
+		//AF.lo = 0x00;
+		//mmu->write(0x0, 0x20);
+		//mmu->write(0x1, 0x4);
+
+		//Test LD (HL+), A
+		//AF.hi = 0x6;
+		//mmu->write(0x0, 0x22);
+
 	}
 
 	void Cpu::clock()
@@ -457,7 +467,7 @@ namespace gbEmu {
 
 	u8 Cpu::op0x18()
 	{
-		s8 i8 = readU8();
+		s8 i8 = fetchU8();
 		PC = PC + i8;
 		return 0;
 	}
@@ -524,67 +534,97 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x20()
 	{
-		return u8();
+		s8 i8 = fetchU8();
+		//Jump if Zero is not set
+		if (getFlag(FLAG_Z) == 0) {
+			PC = PC + i8;
+			return 4;
+		}
+		return 0;
 	}
 	u8 Cpu::op0x21()
 	{
-		return u8();
+		HL.value = fetchU16();
+		return 0;
 	}
 	u8 Cpu::op0x22()
 	{
-		return u8();
+		write(HL.value++, AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0x23()
 	{
-		return u8();
+		HL.value++;
+		return 0;
 	}
 	u8 Cpu::op0x24()
 	{
-		return u8();
+		INC_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0x25()
 	{
-		return u8();
+		DEC_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0x26()
 	{
-		return u8();
+		u8 data = fetchU8();
+		HL.hi = data;
+		return 0;
 	}
 	u8 Cpu::op0x27()
 	{
-		return u8();
+		return 0;
 	}
 	u8 Cpu::op0x28()
 	{
-		return u8();
+		s8 i8 = fetchU8();
+		//Jump if Zero is set
+		if (getFlag(FLAG_Z)) {
+			PC = PC + i8;
+			return 4;
+		}
+
+		return 0;
 	}
 	u8 Cpu::op0x29()
 	{
-		return u8();
+		ADD_HL_NN(HL.value);
+		return 0;
 	}
 	u8 Cpu::op0x2A()
 	{
-		return u8();
+		u8 data = read(HL.value++);
+		AF.hi = data;
+		return 0;
 	}
 	u8 Cpu::op0x2B()
 	{
-		return u8();
+		HL.value--;
+		return 0;
 	}
 	u8 Cpu::op0x2C()
 	{
-		return u8();
+		INC_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0x2D()
 	{
-		return u8();
+		DEC_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0x2E()
 	{
-		return u8();
+		u8 data = fetchU8();
+		HL.lo = data;
+		return 0;
 	}
 	u8 Cpu::op0x2F()
 	{
-		return u8();
+		AF.hi = ~AF.hi;
+		setFlag((FLAG_N | FLAG_H));
+		return 0;
 	}
 	u8 Cpu::op0x30()
 	{
