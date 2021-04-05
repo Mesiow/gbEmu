@@ -89,8 +89,13 @@ namespace gbEmu {
 		//mmu->write(0x0, 0x17);
 
 		//Test JR i8
-		mmu->write(0x0, 0x18);
-		mmu->write(0x1, 0x15);
+		//mmu->write(0x0, 0x18);
+		//mmu->write(0x1, 0x15);
+
+		//Test RRA
+		//AF.hi = 0x24;
+		//AF.lo = 0x10;
+		//mmu->write(0x0, 0x1F);
 	}
 
 	void Cpu::clock()
@@ -459,37 +464,63 @@ namespace gbEmu {
 
 	u8 Cpu::op0x19()
 	{
-		return u8();
+		ADD_HL_NN(DE.value);
+		return 0;
 	}
 
 	u8 Cpu::op0x1A()
 	{
-		return u8();
+		u8 data = read(DE.value);
+		AF.hi = data;
+		return 0;
 	}
 
 	u8 Cpu::op0x1B()
 	{
-		return u8();
+		DE.value--;
+		return 0;
 	}
 
 	u8 Cpu::op0x1C()
 	{
-		return u8();
+		INC_N(DE.lo);
+		return 0;
 	}
 
 	u8 Cpu::op0x1D()
 	{
-		return u8();
+		DEC_N(DE.lo);
+		return 0;
 	}
 
 	u8 Cpu::op0x1E()
 	{
-		return u8();
+		u8 data = fetchU8();
+		DE.lo = data;
+		return 0;
 	}
 
 	u8 Cpu::op0x1F()
 	{
-		return u8();
+		u8 carry = ((AF.lo & FLAG_C));
+		u8 lsb = (AF.hi & 0x1);
+		u8 result = (AF.hi >> 1);
+
+		clearFlag((FLAG_Z | FLAG_N | FLAG_H));
+
+		AF.hi >>= 1;
+
+		//Carry put into bit 0
+		(AF.hi |= (carry << 3));
+
+		//Msb put into carry
+		if (lsb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+		return 0;
 	}
 	u8 Cpu::op0x20()
 	{
