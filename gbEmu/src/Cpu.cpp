@@ -787,259 +787,323 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x40()
 	{
+		BC.hi = BC.hi;
 		return 0;
 	}
 	u8 Cpu::op0x41()
 	{
-		return u8();
+		BC.hi = BC.lo;
+		return 0;
 	}
 	u8 Cpu::op0x42()
 	{
-		return u8();
+		BC.hi = DE.hi;
+		return 0;
 	}
 	u8 Cpu::op0x43()
 	{
-		return u8();
+		BC.hi = DE.lo;
+		return 0;
 	}
 	u8 Cpu::op0x44()
 	{
-		return u8();
+		BC.hi = HL.hi;
+		return 0;
 	}
 	u8 Cpu::op0x45()
 	{
-		return u8();
+		BC.hi = HL.lo;
+		return 0;
 	}
 	u8 Cpu::op0x46()
 	{
-		return u8();
+		BC.hi = read(HL.value);
+		return 0;
 	}
 	u8 Cpu::op0x47()
 	{
-		return u8();
+		BC.hi = AF.hi;
+		return 0;
 	}
 	u8 Cpu::op0x48()
 	{
-		return u8();
+		BC.lo = BC.hi;
+		return 0;
 	}
 	u8 Cpu::op0x49()
 	{
-		return u8();
+		BC.lo = BC.lo;
+		return 0;
 	}
 	u8 Cpu::op0x4A()
 	{
-		return u8();
+		BC.lo = DE.hi;
+		return 0;
 	}
 	u8 Cpu::op0x4B()
 	{
-		return u8();
+		BC.lo = DE.lo;
+		return 0;
 	}
 	u8 Cpu::op0x4C()
 	{
-		return u8();
+		BC.lo = HL.hi;
+		return 0;
 	}
 	u8 Cpu::op0x4D()
 	{
-		return u8();
+		BC.lo = HL.lo;
+		return 0;
 	}
 	u8 Cpu::op0x4E()
 	{
-		return u8();
+		BC.lo = read(HL.value);
+		return 0;
 	}
 	u8 Cpu::op0x4F()
 	{
-		return u8();
+		BC.lo = AF.hi;
+		return 0;
 	}
 	u8 Cpu::op0x50()
 	{
-		return u8();
+		DE.hi = BC.hi;
+		return 0;
 	}
 	u8 Cpu::op0x51()
 	{
-		return u8();
+		DE.hi = BC.lo;
+		return 0;
 	}
 	u8 Cpu::op0x52()
 	{
-		return u8();
+		DE.hi = DE.hi;
+		return 0;
 	}
 	u8 Cpu::op0x53()
 	{
-		return u8();
+		DE.hi = DE.lo;
+		return 0;
 	}
 	u8 Cpu::op0x54()
 	{
-		return u8();
+		DE.hi = HL.hi;
+		return 0;
 	}
 	u8 Cpu::op0x55()
 	{
-		return u8();
+		DE.hi = HL.lo;
+		return 0;
 	}
 	u8 Cpu::op0x56()
 	{
-		return u8();
+		DE.hi = read(HL.value);
+		return 0;
 	}
 	u8 Cpu::op0x57()
 	{
-		return u8();
+		DE.hi = AF.hi;
+		return 0;
 	}
 	u8 Cpu::op0x58()
 	{
-		return u8();
+		DE.lo = BC.hi;
+		return 0;
 	}
 	u8 Cpu::op0x59()
 	{
-		return u8();
+		DE.lo = BC.lo;
+		return 0;
 	}
 	u8 Cpu::op0x5A()
 	{
-		return u8();
+		DE.lo = DE.hi;
+		return 0;
 	}
 	u8 Cpu::op0x5B()
 	{
-		return u8();
+		DE.lo = DE.lo;
+		return 0;
 	}
 	u8 Cpu::op0x5C()
 	{
-		return u8();
+		DE.lo = HL.hi;
+		return 0;
 	}
 	u8 Cpu::op0x5D()
 	{
-		return u8();
+		DE.lo = HL.lo;
+		return 0;
 	}
 	u8 Cpu::op0x5E()
 	{
-		return u8();
+		DE.lo = read(HL.value);
+		return 0;
 	}
 	u8 Cpu::op0x5F()
 	{
-		return u8();
+		DE.lo = AF.hi;
+		return 0;
 	}
 	u8 Cpu::op0x60()
 	{
-		return u8();
+		HL.hi = BC.hi;
+		return 0;
 	}
 	u8 Cpu::op0x61()
 	{
-		return u8();
+		HL.hi = BC.lo;
+		return 0;
 	}
 	u8 Cpu::op0x62()
 	{
-		return u8();
+		HL.hi = DE.hi;
+		return 0;
 	}
 	u8 Cpu::op0x63()
 	{
-		return u8();
+		HL.hi = DE.lo;
+		return 0;
 	}
 	u8 Cpu::op0x64()
 	{
-		return u8();
+		HL.hi = HL.hi;
+		return 0;
 	}
 	u8 Cpu::op0x65()
 	{
-		return u8();
+		HL.hi = HL.lo;
+		return 0;
 	}
 	u8 Cpu::op0x66()
 	{
-		return u8();
+		HL.hi = read(HL.value);
+		return 0;
 	}
 	u8 Cpu::op0x67()
 	{
-		return u8();
+		HL.hi = AF.hi;
+		return 0;
 	}
 	u8 Cpu::op0x68()
 	{
-		return u8();
+		HL.lo = BC.hi;
+		return 0;
 	}
 	u8 Cpu::op0x69()
 	{
-		return u8();
+		HL.lo = BC.lo;
+		return 0;
 	}
 	u8 Cpu::op0x6A()
 	{
-		return u8();
+		HL.lo = DE.hi;
+		return 0;
 	}
 	u8 Cpu::op0x6B()
 	{
-		return u8();
+		HL.lo = DE.lo;
+		return 0;
 	}
 	u8 Cpu::op0x6C()
 	{
-		return u8();
+		HL.lo = HL.hi;
+		return 0;
 	}
 	u8 Cpu::op0x6D()
 	{
-		return u8();
+		HL.lo = HL.lo;
+		return 0;
 	}
 	u8 Cpu::op0x6E()
 	{
-		return u8();
+		HL.lo = read(HL.value);
+		return 0;
 	}
 	u8 Cpu::op0x6F()
 	{
-		return u8();
+		HL.lo = AF.hi;
+		return 0;
 	}
 	u8 Cpu::op0x70()
 	{
-		return u8();
+		write(HL.value, BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0x71()
 	{
-		return u8();
+		write(HL.value, BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0x72()
 	{
-		return u8();
+		write(HL.value, DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0x73()
 	{
-		return u8();
+		write(HL.value, DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0x74()
 	{
-		return u8();
+		write(HL.value, HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0x75()
 	{
-		return u8();
+		write(HL.value, HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0x76()
 	{
-		return u8();
+		//Halt
+		return 0;
 	}
 	u8 Cpu::op0x77()
 	{
-		return u8();
+		write(HL.value, AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0x78()
 	{
-		return u8();
+		AF.hi = BC.hi;
+		return 0;
 	}
 	u8 Cpu::op0x79()
 	{
-		return u8();
+		AF.hi = BC.lo;
+		return 0;
 	}
 	u8 Cpu::op0x7A()
 	{
-		return u8();
+		AF.hi = DE.hi;
+		return 0;
 	}
 	u8 Cpu::op0x7B()
 	{
-		return u8();
+		AF.hi = DE.lo;
+		return 0;
 	}
 	u8 Cpu::op0x7C()
 	{
-		return u8();
+		AF.hi = HL.hi;
+		return 0;
 	}
 	u8 Cpu::op0x7D()
 	{
-		return u8();
+		AF.hi = HL.lo;
+		return 0;
 	}
 	u8 Cpu::op0x7E()
 	{
-		return u8();
+		AF.hi = read(HL.value);
+		return 0;
 	}
 	u8 Cpu::op0x7F()
 	{
-		return u8();
+		AF.hi = AF.hi;
+		return 0;
 	}
 	u8 Cpu::op0x80()
 	{
