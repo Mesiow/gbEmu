@@ -95,7 +95,15 @@ namespace gbEmu {
 		//8 bit decrement
 		u8 DEC_N(u8& reg);
 		//Add reg to HL
-		u8 ADD_HL_NN(u16& reg);
+		u8 ADD_HL_NN(u16 reg);
+		//Add reg/val to Accumulator
+		u8 ADD_A_N(u8 reg);
+		//Add reg/val to accumulator plus the carry flag
+		u8 ADC_A_N(u8 reg);
+		//Sub reg/val from accumulator
+		u8 SUB_A_N(u8 reg);
+		//Sub reg/val plus carry from accumulator
+		u8 SBC_A_N(u8 reg);
 
 
 

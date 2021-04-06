@@ -124,38 +124,40 @@ namespace gbEmu {
 		//mmu->write(0x0, 0x37);
 
 		//Test CCF
-		AF.lo = 0x00;
-		mmu->write(0x0, 0x3F);
+		//AF.lo = 0x00;
+		//mmu->write(0x0, 0x3F);
+
+		//Test ADD_A_N
+		//AF.hi = 0x2;
+		//BC.hi = 0xFE;
+		//mmu->write(0x0, 0x80);
+
+		//Test ADC_A_N
+		//AF.hi = 0xFE;
+		//AF.lo = 0x10;
+		//BC.hi = 0x2;
+		//mmu->write(0x0, 0x88);
+
+		//Test SUB_A_N
+		AF.hi = 0x10;
+		BC.hi = 0x5;
+		mmu->write(0x0, 0x90);
 	}
 
 	void Cpu::clock()
 	{
 		if (cycles == 0) {
-	
 			//Read opcode
 			u8 opcode = read(PC);
 			PC++;
 
-			//Handle 0xCB table of opcodes
-			if (opcode == 0xCB) {
+			//Get instruction associated with that opcode
+			Instruction ins = table[opcode];
 
-				u8 cb_table_opcode = read(PC);
-				Instruction ins = cbTable[cb_table_opcode];
-
-				cycles = ins.cycles;
-				cycles += ins.execute();
-			}
-			else {
-				//Handle Regular table of opcodes
-
-				//Get instruction associated with that opcode
-				Instruction ins = table[opcode];
-
-				//Base number of cycles required
-				cycles = ins.cycles;
-				//May require more cycles based on certain conditions
-				cycles += ins.execute();
-			}
+			//Base number of cycles required
+			cycles = ins.cycles;
+			//May require more cycles based on certain conditions
+			cycles += ins.execute();
 		}
 		cycles--;
 	}
@@ -175,7 +177,6 @@ namespace gbEmu {
 		this->mmu = mmu;
 	}
 
-	
 	u16 Cpu::fetchU16()
 	{
 		u8 lo = read(PC++);
@@ -268,7 +269,7 @@ namespace gbEmu {
 	}
 
 	u8 Cpu::DEC_N(u8& reg) {
-		s8 result = reg - 1;
+		u8 result = reg - 1;
 
 		setFlag(FLAG_Z, (result == 0));
 		setFlag(FLAG_N);
@@ -278,15 +279,69 @@ namespace gbEmu {
 		return 0;
 	}
 
-	u8 Cpu::ADD_HL_NN(u16& reg)
+	u8 Cpu::ADD_HL_NN(u16 reg)
 	{
 		u16 result = HL.value + reg;
 
 		clearFlag(FLAG_N);
 		setFlag(FLAG_H, (HL.value & 0xFFF) + (reg & 0xFFF) > 0xFFF); //set if overflow from bit 11
 		setFlag(FLAG_C, (HL.value & 0xFFFF) + (reg & 0xFFFF) > 0xFFFF); //set if overflow from bit 15
-
+	
 		HL.value += reg;
+		return 0;
+	}
+
+	u8 Cpu::ADD_A_N(u8 reg)
+	{
+		u8 result = AF.hi + reg;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag(FLAG_N);
+		setFlag(FLAG_H, (AF.hi & 0xF) + (reg & 0xF) > 0xF);
+		setFlag(FLAG_C, (AF.hi & 0xFF) + (reg & 0xFF) > 0xFF);
+		
+		AF.hi += reg;
+		return 0;
+	}
+
+	u8 Cpu::ADC_A_N(u8 reg)
+	{
+		u8 carry = getFlag(FLAG_C);
+		u8 result = AF.hi + reg + carry;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag(FLAG_N);
+		setFlag(FLAG_H, (AF.hi & 0xF) + (reg & 0xF) + (carry) > 0xF);
+		setFlag(FLAG_C, (AF.hi & 0xFF) + (reg & 0xFF) + (carry) > 0xFF);
+
+		AF.hi = result;
+		return 0;
+	}
+
+	u8 Cpu::SUB_A_N(u8 reg)
+	{
+		u8 result = AF.hi - reg;
+
+		setFlag(FLAG_Z, (result == 0));
+		setFlag(FLAG_N);
+		setFlag(FLAG_H, ((AF.hi & 0xF) - (reg & 0xF)) < 0);
+		setFlag(FLAG_C, (reg > AF.hi));
+
+		AF.hi -= reg;
+		return 0;
+	}
+
+	u8 Cpu::SBC_A_N(u8 reg)
+	{
+		u8 carry = getFlag(FLAG_C);
+		u8 result = AF.hi - (reg + carry);
+
+		setFlag(FLAG_Z, (result == 0));
+		setFlag(FLAG_N);
+		setFlag(FLAG_H, ((AF.hi & 0xF) - (reg & 0xF) - carry) < 0);
+		setFlag(FLAG_C, ((reg + carry) > AF.hi));
+
+		AF.hi = AF.hi - (reg + carry);
 		return 0;
 	}
 
@@ -1107,131 +1162,163 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x80()
 	{
-		return u8();
+		ADD_A_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0x81()
 	{
-		return u8();
+		ADD_A_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0x82()
 	{
-		return u8();
+		ADD_A_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0x83()
 	{
-		return u8();
+		ADD_A_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0x84()
 	{
-		return u8();
+		ADD_A_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0x85()
 	{
-		return u8();
+		ADD_A_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0x86()
 	{
-		return u8();
+		ADD_A_N(read(HL.value));
+		return 0;
 	}
 	u8 Cpu::op0x87()
 	{
-		return u8();
+		ADD_A_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0x88()
 	{
-		return u8();
+		ADC_A_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0x89()
 	{
-		return u8();
+		ADC_A_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0x8A()
 	{
-		return u8();
+		ADC_A_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0x8B()
 	{
-		return u8();
+		ADC_A_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0x8C()
 	{
-		return u8();
+		ADC_A_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0x8D()
 	{
-		return u8();
+		ADC_A_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0x8E()
 	{
-		return u8();
+		ADC_A_N(read(HL.value));
+		return 0;
 	}
 	u8 Cpu::op0x8F()
 	{
-		return u8();
+		ADC_A_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0x90()
 	{
-		return u8();
+		SUB_A_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0x91()
 	{
-		return u8();
+		SUB_A_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0x92()
 	{
-		return u8();
+		SUB_A_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0x93()
 	{
-		return u8();
+		SUB_A_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0x94()
 	{
-		return u8();
+		SUB_A_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0x95()
 	{
-		return u8();
+		SUB_A_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0x96()
 	{
-		return u8();
+		SUB_A_N(read(HL.value));
+		return 0;
 	}
 	u8 Cpu::op0x97()
 	{
-		return u8();
+		SUB_A_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0x98()
 	{
-		return u8();
+		SBC_A_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0x99()
 	{
-		return u8();
+		SBC_A_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0x9A()
 	{
-		return u8();
+		SBC_A_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0x9B()
 	{
-		return u8();
+		SBC_A_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0x9C()
 	{
-		return u8();
+		SBC_A_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0x9D()
 	{
-		return u8();
+		SBC_A_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0x9E()
 	{
-		return u8();
+		SBC_A_N(read(HL.value));
+		return 0;
 	}
 	u8 Cpu::op0x9F()
 	{
-		return u8();
+		SBC_A_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0xA0()
 	{
@@ -1407,7 +1494,14 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCB()
 	{
-		return u8();
+		//Execute CB table instruction
+		u8 cb_table_opcode = read(PC);
+		Instruction ins = cbTable[cb_table_opcode];
+
+		cycles += ins.cycles;
+		cycles += ins.execute();
+
+		return 0;
 	}
 	u8 Cpu::op0xCC()
 	{
