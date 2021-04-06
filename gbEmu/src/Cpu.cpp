@@ -106,6 +106,26 @@ namespace gbEmu {
 		//AF.hi = 0x6;
 		//mmu->write(0x0, 0x22);
 
+		//Test INC, (HL)
+		//HL.value = 0x05;
+		//mmu->write(0x0, 0x34);
+		//mmu->write(0x05, 0x40);
+
+		//Test LD (HL), u8
+		//HL.value = 0x05;
+		//mmu->write(0x0, 0x36);
+		//mmu->write(0x1, 0x21);
+
+		//Test CPL
+		//AF.hi = 0x4;
+		//mmu->write(0x0, 0x2F);
+
+		//Test SCF
+		//mmu->write(0x0, 0x37);
+
+		//Test CCF
+		AF.lo = 0x00;
+		mmu->write(0x0, 0x3F);
 	}
 
 	void Cpu::clock()
@@ -575,6 +595,49 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x27()
 	{
+		/*
+				
+			The DA instruction adjusts the 8-bit value in the accumulator 
+			to correspond to binary-coded decimal (BCD) format. 
+			This instruction begins by testing the low-order nibble of the 
+			accumulator. If the AC flag is set or if the low 4 bits of the 
+			accumulator exceed a value of 9, the accumulator is incremented 
+			by 6. The high-order nibble is then tested. 
+			If the carry flag is set or if the high 4 bits of the accumulator 
+			exceed a value of 9, the value 60h is added to the accumulator. 
+			This instruction performs a decimal conversion by adding 00h, 
+			06h, or 66h to the accumulator depending on the initial contents 
+			of the PSW and accumulator.
+		
+		*/
+		u8 a = AF.hi;
+
+		if (!getFlag(FLAG_N)) {
+			if ((getFlag(FLAG_H)) || (a & 0x0F) > 9)
+				a += 6;
+
+			if ((getFlag(FLAG_C)) || a > 0x9F)
+				a += 0x60;
+		}
+		else {
+			if (getFlag(FLAG_H)) {
+				a -= 6;
+				if (!(getFlag(FLAG_C)))
+					a &= 0xFF;
+			}
+			if (getFlag(FLAG_C))
+				a -= 0x60;
+		}
+		clearFlag((FLAG_H | FLAG_Z));
+		if (a & 0x100)
+			setFlag(FLAG_C);
+
+		AF.hi = a & 0xFF;
+
+		if (!AF.hi)
+			setFlag(FLAG_Z);
+
+
 		return 0;
 	}
 	u8 Cpu::op0x28()
@@ -628,71 +691,103 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x30()
 	{
-		return u8();
+		s8 i8 = fetchU8();
+		//Jump if Carry is not set
+		if (getFlag(FLAG_C) == 0) {
+			PC = PC + i8;
+			return 4;
+		}
+		return 0;
 	}
 	u8 Cpu::op0x31()
 	{
-		return u8();
+		SP = fetchU16();
+		return 0;
 	}
 	u8 Cpu::op0x32()
 	{
-		return u8();
+		write(HL.value--, AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0x33()
 	{
-		return u8();
+		SP++;
+		return 0;
 	}
 	u8 Cpu::op0x34()
 	{
-		return u8();
+		u8 data = read(HL.value);
+		write(HL.value, ++data);
+		return 0;
 	}
 	u8 Cpu::op0x35()
 	{
-		return u8();
+		u8 data = read(HL.value);
+		write(HL.value, --data);
+		return 0;
 	}
 	u8 Cpu::op0x36()
 	{
-		return u8();
+		u8 data = fetchU8();
+		write(HL.value, data);
+		return 0;
 	}
 	u8 Cpu::op0x37()
 	{
-		return u8();
+		clearFlag((FLAG_N | FLAG_H));
+		setFlag(FLAG_C);
+		return 0;
 	}
 	u8 Cpu::op0x38()
 	{
-		return u8();
+		s8 i8 = fetchU8();
+		if (getFlag(FLAG_C)) {
+			PC = PC + i8;
+			return 4;
+		}
+		return 0;
 	}
 	u8 Cpu::op0x39()
 	{
-		return u8();
+		ADD_HL_NN(SP);
+		return 0;
 	}
 	u8 Cpu::op0x3A()
 	{
-		return u8();
+		u8 data = read(HL.value--);
+		AF.hi = data;
+		return 0;
 	}
 	u8 Cpu::op0x3B()
 	{
-		return u8();
+		SP--;
+		return 0;
 	}
 	u8 Cpu::op0x3C()
 	{
-		return u8();
+		INC_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0x3D()
 	{
-		return u8();
+		DEC_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0x3E()
 	{
-		return u8();
+		u8 data = fetchU8();
+		AF.hi = data;
+		return 0;
 	}
 	u8 Cpu::op0x3F()
 	{
-		return u8();
+		clearFlag((FLAG_N | FLAG_H));
+		setFlag(FLAG_C, (getFlag(FLAG_C) ^ 1));
+		return 0;
 	}
 	u8 Cpu::op0x40()
 	{
-		return u8();
+		return 0;
 	}
 	u8 Cpu::op0x41()
 	{

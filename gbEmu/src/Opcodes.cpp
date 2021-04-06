@@ -40,7 +40,7 @@ namespace gbEmu {
 		/* Fourth row */
 		table[0x30] = { "JR", bind(&Cpu::op0x30), 8 };  table[0x31] = { "LD", bind(&Cpu::op0x31), 12 };
 		table[0x32] = { "LD", bind(&Cpu::op0x32), 8 };  table[0x33] = { "INC", bind(&Cpu::op0x33), 8 };
-		table[0x34] = { "INC", bind(&Cpu::op0x34), 4 }; table[0x35] = { "DEC", bind(&Cpu::op0x35), 4 };
+		table[0x34] = { "INC", bind(&Cpu::op0x34), 12 }; table[0x35] = { "DEC", bind(&Cpu::op0x35), 12 };
 		table[0x36] = { "LD", bind(&Cpu::op0x36), 12 };  table[0x37] = { "SCF", bind(&Cpu::op0x37), 4 };
 		table[0x38] = { "JR", bind(&Cpu::op0x38), 8 };  table[0x39] = { "ADD", bind(&Cpu::op0x39), 8 };
 		table[0x3A] = { "LD", bind(&Cpu::op0x3A), 8 };  table[0x3B] = { "DEC", bind(&Cpu::op0x3B), 8 };
