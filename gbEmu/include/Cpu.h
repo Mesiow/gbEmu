@@ -104,6 +104,11 @@ namespace gbEmu {
 		u8 SUB_A_N(u8 reg);
 		//Sub reg/val plus carry from accumulator
 		u8 SBC_A_N(u8 reg);
+		//Bit AND between A and reg/val
+		u8 AND_A_N(u8 reg);
+		//Bit XOR between A and reg/val
+		u8 XOR_A_N(u8 reg);
+
 
 
 

@@ -139,9 +139,9 @@ namespace gbEmu {
 		//mmu->write(0x0, 0x88);
 
 		//Test SUB_A_N
-		AF.hi = 0x10;
-		BC.hi = 0x5;
-		mmu->write(0x0, 0x90);
+		//AF.hi = 0x10;
+		//BC.hi = 0x5;
+		//mmu->write(0x0, 0x90);
 	}
 
 	void Cpu::clock()
@@ -342,6 +342,52 @@ namespace gbEmu {
 		setFlag(FLAG_C, ((reg + carry) > AF.hi));
 
 		AF.hi = AF.hi - (reg + carry);
+		return 0;
+	}
+
+	u8 Cpu::AND_A_N(u8 reg)
+	{
+		u8 result = AF.hi & reg;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag(FLAG_N);
+		setFlag(FLAG_H);
+		clearFlag(FLAG_C);
+
+		AF.hi &= reg;
+		return 0;
+	}
+
+	u8 Cpu::XOR_A_N(u8 reg)
+	{
+		u8 result = AF.hi ^ reg;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H | FLAG_C));
+
+		AF.hi ^= reg;
+		return 0;
+	}
+
+	u8 Cpu::OR_A_N(u8 reg)
+	{
+		u8 result = AF.hi | reg;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H | FLAG_C));
+
+		AF.hi |= reg;
+		return 0;
+	}
+
+	u8 Cpu::CP_A_N(u8 reg)
+	{
+		u8 result = AF.hi - reg;
+
+		setFlag(FLAG_Z, (result == 0));
+		setFlag(FLAG_N);
+		setFlag(FLAG_H, ((AF.hi & 0xF) - (reg & 0xF)) < 0);
+		setFlag(FLAG_C, (reg > AF.hi));
 		return 0;
 	}
 
@@ -1322,131 +1368,163 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xA0()
 	{
-		return u8();
+		AND_A_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0xA1()
 	{
-		return u8();
+		AND_A_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0xA2()
 	{
-		return u8();
+		AND_A_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0xA3()
 	{
-		return u8();
+		AND_A_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0xA4()
 	{
-		return u8();
+		AND_A_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0xA5()
 	{
-		return u8();
+		AND_A_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0xA6()
 	{
-		return u8();
+		AND_A_N(read(HL.value));
+		return 0;
 	}
 	u8 Cpu::op0xA7()
 	{
-		return u8();
+		AND_A_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0xA8()
 	{
-		return u8();
+		XOR_A_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0xA9()
 	{
-		return u8();
+		XOR_A_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0xAA()
 	{
-		return u8();
+		XOR_A_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0xAB()
 	{
-		return u8();
+		XOR_A_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0xAC()
 	{
-		return u8();
+		XOR_A_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0xAD()
 	{
-		return u8();
+		XOR_A_N(HL.lo);
+		return 0;;
 	}
 	u8 Cpu::op0xAE()
 	{
-		return u8();
+		XOR_A_N(read(HL.value));
+		return 0;
 	}
 	u8 Cpu::op0xAF()
 	{
-		return u8();
+		XOR_A_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0xB0()
 	{
-		return u8();
+		OR_A_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0xB1()
 	{
-		return u8();
+		OR_A_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0xB2()
 	{
-		return u8();
+		OR_A_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0xB3()
 	{
-		return u8();
+		OR_A_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0xB4()
 	{
-		return u8();
+		OR_A_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0xB5()
 	{
-		return u8();
+		OR_A_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0xB6()
 	{
-		return u8();
+		OR_A_N(read(HL.value));
+		return 0;
 	}
 	u8 Cpu::op0xB7()
 	{
-		return u8();
+		OR_A_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0xB8()
 	{
-		return u8();
+		CP_A_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::op0xB9()
 	{
-		return u8();
+		CP_A_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::op0xBA()
 	{
-		return u8();
+		CP_A_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::op0xBB()
 	{
-		return u8();
+		CP_A_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::op0xBC()
 	{
-		return u8();
+		CP_A_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::op0xBD()
 	{
-		return u8();
+		CP_A_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::op0xBE()
 	{
-		return u8();
+		CP_A_N(read(HL.value));
+		return 0;
 	}
 	u8 Cpu::op0xBF()
 	{
-		return u8();
+		CP_A_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0xC0()
 	{
