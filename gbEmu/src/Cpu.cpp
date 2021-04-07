@@ -142,6 +142,20 @@ namespace gbEmu {
 		//AF.hi = 0x10;
 		//BC.hi = 0x5;
 		//mmu->write(0x0, 0x90);
+
+        //Test PUSH_NN
+		//DE.value = 0x1425;
+		//mmu->write(0x0, 0xC5);
+
+		//Test POP_NN
+		//mmu->write(0x0, 0xC1);
+		
+		//Test CALL 
+		//mmu->write(0x0, 0xCD);
+		//mmu->write(0x1, 0x40);
+		//mmu->write(0x2, 0x1);
+		//Test RET
+		//mmu->write(0x140, 0xC9);		
 	}
 
 	void Cpu::clock()
@@ -388,6 +402,82 @@ namespace gbEmu {
 		setFlag(FLAG_N);
 		setFlag(FLAG_H, ((AF.hi & 0xF) - (reg & 0xF)) < 0);
 		setFlag(FLAG_C, (reg > AF.hi));
+		return 0;
+	}
+
+	void Cpu::PUSH_NN(Register reg)
+	{
+		SP--;
+		write(SP, reg.hi);
+		SP--;
+		write(SP, reg.lo);
+	}
+
+	void Cpu::POP_NN(Register& reg)
+	{
+		reg.lo = read(SP);
+		SP++;
+		reg.hi = read(SP);
+		SP++;
+	}
+
+	void Cpu::JP()
+	{
+		u16 addr = fetchU16();
+		PC = addr;
+	}
+
+	u8 Cpu::JP_COND(bool condition)
+	{
+		u16 addr = fetchU16();
+		if (condition) {
+			PC = addr;
+			return 4;
+		}
+		return 0;
+	}
+
+	void Cpu::CALL()
+	{
+		u16 addr = fetchU16();
+
+		u8 lo = (PC & 0xFF);
+		u8 hi = (PC & 0xFF00) >> 8;
+
+		SP--;
+		write(SP, hi);
+		SP--;
+		write(SP, lo);
+
+		PC = addr;
+	}
+
+	u8 Cpu::CALL_COND(bool condition)
+	{
+		u16 addr = fetchU16();
+		if (condition) {
+			CALL();
+			return 8;
+		}
+		return 0;
+	}
+
+	void Cpu::RET()
+	{
+		u8 lo;
+		u8 hi;
+
+		lo = read(SP);
+		SP++;
+	    hi = read(SP);
+		SP++;
+
+		u16 returnAddr = ((hi << 8) | lo);
+		PC = returnAddr;
+	}
+
+	u8 Cpu::RET_COND(bool condition)
+	{
 		return 0;
 	}
 
@@ -1528,15 +1618,18 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC0()
 	{
-		return u8();
+
+		return 0;
 	}
 	u8 Cpu::op0xC1()
 	{
-		return u8();
+		POP_NN(BC);
+		return 0;
 	}
 	u8 Cpu::op0xC2()
 	{
-		return u8();
+		u8 extra_cycles = JP_COND((getFlag(FLAG_Z) == 0));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xC3()
 	{
@@ -1548,11 +1641,13 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC5()
 	{
-		return u8();
+		PUSH_NN(BC);
+		return 0;
 	}
 	u8 Cpu::op0xC6()
 	{
-		return u8();
+		ADD_A_N(fetchU8());
+		return 0;
 	}
 	u8 Cpu::op0xC7()
 	{
@@ -1564,7 +1659,8 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC9()
 	{
-		return u8();
+		RET();
+		return 0;
 	}
 	u8 Cpu::op0xCA()
 	{
@@ -1587,11 +1683,13 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCD()
 	{
-		return u8();
+		CALL();
+		return 0;
 	}
 	u8 Cpu::op0xCE()
 	{
-		return u8();
+		ADC_A_N(fetchU8());
+		return 0;
 	}
 	u8 Cpu::op0xCF()
 	{

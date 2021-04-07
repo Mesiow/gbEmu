@@ -105,8 +105,9 @@ namespace gbEmu {
     void DebugUI::handleButtonPresses()
     {
         if (stepPressed) {
-            //Clock the cpu once
-            cpu->clock();
+              cpu->clock();
+              while (cpu->cycles > 0)
+                  cpu->clock();
         }
         if (runPressed) {
             printf("Running cpu emulation\n");

@@ -108,6 +108,41 @@ namespace gbEmu {
 		u8 AND_A_N(u8 reg);
 		//Bit XOR between A and reg/val
 		u8 XOR_A_N(u8 reg);
+		//Bit OR between A and reg/val
+		u8 OR_A_N(u8 reg);
+		//Subtract reg/val from A and set flags accordingly
+		//but dont store the result
+		u8 CP_A_N(u8 reg);
+
+		/*
+			Stack operations
+		*/
+
+		//Push 16 bit register into the stack
+		void PUSH_NN(Register reg);
+		//Pop 16 bit register from the stack
+		void POP_NN(Register& reg);
+
+		/*
+			Jumps and Subroutines
+		*/
+
+		//Jump PC to immediate 16 bit address
+		void JP();
+		//Jump PC to immediate 16 bit address if condition passes
+		//Returns extra cycles or zero if none
+		u8 JP_COND(bool condition);
+
+		//Call 16 bit immediate address. This pushes the address of the instruction
+		//after the CALL on the stack, so that RET can pop it later
+		void CALL();
+		//Call with a condition
+		u8 CALL_COND(bool condition);
+
+		//Return from a subroutine. This is basically a POP PC
+		void RET();
+		//Return from subroutine if condition passes
+		u8 RET_COND(bool condition);
 
 
 
@@ -262,7 +297,7 @@ namespace gbEmu {
 
 		/* 
 		   *0xCB Table Instruction Implementation 
-		   *Returns extra cycles if needed 
+		   *Returns extra cycles or zero if none
 		*/
 
 
