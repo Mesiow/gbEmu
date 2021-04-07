@@ -144,6 +144,13 @@ namespace gbEmu {
 		//Return from subroutine if condition passes
 		u8 RET_COND(bool condition);
 
+		//Call address. This is a shorter and faster equivalent to CALL
+		void RST(u16 address);
+
+		//Enable/Disable interrupts
+		void EI();
+		void DI();
+
 
 
 
@@ -313,6 +320,7 @@ namespace gbEmu {
 		u16 SP;
 
 		u8 cycles = 0;
+		bool interruptsEnabled = false;
 
 		//1. Pneumonic
 		//2. Function pointer to the opcode implementation

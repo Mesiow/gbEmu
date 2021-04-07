@@ -478,7 +478,34 @@ namespace gbEmu {
 
 	u8 Cpu::RET_COND(bool condition)
 	{
+		if (condition) {
+			RET();
+			return 12;
+		}
 		return 0;
+	}
+
+	void Cpu::RST(u16 address)
+	{
+		u8 lo = (PC & 0xFF);
+		u8 hi = (PC & 0xFF00) >> 8;
+
+		SP--;
+		write(SP, hi);
+		SP--;
+		write(SP, lo);
+
+		PC = address;
+	}
+
+	void Cpu::EI()
+	{
+		interruptsEnabled = true;
+	}
+
+	void Cpu::DI()
+	{
+		interruptsEnabled = false;
 	}
 
 
@@ -1618,8 +1645,8 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC0()
 	{
-
-		return 0;
+		u8 extra_cycles = RET_COND((getFlag(FLAG_Z) == 0));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xC1()
 	{
@@ -1633,11 +1660,13 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC3()
 	{
-		return u8();
+		JP();
+		return 0;
 	}
 	u8 Cpu::op0xC4()
 	{
-		return u8();
+		u8 extra_cycles = CALL_COND((getFlag(FLAG_Z) == 0));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xC5()
 	{
@@ -1651,11 +1680,13 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC7()
 	{
-		return u8();
+		RST(0x0000);
+		return 0;
 	}
 	u8 Cpu::op0xC8()
 	{
-		return u8();
+		u8 extra_cycles = RET_COND(getFlag(FLAG_Z));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xC9()
 	{
@@ -1664,7 +1695,8 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCA()
 	{
-		return u8();
+		u8 extra_cycles = JP_COND(getFlag(FLAG_Z));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xCB()
 	{
@@ -1679,7 +1711,8 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCC()
 	{
-		return u8();
+		u8 extra_cycles = CALL_COND(getFlag(FLAG_Z));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xCD()
 	{
@@ -1693,198 +1726,266 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCF()
 	{
-		return u8();
+		RST(0x0008);
+		return 0;
 	}
 	u8 Cpu::op0xD0()
 	{
-		return u8();
+		u8 extra_cycles = RET_COND((getFlag(FLAG_C == 0)));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xD1()
 	{
-		return u8();
+		POP_NN(DE);
+		return 0;
 	}
 	u8 Cpu::op0xD2()
 	{
-		return u8();
+		u8 extra_cycles = JP_COND((getFlag(FLAG_C) == 0));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xD3()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xD4()
 	{
-		return u8();
+		u8 extra_cycles = CALL_COND((getFlag(FLAG_C) == 0));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xD5()
 	{
-		return u8();
+		PUSH_NN(DE);
+		return 0;
 	}
 	u8 Cpu::op0xD6()
 	{
-		return u8();
+		SUB_A_N(fetchU8());
+		return 0;
 	}
 	u8 Cpu::op0xD7()
 	{
-		return u8();
+		RST(0x0010);
+		return 0;
 	}
 	u8 Cpu::op0xD8()
 	{
-		return u8();
+		u8 extra_cycles = RET_COND(getFlag(FLAG_C));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xD9()
 	{
-		return u8();
+		EI();
+		RET();
+		return 0;
 	}
 	u8 Cpu::op0xDA()
 	{
-		return u8();
+		u8 extra_cycles = JP_COND(getFlag(FLAG_C));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xDB()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xDC()
 	{
-		return u8();
+		u8 extra_cycles = CALL_COND(getFlag(FLAG_C));
+		return extra_cycles;
 	}
 	u8 Cpu::op0xDD()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xDE()
 	{
-		return u8();
+		SBC_A_N(fetchU8());
+		return 0;
 	}
 	u8 Cpu::op0xDF()
 	{
-		return u8();
+		RST(0x0018);
+		return 0;
 	}
 	u8 Cpu::op0xE0()
 	{
-		return u8();
+		u8 data = fetchU8();
+		write((0xFF00 + data), AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0xE1()
 	{
-		return u8();
+		POP_NN(HL);
+		return 0;
 	}
 	u8 Cpu::op0xE2()
 	{
-		return u8();
+		write((0xFF00 + BC.lo), AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0xE3()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xE4()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xE5()
 	{
-		return u8();
+		PUSH_NN(HL);
+		return 0;
 	}
 	u8 Cpu::op0xE6()
 	{
-		return u8();
+		AND_A_N(fetchU8());
+		return 0;
 	}
 	u8 Cpu::op0xE7()
 	{
-		return u8();
+		RST(0x0020);
+		return 0;
 	}
 	u8 Cpu::op0xE8()
 	{
-		return u8();
+		u8 i8 = fetchU8();
+		u16 result = SP + i8;
+
+		clearFlag((FLAG_Z | FLAG_N));
+		setFlag(FLAG_H, (SP & 0xFFF) + (i8 & 0xFFF) > 0xFFF);
+		setFlag(FLAG_C, (SP & 0xFFFF) + (i8 & 0xFFFF) > 0xFFFF);
+
+		SP += i8;
+		return 0;
 	}
 	u8 Cpu::op0xE9()
 	{
-		return u8();
+		PC = HL.value;
+		return 0;
 	}
 	u8 Cpu::op0xEA()
 	{
-		return u8();
+		u16 addr = fetchU16();
+		write(addr, AF.hi);
+		return 0;
 	}
 	u8 Cpu::op0xEB()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xEC()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xED()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xEE()
 	{
-		return u8();
+		XOR_A_N(fetchU8());
+		return 0;
 	}
 	u8 Cpu::op0xEF()
 	{
-		return u8();
+		RST(0x0028);
+		return 0;
 	}
 	u8 Cpu::op0xF0()
 	{
-		return u8();
+		u8 data = fetchU8();
+		AF.hi = read((0xFF00 + data));
+		return 0;
 	}
 	u8 Cpu::op0xF1()
 	{
-		return u8();
+		POP_NN(AF);
+		return 0;
 	}
 	u8 Cpu::op0xF2()
 	{
-		return u8();
+		AF.hi = read((0xFF00 + BC.lo));
+		return 0;
 	}
 	u8 Cpu::op0xF3()
 	{
-		return u8();
+		DI();
+		return 0;
 	}
 	u8 Cpu::op0xF4()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xF5()
 	{
-		return u8();
+		PUSH_NN(AF);
+		return 0;
 	}
 	u8 Cpu::op0xF6()
 	{
-		return u8();
+		OR_A_N(fetchU8());
+		return 0;
 	}
 	u8 Cpu::op0xF7()
 	{
-		return u8();
+		RST(0x0030);
+		return 0;
 	}
 	u8 Cpu::op0xF8()
 	{
-		return u8();
+		u8 i8 = fetchU8();
+		u16 result = SP + i8;
+
+		clearFlag((FLAG_Z | FLAG_N));
+		setFlag(FLAG_H, (SP & 0xFFF) + (i8 & 0xFFF) > 0xFFF);
+		setFlag(FLAG_C, (SP & 0xFFFF) + (i8 & 0xFFFF) > 0xFFFF);
+
+		HL.value = result;
+		return 0;
 	}
 	u8 Cpu::op0xF9()
 	{
-		return u8();
+		SP = HL.value;
+		return 0;
 	}
 	u8 Cpu::op0xFA()
 	{
-		return u8();
+		u16 addr = fetchU16();
+		AF.hi = read(addr);
+		return 0;
 	}
 	u8 Cpu::op0xFB()
 	{
-		return u8();
+		EI();
+		return 0;
 	}
 	u8 Cpu::op0xFC()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xFD()
 	{
-		return u8();
+		//Illegal opcode
+		return 0;
 	}
 	u8 Cpu::op0xFE()
 	{
-		return u8();
+		CP_A_N(fetchU8());
+		return 0;
 	}
 	u8 Cpu::op0xFF()
 	{
-		return u8();
+		RST(0x0038);
+		return 0;
 	}
 }
