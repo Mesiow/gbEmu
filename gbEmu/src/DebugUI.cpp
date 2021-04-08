@@ -4,7 +4,8 @@
 
 namespace gbEmu {
 
-    MemoryEditor DebugUI::ed;
+    MemoryEditor DebugUI::mainMemory;
+    MemoryEditor DebugUI::bootRomMemory;
 
     DebugUI::DebugUI(MMU* mmu, Cpu *cpu) {
         this->mmu = mmu;
@@ -92,7 +93,8 @@ namespace gbEmu {
         haltPressed = ImGui::Button("Halt");
         ImGui::SameLine();
 
-        ed.DrawWindow("Memory Editor", mmu->memory, MAX_MEM);
+        mainMemory.DrawWindow("Memory Editor", mmu->memory, MAX_MEM);
+        bootRomMemory.DrawWindow("Boot Rom", mmu->bootrom, 0x100);
 
         ImGui::End();
     }

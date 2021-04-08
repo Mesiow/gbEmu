@@ -11,7 +11,8 @@ namespace gbEmu {
 		void update();
 		void handleButtonPresses();
 
-		static MemoryEditor ed;
+		static MemoryEditor mainMemory;
+		static MemoryEditor bootRomMemory;
 		MMU* mmu;
 		Cpu* cpu;
 

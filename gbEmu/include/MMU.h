@@ -6,6 +6,7 @@
 namespace gbEmu {
 #define MAX_MEM 0x10000
 
+
 	struct MMU {
 		MMU();
 
@@ -14,5 +15,6 @@ namespace gbEmu {
 		u8 read(u16 address);
 
 		u8 memory[MAX_MEM];
+		u8 bootrom[0x100];
 	};
 }
