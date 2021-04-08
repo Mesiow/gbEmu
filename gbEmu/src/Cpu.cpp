@@ -513,6 +513,39 @@ namespace gbEmu {
 		Instruction Implementations
 	*/
 
+	void Cpu::RLC_N(u8& reg)
+	{
+		u8 msb = ((reg & 0x80) >> 7);
+		u8 result = (reg << 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		//Carry will store old bit 7 data
+		if (msb)
+			setFlag(FLAG_C);
+		else
+			clearFlag(FLAG_C);
+
+		reg <<= 1;
+	}
+
+	void Cpu::RRC_N(u8& reg)
+	{
+		u8 lsb = (reg & 0x1);
+		u8 result = (reg >> 1) & 0xFF;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		if (lsb)
+			setFlag(FLAG_C);
+		else
+			clearFlag(FLAG_C);
+
+		reg >>= 1;
+	}
+
 	u8 Cpu::op0x00()
 	{
 		//NOP - do nothing
@@ -1999,67 +2032,112 @@ namespace gbEmu {
 
 	u8 Cpu::opCB0x00()
 	{
-		return u8();
+		RLC_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x01()
 	{
-		return u8();
+		RLC_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x02()
 	{
-		return u8();
+		RLC_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x03()
 	{
-		return u8();
+		RLC_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x04()
 	{
-		return u8();
+		RLC_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x05()
 	{
-		return u8();
+		RLC_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x06()
 	{
-		return u8();
+		u8 data = read(HL.value);
+
+		u8 msb = ((data & 0x80) >> 7);
+		u8 result = (data << 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		//Carry will store old bit 7 data
+		if (msb)
+			setFlag(FLAG_C);
+		else
+			clearFlag(FLAG_C);
+
+		data <<= 1;
+		write(HL.value, data);
+		return 0;
 	}
 	u8 Cpu::opCB0x07()
 	{
-		return u8();
+		RLC_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x08()
 	{
-		return u8();
+		RRC_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x09()
 	{
-		return u8();
+		RRC_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x0A()
 	{
-		return u8();
+		RRC_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x0B()
 	{
-		return u8();
+		RRC_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x0C()
 	{
-		return u8();
+		RRC_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x0D()
 	{
-		return u8();
+		RRC_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x0E()
 	{
-		return u8();
+		u8 data = read(HL.value);
+
+		u8 lsb = (data & 0x1);
+		u8 result = (data >> 1) & 0xFF;
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		if (lsb)
+			setFlag(FLAG_C);
+		else
+			clearFlag(FLAG_C);
+
+		data >>= 1;
+		write(HL.value, data);
+		return 0;
 	}
 	u8 Cpu::opCB0x0F()
 	{
-		return u8();
+		RRC_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x10()
 	{
