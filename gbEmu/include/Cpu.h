@@ -152,6 +152,20 @@ namespace gbEmu {
 		void DI();
 
 
+		/* 
+			Bit shift operations
+		*/
+
+		//Rotate left circular register N
+		void RLC_N(u8& reg);
+		//Rotate right circular register N
+		void RRC_N(u8& reg);
+		//Rotate left register
+		void RL_N(u8& reg);
+		//Rotate right register
+		void RR_N(u8& reg);
+
+
 		/*
 			*Instruction implementations.
 			*Returns extra cycles if needed

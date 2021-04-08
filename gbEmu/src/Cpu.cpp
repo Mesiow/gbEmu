@@ -546,6 +546,51 @@ namespace gbEmu {
 		reg >>= 1;
 	}
 
+	void Cpu::RL_N(u8& reg)
+	{
+		u8 carry = ((AF.lo & FLAG_C) >> 4);
+		u8 msb = ((reg & 0x80) >> 7);
+		u8 result = (reg << 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		reg <<= 1;
+
+		//Carry put into bit 0
+		(reg |= carry);
+		//Msb put into carry
+		if (msb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+	}
+
+	void Cpu::RR_N(u8& reg)
+	{
+		u8 carry = ((AF.lo & FLAG_C));
+		u8 lsb = (reg & 0x1);
+		u8 result = (reg >> 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		reg >>= 1;
+
+		//Carry put into bit 7
+		(reg |= (carry << 3));
+
+		//Msb put into carry
+		if (lsb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+	}
+
 	u8 Cpu::op0x00()
 	{
 		//NOP - do nothing
@@ -791,7 +836,7 @@ namespace gbEmu {
 
 		AF.hi >>= 1;
 
-		//Carry put into bit 0
+		//Carry put into bit 7
 		(AF.hi |= (carry << 3));
 
 		//Msb put into carry
@@ -2141,67 +2186,124 @@ namespace gbEmu {
 	}
 	u8 Cpu::opCB0x10()
 	{
-		return u8();
+		RL_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x11()
 	{
-		return u8();
+		RL_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x12()
 	{
-		return u8();
+		RL_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x13()
 	{
-		return u8();
+		RL_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x14()
 	{
-		return u8();
+		RL_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x15()
 	{
-		return u8();
+		RL_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x16()
 	{
-		return u8();
+		u8 data = read(HL.value);
+
+		u8 carry = ((AF.lo & FLAG_C) >> 4);
+		u8 msb = ((data & 0x80) >> 7);
+		u8 result = (data << 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		data <<= 1;
+
+		//Carry put into bit 0
+		(data |= carry);
+		//Msb put into carry
+		if (msb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+		write(HL.value, data);
+		return 0;
 	}
 	u8 Cpu::opCB0x17()
 	{
-		return u8();
+		RL_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x18()
 	{
-		return u8();
+		RR_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x19()
 	{
-		return u8();
+		RR_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x1A()
 	{
-		return u8();
+		RR_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x1B()
 	{
-		return u8();
+		RR_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x1C()
 	{
-		return u8();
+		RR_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x1D()
 	{
-		return u8();
+		RR_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x1E()
 	{
-		return u8();
+		u8 data = read(HL.value);
+
+		u8 carry = ((AF.lo & FLAG_C));
+		u8 lsb = (data & 0x1);
+		u8 result = (data >> 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		data >>= 1;
+
+		//Carry put into bit 7
+		(data |= (carry << 3));
+
+		//Msb put into carry
+		if (lsb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+		write(HL.value, data);
+		return 0;
 	}
 	u8 Cpu::opCB0x1F()
 	{
-		return u8();
+		RR_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x20()
 	{
