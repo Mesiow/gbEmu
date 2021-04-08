@@ -156,6 +156,11 @@ namespace gbEmu {
 		//mmu->write(0x2, 0x1);
 		//Test RET
 		//mmu->write(0x140, 0xC9);		
+
+		//Test 0xCB Swap
+		BC.hi = 0x23;
+		mmu->write(0x0, 0xCB);
+		mmu->write(0x1, 0x30);
 	}
 
 	void Cpu::clock()
@@ -589,6 +594,54 @@ namespace gbEmu {
 		else {
 			clearFlag(FLAG_C);
 		}
+	}
+
+	void Cpu::SLA_N(u8& reg)
+	{
+		u8 msb = ((reg & 0x80) >> 7);
+		u8 result = (reg << 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		if (msb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+		reg <<= 1;
+		reg = resetBit(reg, 0);
+	}
+
+	void Cpu::SRA_N(u8& reg)
+	{
+		u8 lsb = (reg & 0x1);
+		u8 result = (reg >> 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		if (lsb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+		reg >>= 1;
+	}
+
+	void Cpu::SWAP_N(u8& reg)
+	{
+		u8 upper4 = (reg & 0xF0) >> 4;
+		u8 lower4 = (reg & 0x0F);
+
+		u8 result = ((lower4 & 0xF) << 4) | (upper4 & 0xF);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H | FLAG_C));
+
+		reg = result;
 	}
 
 	u8 Cpu::op0x00()
@@ -2307,99 +2360,166 @@ namespace gbEmu {
 	}
 	u8 Cpu::opCB0x20()
 	{
-		return u8();
+		SLA_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x21()
 	{
-		return u8();
+		SLA_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x22()
 	{
-		return u8();
+		SLA_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x23()
 	{
-		return u8();
+		SLA_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x24()
 	{
-		return u8();
+		SLA_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x25()
 	{
-		return u8();
+		SLA_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x26()
 	{
-		return u8();
+		u8 data = read(HL.value);
+
+		u8 msb = ((data & 0x80) >> 7);
+		u8 result = (data << 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		if (msb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+		data <<= 1;
+		data = resetBit(data, 0);
+
+		write(HL.value, data);
+		return 0;
 	}
 	u8 Cpu::opCB0x27()
 	{
-		return u8();
+		SLA_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x28()
 	{
-		return u8();
+		SRA_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x29()
 	{
-		return u8();
+		SRA_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x2A()
 	{
-		return u8();
+		SRA_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x2B()
 	{
-		return u8();
+		SRA_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x2C()
 	{
-		return u8();
+		SRA_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x2D()
 	{
-		return u8();
+		SRA_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x2E()
 	{
-		return u8();
+		u8 data = read(HL.value);
+
+		u8 lsb = (data & 0x1);
+		u8 result = (data >> 1);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H));
+
+		if (lsb) {
+			setFlag(FLAG_C);
+		}
+		else {
+			clearFlag(FLAG_C);
+		}
+		data >>= 1;
+		write(HL.value, data);
+		return 0;
 	}
 	u8 Cpu::opCB0x2F()
 	{
-		return u8();
+		SRA_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x30()
 	{
-		return u8();
+		SWAP_N(BC.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x31()
 	{
-		return u8();
+		SWAP_N(BC.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x32()
 	{
-		return u8();
+		SWAP_N(DE.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x33()
 	{
-		return u8();
+		SWAP_N(DE.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x34()
 	{
-		return u8();
+		SWAP_N(HL.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x35()
 	{
-		return u8();
+		SWAP_N(HL.lo);
+		return 0;
 	}
 	u8 Cpu::opCB0x36()
 	{
-		return u8();
+		u8 data = read(HL.value);
+
+		u8 upper4 = (data & 0xF0) >> 4;
+		u8 lower4 = (data & 0x0F);
+
+		u8 result = ((lower4 & 0xF) << 4) | (upper4 & 0xF);
+
+		setFlag(FLAG_Z, (result == 0));
+		clearFlag((FLAG_N | FLAG_H | FLAG_C));
+
+		data = result;
+		write(HL.value, data);
+		return 0;
 	}
 	u8 Cpu::opCB0x37()
 	{
-		return u8();
+		SWAP_N(AF.hi);
+		return 0;
 	}
 	u8 Cpu::opCB0x38()
 	{

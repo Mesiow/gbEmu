@@ -164,6 +164,14 @@ namespace gbEmu {
 		void RL_N(u8& reg);
 		//Rotate right register
 		void RR_N(u8& reg);
+		//Shifts register N to the left with bit 7 moved to the carry flag
+		//and bit 0 reset
+		void SLA_N(u8& reg);
+		//Shifts register N to the right with bit 0 moved to the carry flag
+		//and bit 7 retaining it's original value
+		void SRA_N(u8& reg);
+		//Swap upper 4 bits in register N and lower 4 ones
+		void SWAP_N(u8& reg);
 
 
 		/*

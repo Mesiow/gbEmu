@@ -176,164 +176,166 @@ namespace gbEmu {
 		/*
 			0xCB Table
 		*/
-		table[0x00] = { "RLC", bind(&Cpu::opCB0x00), 8 }; table[0x01] = { "RLC", bind(&Cpu::opCB0x01), 8 };
-		table[0x02] = { "RLC", bind(&Cpu::opCB0x02), 8 }; table[0x03] = { "RLC", bind(&Cpu::opCB0x03), 8 };
-		table[0x04] = { "RLC", bind(&Cpu::opCB0x04), 8 }; table[0x05] = { "RLC", bind(&Cpu::opCB0x05), 8 };
-		table[0x06] = { "RLC", bind(&Cpu::opCB0x06), 16 }; table[0x07] = { "RLC", bind(&Cpu::opCB0x07), 8 };
-		table[0x08] = { "RRC", bind(&Cpu::opCB0x08), 8 }; table[0x09] = { "RRC", bind(&Cpu::opCB0x09), 8 };
-		table[0x0A] = { "RRC", bind(&Cpu::opCB0x0A), 8 }; table[0x0B] = { "RRC", bind(&Cpu::opCB0x0B), 8 };
-		table[0x0C] = { "RRC", bind(&Cpu::opCB0x0C), 8 }; table[0x0D] = { "RRC", bind(&Cpu::opCB0x0D), 8 };
-		table[0x0E] = { "RRC", bind(&Cpu::opCB0x0E), 16 }; table[0x0F] = { "RRC", bind(&Cpu::opCB0x0F), 8 };
+		cbTable.resize(0x100);
+
+		cbTable[0x00] = { "RLC", bind(&Cpu::opCB0x00), 8 }; cbTable[0x01] = { "RLC", bind(&Cpu::opCB0x01), 8 };
+		cbTable[0x02] = { "RLC", bind(&Cpu::opCB0x02), 8 }; cbTable[0x03] = { "RLC", bind(&Cpu::opCB0x03), 8 };
+		cbTable[0x04] = { "RLC", bind(&Cpu::opCB0x04), 8 }; cbTable[0x05] = { "RLC", bind(&Cpu::opCB0x05), 8 };
+		cbTable[0x06] = { "RLC", bind(&Cpu::opCB0x06), 16 };cbTable[0x07] = { "RLC", bind(&Cpu::opCB0x07), 8 };
+		cbTable[0x08] = { "RRC", bind(&Cpu::opCB0x08), 8 }; cbTable[0x09] = { "RRC", bind(&Cpu::opCB0x09), 8 };
+		cbTable[0x0A] = { "RRC", bind(&Cpu::opCB0x0A), 8 }; cbTable[0x0B] = { "RRC", bind(&Cpu::opCB0x0B), 8 };
+		cbTable[0x0C] = { "RRC", bind(&Cpu::opCB0x0C), 8 }; cbTable[0x0D] = { "RRC", bind(&Cpu::opCB0x0D), 8 };
+		cbTable[0x0E] = { "RRC", bind(&Cpu::opCB0x0E), 16 };cbTable[0x0F] = { "RRC", bind(&Cpu::opCB0x0F), 8 };
 
 		/* Second row */
-		table[0x10] = { "RL", bind(&Cpu::op0x10), 8 }; table[0x11] = { "RL", bind(&Cpu::op0x11), 8 };
-		table[0x12] = { "RL", bind(&Cpu::op0x12), 8 }; table[0x13] = { "RL", bind(&Cpu::op0x13), 8 };
-		table[0x14] = { "RL", bind(&Cpu::op0x14), 8 }; table[0x15] = { "RL", bind(&Cpu::op0x15), 8 };
-		table[0x16] = { "RL", bind(&Cpu::op0x16), 16 }; table[0x17] = { "RL", bind(&Cpu::op0x17), 8 };
-		table[0x18] = { "RR", bind(&Cpu::op0x18), 8 }; table[0x19] = { "RR", bind(&Cpu::op0x19), 8 };
-		table[0x1A] = { "RR", bind(&Cpu::op0x1A), 8 }; table[0x1B] = { "RR", bind(&Cpu::op0x1B), 8 };
-		table[0x1C] = { "RR", bind(&Cpu::op0x1C), 8 }; table[0x1D] = { "RR", bind(&Cpu::op0x1D), 8 };
-		table[0x1E] = { "RR", bind(&Cpu::op0x1E), 16 }; table[0x1F] = { "RR", bind(&Cpu::op0x1F), 8 };
+		cbTable[0x10] = { "RL", bind(&Cpu::op0x10), 8 }; cbTable[0x11] = { "RL", bind(&Cpu::op0x11), 8 };
+		cbTable[0x12] = { "RL", bind(&Cpu::op0x12), 8 }; cbTable[0x13] = { "RL", bind(&Cpu::op0x13), 8 };
+		cbTable[0x14] = { "RL", bind(&Cpu::op0x14), 8 }; cbTable[0x15] = { "RL", bind(&Cpu::op0x15), 8 };
+		cbTable[0x16] = { "RL", bind(&Cpu::op0x16), 16 };cbTable[0x17] = { "RL", bind(&Cpu::op0x17), 8 };
+		cbTable[0x18] = { "RR", bind(&Cpu::op0x18), 8 }; cbTable[0x19] = { "RR", bind(&Cpu::op0x19), 8 };
+		cbTable[0x1A] = { "RR", bind(&Cpu::op0x1A), 8 }; cbTable[0x1B] = { "RR", bind(&Cpu::op0x1B), 8 };
+		cbTable[0x1C] = { "RR", bind(&Cpu::op0x1C), 8 }; cbTable[0x1D] = { "RR", bind(&Cpu::op0x1D), 8 };
+		cbTable[0x1E] = { "RR", bind(&Cpu::op0x1E), 16 };cbTable[0x1F] = { "RR", bind(&Cpu::op0x1F), 8 };
 
 		/* Third row */
-		table[0x20] = { "SLA", bind(&Cpu::opCB0x20), 8 }; table[0x21] = { "SLA", bind(&Cpu::opCB0x21), 8 };
-		table[0x22] = { "SLA", bind(&Cpu::opCB0x22), 8 }; table[0x23] = { "SLA", bind(&Cpu::opCB0x23), 8 };
-		table[0x24] = { "SLA", bind(&Cpu::opCB0x24), 8 }; table[0x25] = { "SLA", bind(&Cpu::opCB0x25), 8 };
-		table[0x26] = { "SLA", bind(&Cpu::opCB0x26), 16 }; table[0x27] = { "SLA", bind(&Cpu::opCB0x27), 8 };
-		table[0x28] = { "SRA", bind(&Cpu::opCB0x28), 8 }; table[0x29] = { "SRA", bind(&Cpu::opCB0x29), 8 };
-		table[0x2A] = { "SRA", bind(&Cpu::opCB0x2A), 8 }; table[0x2B] = { "SRA", bind(&Cpu::opCB0x2B), 8 };
-		table[0x2C] = { "SRA", bind(&Cpu::opCB0x2C), 8 }; table[0x2D] = { "SRA", bind(&Cpu::opCB0x2D), 8 };
-		table[0x2E] = { "SRA", bind(&Cpu::opCB0x2E), 16 }; table[0x2F] = { "SRA", bind(&Cpu::opCB0x2F), 8 };
+		cbTable[0x20] = { "SLA", bind(&Cpu::opCB0x20), 8 }; cbTable[0x21] = { "SLA", bind(&Cpu::opCB0x21), 8 };
+		cbTable[0x22] = { "SLA", bind(&Cpu::opCB0x22), 8 }; cbTable[0x23] = { "SLA", bind(&Cpu::opCB0x23), 8 };
+		cbTable[0x24] = { "SLA", bind(&Cpu::opCB0x24), 8 }; cbTable[0x25] = { "SLA", bind(&Cpu::opCB0x25), 8 };
+		cbTable[0x26] = { "SLA", bind(&Cpu::opCB0x26), 16 };cbTable[0x27] = { "SLA", bind(&Cpu::opCB0x27), 8 };
+		cbTable[0x28] = { "SRA", bind(&Cpu::opCB0x28), 8 }; cbTable[0x29] = { "SRA", bind(&Cpu::opCB0x29), 8 };
+		cbTable[0x2A] = { "SRA", bind(&Cpu::opCB0x2A), 8 }; cbTable[0x2B] = { "SRA", bind(&Cpu::opCB0x2B), 8 };
+		cbTable[0x2C] = { "SRA", bind(&Cpu::opCB0x2C), 8 }; cbTable[0x2D] = { "SRA", bind(&Cpu::opCB0x2D), 8 };
+		cbTable[0x2E] = { "SRA", bind(&Cpu::opCB0x2E), 16 };cbTable[0x2F] = { "SRA", bind(&Cpu::opCB0x2F), 8 };
 
 		/* Fourth row */
-		table[0x30] = { "SWAP", bind(&Cpu::opCB0x30), 8 };  table[0x31] = { "SWAP", bind(&Cpu::opCB0x31), 8 };
-		table[0x32] = { "SWAP", bind(&Cpu::opCB0x32), 8 };  table[0x33] = { "SWAP", bind(&Cpu::opCB0x33), 8 };
-		table[0x34] = { "SWAP", bind(&Cpu::opCB0x34), 8 }; table[0x35] = { "SWAP", bind(&Cpu::opCB0x35), 8 };
-		table[0x36] = { "SWAP", bind(&Cpu::opCB0x36), 16 };  table[0x37] = { "SWAP", bind(&Cpu::opCB0x37), 8 };
-		table[0x38] = { "SRL", bind(&Cpu::opCB0x38), 8 };  table[0x39] = { "SRL", bind(&Cpu::opCB0x39), 8 };
-		table[0x3A] = { "SRL", bind(&Cpu::opCB0x3A), 8 };  table[0x3B] = { "SRL", bind(&Cpu::opCB0x3B), 8 };
-		table[0x3C] = { "SRL", bind(&Cpu::opCB0x3C), 8 }; table[0x3D] = { "SRL", bind(&Cpu::opCB0x3D), 8 };
-		table[0x3E] = { "SRL", bind(&Cpu::opCB0x3E), 16 };  table[0x3F] = { "SRL", bind(&Cpu::opCB0x3F), 8 };
+		cbTable[0x30] = { "SWAP", bind(&Cpu::opCB0x30), 8 }; cbTable[0x31] = { "SWAP", bind(&Cpu::opCB0x31), 8 };
+		cbTable[0x32] = { "SWAP", bind(&Cpu::opCB0x32), 8 }; cbTable[0x33] = { "SWAP", bind(&Cpu::opCB0x33), 8 };
+		cbTable[0x34] = { "SWAP", bind(&Cpu::opCB0x34), 8 }; cbTable[0x35] = { "SWAP", bind(&Cpu::opCB0x35), 8 };
+		cbTable[0x36] = { "SWAP", bind(&Cpu::opCB0x36), 16 };cbTable[0x37] = { "SWAP", bind(&Cpu::opCB0x37), 8 };
+		cbTable[0x38] = { "SRL", bind(&Cpu::opCB0x38), 8 };  cbTable[0x39] = { "SRL", bind(&Cpu::opCB0x39), 8 };
+		cbTable[0x3A] = { "SRL", bind(&Cpu::opCB0x3A), 8 };  cbTable[0x3B] = { "SRL", bind(&Cpu::opCB0x3B), 8 };
+		cbTable[0x3C] = { "SRL", bind(&Cpu::opCB0x3C), 8 };  cbTable[0x3D] = { "SRL", bind(&Cpu::opCB0x3D), 8 };
+		cbTable[0x3E] = { "SRL", bind(&Cpu::opCB0x3E), 16 }; cbTable[0x3F] = { "SRL", bind(&Cpu::opCB0x3F), 8 };
 
 		/* Fifth row */
-		table[0x40] = { "BIT", bind(&Cpu::opCB0x40), 8 };  table[0x41] = { "BIT", bind(&Cpu::opCB0x41), 8 };
-		table[0x42] = { "BIT", bind(&Cpu::opCB0x42), 8 };  table[0x43] = { "BIT", bind(&Cpu::opCB0x43), 8 };
-		table[0x44] = { "BIT", bind(&Cpu::opCB0x44), 8 }; table[0x45] = { "BIT", bind(&Cpu::opCB0x45), 8 };
-		table[0x46] = { "BIT", bind(&Cpu::opCB0x46), 12 }; table[0x47] = { "BIT", bind(&Cpu::opCB0x47), 8 };
-		table[0x48] = { "BIT", bind(&Cpu::opCB0x48), 8 };  table[0x49] = { "BIT", bind(&Cpu::opCB0x49), 8 };
-		table[0x4A] = { "BIT", bind(&Cpu::opCB0x4A), 8 };  table[0x4B] = { "BIT", bind(&Cpu::opCB0x4B), 8 };
-		table[0x4C] = { "BIT", bind(&Cpu::opCB0x4C), 8 }; table[0x4D] = { "BIT", bind(&Cpu::opCB0x4D), 8 };
-		table[0x4E] = { "BIT", bind(&Cpu::opCB0x4E), 12 };  table[0x4F] = { "BIT", bind(&Cpu::opCB0x4F), 8 };
+		cbTable[0x40] = { "BIT", bind(&Cpu::opCB0x40), 8 }; cbTable[0x41] = { "BIT", bind(&Cpu::opCB0x41), 8 };
+		cbTable[0x42] = { "BIT", bind(&Cpu::opCB0x42), 8 }; cbTable[0x43] = { "BIT", bind(&Cpu::opCB0x43), 8 };
+		cbTable[0x44] = { "BIT", bind(&Cpu::opCB0x44), 8 }; cbTable[0x45] = { "BIT", bind(&Cpu::opCB0x45), 8 };
+		cbTable[0x46] = { "BIT", bind(&Cpu::opCB0x46), 12 };cbTable[0x47] = { "BIT", bind(&Cpu::opCB0x47), 8 };
+		cbTable[0x48] = { "BIT", bind(&Cpu::opCB0x48), 8 }; cbTable[0x49] = { "BIT", bind(&Cpu::opCB0x49), 8 };
+		cbTable[0x4A] = { "BIT", bind(&Cpu::opCB0x4A), 8 }; cbTable[0x4B] = { "BIT", bind(&Cpu::opCB0x4B), 8 };
+		cbTable[0x4C] = { "BIT", bind(&Cpu::opCB0x4C), 8 }; cbTable[0x4D] = { "BIT", bind(&Cpu::opCB0x4D), 8 };
+		cbTable[0x4E] = { "BIT", bind(&Cpu::opCB0x4E), 12 };cbTable[0x4F] = { "BIT", bind(&Cpu::opCB0x4F), 8 };
 
 		/* Sixth row */
-		table[0x50] = { "BIT", bind(&Cpu::opCB0x50), 8 };  table[0x51] = { "BIT", bind(&Cpu::opCB0x51), 8 };
-		table[0x52] = { "BIT", bind(&Cpu::opCB0x52), 8 };  table[0x53] = { "BIT", bind(&Cpu::opCB0x53), 8 };
-		table[0x54] = { "BIT", bind(&Cpu::opCB0x54), 8 };  table[0x55] = { "BIT", bind(&Cpu::opCB0x55), 8 };
-		table[0x56] = { "BIT", bind(&Cpu::opCB0x56), 12 }; table[0x57] = { "BIT", bind(&Cpu::opCB0x57), 8 };
-		table[0x58] = { "BIT", bind(&Cpu::opCB0x58), 8 };  table[0x59] = { "BIT", bind(&Cpu::opCB0x59), 8 };
-		table[0x5A] = { "BIT", bind(&Cpu::opCB0x5A), 8 };  table[0x5B] = { "BIT", bind(&Cpu::opCB0x5B), 8 };
-		table[0x5C] = { "BIT", bind(&Cpu::opCB0x5C), 8 };  table[0x5D] = { "BIT", bind(&Cpu::opCB0x5D), 8 };
-		table[0x5E] = { "BIT", bind(&Cpu::opCB0x5E), 12 };  table[0x5F] = { "BIT", bind(&Cpu::opCB0x5F), 8 };
+		cbTable[0x50] = { "BIT", bind(&Cpu::opCB0x50), 8 };  cbTable[0x51] = { "BIT", bind(&Cpu::opCB0x51), 8 };
+		cbTable[0x52] = { "BIT", bind(&Cpu::opCB0x52), 8 };  cbTable[0x53] = { "BIT", bind(&Cpu::opCB0x53), 8 };
+		cbTable[0x54] = { "BIT", bind(&Cpu::opCB0x54), 8 };  cbTable[0x55] = { "BIT", bind(&Cpu::opCB0x55), 8 };
+		cbTable[0x56] = { "BIT", bind(&Cpu::opCB0x56), 12 }; cbTable[0x57] = { "BIT", bind(&Cpu::opCB0x57), 8 };
+		cbTable[0x58] = { "BIT", bind(&Cpu::opCB0x58), 8 };  cbTable[0x59] = { "BIT", bind(&Cpu::opCB0x59), 8 };
+		cbTable[0x5A] = { "BIT", bind(&Cpu::opCB0x5A), 8 };  cbTable[0x5B] = { "BIT", bind(&Cpu::opCB0x5B), 8 };
+		cbTable[0x5C] = { "BIT", bind(&Cpu::opCB0x5C), 8 };  cbTable[0x5D] = { "BIT", bind(&Cpu::opCB0x5D), 8 };
+		cbTable[0x5E] = { "BIT", bind(&Cpu::opCB0x5E), 12 }; cbTable[0x5F] = { "BIT", bind(&Cpu::opCB0x5F), 8 };
 
 		/* Seventh row */
-		table[0x60] = { "BIT", bind(&Cpu::opCB0x60), 8 };  table[0x61] = { "BIT", bind(&Cpu::opCB0x61), 8 };
-		table[0x62] = { "BIT", bind(&Cpu::opCB0x62), 8 };  table[0x63] = { "BIT", bind(&Cpu::opCB0x63), 8 };
-		table[0x64] = { "BIT", bind(&Cpu::opCB0x64), 8 };  table[0x65] = { "BIT", bind(&Cpu::opCB0x65), 8 };
-		table[0x66] = { "BIT", bind(&Cpu::opCB0x66), 12 }; table[0x67] = { "BIT", bind(&Cpu::opCB0x67), 8 };
-		table[0x68] = { "BIT", bind(&Cpu::opCB0x68), 8 };  table[0x69] = { "BIT", bind(&Cpu::opCB0x69), 8 };
-		table[0x6A] = { "BIT", bind(&Cpu::opCB0x6A), 8 };  table[0x6B] = { "BIT", bind(&Cpu::opCB0x6B), 8 };
-		table[0x6C] = { "BIT", bind(&Cpu::opCB0x6C), 8 };  table[0x6D] = { "BIT", bind(&Cpu::opCB0x6D), 8 };
-		table[0x6E] = { "BIT", bind(&Cpu::opCB0x6E), 12 }; table[0x6F] = { "BIT", bind(&Cpu::opCB0x6F), 8 };
+		cbTable[0x60] = { "BIT", bind(&Cpu::opCB0x60), 8 };  cbTable[0x61] = { "BIT", bind(&Cpu::opCB0x61), 8 };
+		cbTable[0x62] = { "BIT", bind(&Cpu::opCB0x62), 8 };  cbTable[0x63] = { "BIT", bind(&Cpu::opCB0x63), 8 };
+		cbTable[0x64] = { "BIT", bind(&Cpu::opCB0x64), 8 };  cbTable[0x65] = { "BIT", bind(&Cpu::opCB0x65), 8 };
+		cbTable[0x66] = { "BIT", bind(&Cpu::opCB0x66), 12 }; cbTable[0x67] = { "BIT", bind(&Cpu::opCB0x67), 8 };
+		cbTable[0x68] = { "BIT", bind(&Cpu::opCB0x68), 8 };  cbTable[0x69] = { "BIT", bind(&Cpu::opCB0x69), 8 };
+		cbTable[0x6A] = { "BIT", bind(&Cpu::opCB0x6A), 8 };  cbTable[0x6B] = { "BIT", bind(&Cpu::opCB0x6B), 8 };
+		cbTable[0x6C] = { "BIT", bind(&Cpu::opCB0x6C), 8 };  cbTable[0x6D] = { "BIT", bind(&Cpu::opCB0x6D), 8 };
+		cbTable[0x6E] = { "BIT", bind(&Cpu::opCB0x6E), 12 }; cbTable[0x6F] = { "BIT", bind(&Cpu::opCB0x6F), 8 };
 
 		/* Eighth row */
-		table[0x70] = { "BIT", bind(&Cpu::opCB0x70), 8 };  table[0x71] = { "BIT", bind(&Cpu::opCB0x71), 8 };
-		table[0x72] = { "BIT", bind(&Cpu::opCB0x72), 8 };  table[0x73] = { "BIT", bind(&Cpu::opCB0x73), 8 };
-		table[0x74] = { "BIT", bind(&Cpu::opCB0x74), 8 };  table[0x75] = { "BIT", bind(&Cpu::opCB0x75), 8 };
-		table[0x76] = { "BIT", bind(&Cpu::opCB0x76), 12 }; table[0x77] = { "BIT", bind(&Cpu::opCB0x77), 8 };
-		table[0x78] = { "BIT", bind(&Cpu::opCB0x78), 8 };  table[0x79] = { "BIT", bind(&Cpu::opCB0x79), 8 };
-		table[0x7A] = { "BIT", bind(&Cpu::opCB0x7A), 8 };  table[0x7B] = { "BIT", bind(&Cpu::opCB0x7B), 8 };
-		table[0x7C] = { "BIT", bind(&Cpu::opCB0x7C), 8 };  table[0x7D] = { "BIT", bind(&Cpu::opCB0x7D), 8 };
-		table[0x7E] = { "BIT", bind(&Cpu::opCB0x7E), 12 }; table[0x7F] = { "BIT", bind(&Cpu::opCB0x7F), 8 };
+		cbTable[0x70] = { "BIT", bind(&Cpu::opCB0x70), 8 };  cbTable[0x71] = { "BIT", bind(&Cpu::opCB0x71), 8 };
+		cbTable[0x72] = { "BIT", bind(&Cpu::opCB0x72), 8 };  cbTable[0x73] = { "BIT", bind(&Cpu::opCB0x73), 8 };
+		cbTable[0x74] = { "BIT", bind(&Cpu::opCB0x74), 8 };  cbTable[0x75] = { "BIT", bind(&Cpu::opCB0x75), 8 };
+		cbTable[0x76] = { "BIT", bind(&Cpu::opCB0x76), 12 }; cbTable[0x77] = { "BIT", bind(&Cpu::opCB0x77), 8 };
+		cbTable[0x78] = { "BIT", bind(&Cpu::opCB0x78), 8 };  cbTable[0x79] = { "BIT", bind(&Cpu::opCB0x79), 8 };
+		cbTable[0x7A] = { "BIT", bind(&Cpu::opCB0x7A), 8 };  cbTable[0x7B] = { "BIT", bind(&Cpu::opCB0x7B), 8 };
+		cbTable[0x7C] = { "BIT", bind(&Cpu::opCB0x7C), 8 };  cbTable[0x7D] = { "BIT", bind(&Cpu::opCB0x7D), 8 };
+		cbTable[0x7E] = { "BIT", bind(&Cpu::opCB0x7E), 12 }; cbTable[0x7F] = { "BIT", bind(&Cpu::opCB0x7F), 8 };
 
 		/* Ninth row */
-		table[0x80] = { "RES", bind(&Cpu::opCB0x80), 8 };  table[0x81] = { "RES", bind(&Cpu::opCB0x81), 8 };
-		table[0x82] = { "RES", bind(&Cpu::opCB0x82), 8 };  table[0x83] = { "RES", bind(&Cpu::opCB0x83), 8 };
-		table[0x84] = { "RES", bind(&Cpu::opCB0x84), 8 };  table[0x85] = { "RES", bind(&Cpu::opCB0x85), 8 };
-		table[0x86] = { "RES", bind(&Cpu::opCB0x86), 16 }; table[0x87] = { "RES", bind(&Cpu::opCB0x87), 8 };
-		table[0x88] = { "RES", bind(&Cpu::opCB0x88), 8 };  table[0x89] = { "RES", bind(&Cpu::opCB0x89), 8 };
-		table[0x8A] = { "RES", bind(&Cpu::opCB0x8A), 8 };  table[0x8B] = { "RES", bind(&Cpu::opCB0x8B), 8 };
-		table[0x8C] = { "RES", bind(&Cpu::opCB0x8C), 8 };  table[0x8D] = { "RES", bind(&Cpu::opCB0x8D), 8 };
-		table[0x8E] = { "RES", bind(&Cpu::opCB0x8E), 16 }; table[0x8F] = { "RES", bind(&Cpu::opCB0x8F), 8 };
+		cbTable[0x80] = { "RES", bind(&Cpu::opCB0x80), 8 };  cbTable[0x81] = { "RES", bind(&Cpu::opCB0x81), 8 };
+		cbTable[0x82] = { "RES", bind(&Cpu::opCB0x82), 8 };  cbTable[0x83] = { "RES", bind(&Cpu::opCB0x83), 8 };
+		cbTable[0x84] = { "RES", bind(&Cpu::opCB0x84), 8 };  cbTable[0x85] = { "RES", bind(&Cpu::opCB0x85), 8 };
+		cbTable[0x86] = { "RES", bind(&Cpu::opCB0x86), 16 }; cbTable[0x87] = { "RES", bind(&Cpu::opCB0x87), 8 };
+		cbTable[0x88] = { "RES", bind(&Cpu::opCB0x88), 8 };  cbTable[0x89] = { "RES", bind(&Cpu::opCB0x89), 8 };
+		cbTable[0x8A] = { "RES", bind(&Cpu::opCB0x8A), 8 };  cbTable[0x8B] = { "RES", bind(&Cpu::opCB0x8B), 8 };
+		cbTable[0x8C] = { "RES", bind(&Cpu::opCB0x8C), 8 };  cbTable[0x8D] = { "RES", bind(&Cpu::opCB0x8D), 8 };
+		cbTable[0x8E] = { "RES", bind(&Cpu::opCB0x8E), 16 }; cbTable[0x8F] = { "RES", bind(&Cpu::opCB0x8F), 8 };
 
 		/* Tenth row */
-		table[0x90] = { "RES", bind(&Cpu::opCB0x90), 8 };  table[0x91] = { "RES", bind(&Cpu::opCB0x91), 8 };
-		table[0x92] = { "RES", bind(&Cpu::opCB0x92), 8 };  table[0x93] = { "RES", bind(&Cpu::opCB0x93), 8 };
-		table[0x94] = { "RES", bind(&Cpu::opCB0x94), 8 };  table[0x95] = { "RES", bind(&Cpu::opCB0x95), 8 };
-		table[0x96] = { "RES", bind(&Cpu::opCB0x96), 16 }; table[0x97] = { "RES", bind(&Cpu::opCB0x97), 8 };
-		table[0x98] = { "RES", bind(&Cpu::opCB0x98), 8 };  table[0x99] = { "RES", bind(&Cpu::opCB0x99), 8 };
-		table[0x9A] = { "RES", bind(&Cpu::opCB0x9A), 8 };  table[0x9B] = { "RES", bind(&Cpu::opCB0x9B), 8 };
-		table[0x9C] = { "RES", bind(&Cpu::opCB0x9C), 8 };  table[0x9D] = { "RES", bind(&Cpu::opCB0x9D), 8 };
-		table[0x9E] = { "RES", bind(&Cpu::opCB0x9E), 16 }; table[0x9F] = { "RES", bind(&Cpu::opCB0x9F), 8 };
+		cbTable[0x90] = { "RES", bind(&Cpu::opCB0x90), 8 };  cbTable[0x91] = { "RES", bind(&Cpu::opCB0x91), 8 };
+		cbTable[0x92] = { "RES", bind(&Cpu::opCB0x92), 8 };  cbTable[0x93] = { "RES", bind(&Cpu::opCB0x93), 8 };
+		cbTable[0x94] = { "RES", bind(&Cpu::opCB0x94), 8 };  cbTable[0x95] = { "RES", bind(&Cpu::opCB0x95), 8 };
+		cbTable[0x96] = { "RES", bind(&Cpu::opCB0x96), 16 }; cbTable[0x97] = { "RES", bind(&Cpu::opCB0x97), 8 };
+		cbTable[0x98] = { "RES", bind(&Cpu::opCB0x98), 8 };  cbTable[0x99] = { "RES", bind(&Cpu::opCB0x99), 8 };
+		cbTable[0x9A] = { "RES", bind(&Cpu::opCB0x9A), 8 };  cbTable[0x9B] = { "RES", bind(&Cpu::opCB0x9B), 8 };
+		cbTable[0x9C] = { "RES", bind(&Cpu::opCB0x9C), 8 };  cbTable[0x9D] = { "RES", bind(&Cpu::opCB0x9D), 8 };
+		cbTable[0x9E] = { "RES", bind(&Cpu::opCB0x9E), 16 }; cbTable[0x9F] = { "RES", bind(&Cpu::opCB0x9F), 8 };
 
 		/* Eleventh row */
-		table[0xA0] = { "RES", bind(&Cpu::opCB0xA0), 8 };  table[0xA1] = { "RES", bind(&Cpu::opCB0xA1), 8 };
-		table[0xA2] = { "RES", bind(&Cpu::opCB0xA2), 8 };  table[0xA3] = { "RES", bind(&Cpu::opCB0xA3), 8 };
-		table[0xA4] = { "RES", bind(&Cpu::opCB0xA4), 8 };  table[0xA5] = { "RES", bind(&Cpu::opCB0xA5), 8 };
-		table[0xA6] = { "RES", bind(&Cpu::opCB0xA6), 16 }; table[0xA7] = { "RES", bind(&Cpu::opCB0xA7), 8 };
-		table[0xA8] = { "RES", bind(&Cpu::opCB0xA8), 8 };  table[0xA9] = { "RES", bind(&Cpu::opCB0xA9), 8 };
-		table[0xAA] = { "RES", bind(&Cpu::opCB0xAA), 8 };  table[0xAB] = { "RES", bind(&Cpu::opCB0xAB), 8 };
-		table[0xAC] = { "RES", bind(&Cpu::opCB0xAC), 8 };  table[0xAD] = { "RES", bind(&Cpu::opCB0xAD), 8 };
-		table[0xAE] = { "RES", bind(&Cpu::opCB0xAE), 16 }; table[0xAF] = { "RES", bind(&Cpu::opCB0xAF), 8 };
+		cbTable[0xA0] = { "RES", bind(&Cpu::opCB0xA0), 8 };  cbTable[0xA1] = { "RES", bind(&Cpu::opCB0xA1), 8 };
+		cbTable[0xA2] = { "RES", bind(&Cpu::opCB0xA2), 8 };  cbTable[0xA3] = { "RES", bind(&Cpu::opCB0xA3), 8 };
+		cbTable[0xA4] = { "RES", bind(&Cpu::opCB0xA4), 8 };  cbTable[0xA5] = { "RES", bind(&Cpu::opCB0xA5), 8 };
+		cbTable[0xA6] = { "RES", bind(&Cpu::opCB0xA6), 16 }; cbTable[0xA7] = { "RES", bind(&Cpu::opCB0xA7), 8 };
+		cbTable[0xA8] = { "RES", bind(&Cpu::opCB0xA8), 8 };  cbTable[0xA9] = { "RES", bind(&Cpu::opCB0xA9), 8 };
+		cbTable[0xAA] = { "RES", bind(&Cpu::opCB0xAA), 8 };  cbTable[0xAB] = { "RES", bind(&Cpu::opCB0xAB), 8 };
+		cbTable[0xAC] = { "RES", bind(&Cpu::opCB0xAC), 8 };  cbTable[0xAD] = { "RES", bind(&Cpu::opCB0xAD), 8 };
+		cbTable[0xAE] = { "RES", bind(&Cpu::opCB0xAE), 16 }; cbTable[0xAF] = { "RES", bind(&Cpu::opCB0xAF), 8 };
 
 		/* Twelfth row */
-		table[0xB0] = { "RES", bind(&Cpu::opCB0xB0), 8 };  table[0xB1] = { "RES", bind(&Cpu::opCB0xB1), 8 };
-		table[0xB2] = { "RES", bind(&Cpu::opCB0xB2), 8 };  table[0xB3] = { "RES", bind(&Cpu::opCB0xB3), 8 };
-		table[0xB4] = { "RES", bind(&Cpu::opCB0xB4), 8 };  table[0xB5] = { "RES", bind(&Cpu::opCB0xB5), 8 };
-		table[0xB6] = { "RES", bind(&Cpu::opCB0xB6), 16 }; table[0xB7] = { "RES", bind(&Cpu::opCB0xB7), 8 };
-		table[0xB8] = { "RES", bind(&Cpu::opCB0xB8), 8 };  table[0xB9] = { "RES", bind(&Cpu::opCB0xB9), 8 };
-		table[0xBA] = { "RES", bind(&Cpu::opCB0xBA), 8 };  table[0xBB] = { "RES", bind(&Cpu::opCB0xBB), 8 };
-		table[0xBC] = { "RES", bind(&Cpu::opCB0xBC), 8 };  table[0xBD] = { "RES", bind(&Cpu::opCB0xBD), 8 };
-		table[0xBE] = { "RES", bind(&Cpu::opCB0xBE), 16 }; table[0xBF] = { "RES", bind(&Cpu::opCB0xBF), 8 };
+		cbTable[0xB0] = { "RES", bind(&Cpu::opCB0xB0), 8 }; cbTable[0xB1] = { "RES", bind(&Cpu::opCB0xB1), 8 };
+		cbTable[0xB2] = { "RES", bind(&Cpu::opCB0xB2), 8 }; cbTable[0xB3] = { "RES", bind(&Cpu::opCB0xB3), 8 };
+		cbTable[0xB4] = { "RES", bind(&Cpu::opCB0xB4), 8 }; cbTable[0xB5] = { "RES", bind(&Cpu::opCB0xB5), 8 };
+		cbTable[0xB6] = { "RES", bind(&Cpu::opCB0xB6), 16 };cbTable[0xB7] = { "RES", bind(&Cpu::opCB0xB7), 8 };
+		cbTable[0xB8] = { "RES", bind(&Cpu::opCB0xB8), 8 }; cbTable[0xB9] = { "RES", bind(&Cpu::opCB0xB9), 8 };
+		cbTable[0xBA] = { "RES", bind(&Cpu::opCB0xBA), 8 }; cbTable[0xBB] = { "RES", bind(&Cpu::opCB0xBB), 8 };
+		cbTable[0xBC] = { "RES", bind(&Cpu::opCB0xBC), 8 }; cbTable[0xBD] = { "RES", bind(&Cpu::opCB0xBD), 8 };
+		cbTable[0xBE] = { "RES", bind(&Cpu::opCB0xBE), 16 };cbTable[0xBF] = { "RES", bind(&Cpu::opCB0xBF), 8 };
 
 		/* Thirteenth row */
-		table[0xC0] = { "SET", bind(&Cpu::opCB0xC0), 8 };  table[0xC1] = { "SET", bind(&Cpu::opCB0xC1), 8 };
-		table[0xC2] = { "SET", bind(&Cpu::opCB0xC2), 8 };  table[0xC3] = { "SET", bind(&Cpu::opCB0xC3), 8 };
-		table[0xC4] = { "SET", bind(&Cpu::opCB0xC4), 8 };  table[0xC5] = { "SET", bind(&Cpu::opCB0xC5), 8 };
-		table[0xC6] = { "SET", bind(&Cpu::opCB0xC6), 16 }; table[0xC7] = { "SET", bind(&Cpu::opCB0xC7), 8 };
-		table[0xC8] = { "SET", bind(&Cpu::opCB0xC8), 8 };  table[0xC9] = { "SET", bind(&Cpu::opCB0xC9), 8 };
-		table[0xCA] = { "SET", bind(&Cpu::opCB0xCA), 8 };  table[0xCB] = { "SET", bind(&Cpu::opCB0xCB), 8 };
-		table[0xCC] = { "SET", bind(&Cpu::opCB0xCC), 8 };  table[0xCD] = { "SET", bind(&Cpu::opCB0xCD), 8 };
-		table[0xCE] = { "SET", bind(&Cpu::opCB0xCE), 16 }; table[0xCF] = { "SET", bind(&Cpu::opCB0xCF), 8 };
+		cbTable[0xC0] = { "SET", bind(&Cpu::opCB0xC0), 8 };  cbTable[0xC1] = { "SET", bind(&Cpu::opCB0xC1), 8 };
+		cbTable[0xC2] = { "SET", bind(&Cpu::opCB0xC2), 8 };  cbTable[0xC3] = { "SET", bind(&Cpu::opCB0xC3), 8 };
+		cbTable[0xC4] = { "SET", bind(&Cpu::opCB0xC4), 8 };  cbTable[0xC5] = { "SET", bind(&Cpu::opCB0xC5), 8 };
+		cbTable[0xC6] = { "SET", bind(&Cpu::opCB0xC6), 16 }; cbTable[0xC7] = { "SET", bind(&Cpu::opCB0xC7), 8 };
+		cbTable[0xC8] = { "SET", bind(&Cpu::opCB0xC8), 8 };  cbTable[0xC9] = { "SET", bind(&Cpu::opCB0xC9), 8 };
+		cbTable[0xCA] = { "SET", bind(&Cpu::opCB0xCA), 8 };  cbTable[0xCB] = { "SET", bind(&Cpu::opCB0xCB), 8 };
+		cbTable[0xCC] = { "SET", bind(&Cpu::opCB0xCC), 8 };  cbTable[0xCD] = { "SET", bind(&Cpu::opCB0xCD), 8 };
+		cbTable[0xCE] = { "SET", bind(&Cpu::opCB0xCE), 16 }; cbTable[0xCF] = { "SET", bind(&Cpu::opCB0xCF), 8 };
 
 		/* Fourteenth row */
-		table[0xD0] = { "SET", bind(&Cpu::opCB0xD0), 8 };  table[0xD1] = { "SET", bind(&Cpu::opCB0xD1), 8 };
-		table[0xD2] = { "SET", bind(&Cpu::opCB0xD2), 8 };  table[0xD3] = { "SET", bind(&Cpu::opCB0xD3), 8 };
-		table[0xD4] = { "SET", bind(&Cpu::opCB0xD4), 8 };  table[0xD5] = { "SET", bind(&Cpu::opCB0xD5), 8 };
-		table[0xD6] = { "SET", bind(&Cpu::opCB0xD6), 16 }; table[0xD7] = { "SET", bind(&Cpu::opCB0xD7), 8 };
-		table[0xD8] = { "SET", bind(&Cpu::opCB0xD8), 8 };  table[0xD9] = { "SET", bind(&Cpu::opCB0xD9), 8 };
-		table[0xDA] = { "SET", bind(&Cpu::opCB0xDA), 8 };  table[0xDB] = { "SET", bind(&Cpu::opCB0xDB), 8 };
-		table[0xDC] = { "SET", bind(&Cpu::opCB0xDC), 8 };  table[0xDD] = { "SET", bind(&Cpu::opCB0xDD), 8 };
-		table[0xDE] = { "SET", bind(&Cpu::opCB0xDE), 16 }; table[0xDF] = { "SET", bind(&Cpu::opCB0xDF), 8 };
+		cbTable[0xD0] = { "SET", bind(&Cpu::opCB0xD0), 8 };  cbTable[0xD1] = { "SET", bind(&Cpu::opCB0xD1), 8 };
+		cbTable[0xD2] = { "SET", bind(&Cpu::opCB0xD2), 8 };  cbTable[0xD3] = { "SET", bind(&Cpu::opCB0xD3), 8 };
+		cbTable[0xD4] = { "SET", bind(&Cpu::opCB0xD4), 8 };  cbTable[0xD5] = { "SET", bind(&Cpu::opCB0xD5), 8 };
+		cbTable[0xD6] = { "SET", bind(&Cpu::opCB0xD6), 16 }; cbTable[0xD7] = { "SET", bind(&Cpu::opCB0xD7), 8 };
+		cbTable[0xD8] = { "SET", bind(&Cpu::opCB0xD8), 8 };  cbTable[0xD9] = { "SET", bind(&Cpu::opCB0xD9), 8 };
+		cbTable[0xDA] = { "SET", bind(&Cpu::opCB0xDA), 8 };  cbTable[0xDB] = { "SET", bind(&Cpu::opCB0xDB), 8 };
+		cbTable[0xDC] = { "SET", bind(&Cpu::opCB0xDC), 8 };  cbTable[0xDD] = { "SET", bind(&Cpu::opCB0xDD), 8 };
+		cbTable[0xDE] = { "SET", bind(&Cpu::opCB0xDE), 16 }; cbTable[0xDF] = { "SET", bind(&Cpu::opCB0xDF), 8 };
 
 		/* Fifteenth row */
-		table[0xE0] = { "SET", bind(&Cpu::opCB0xE0), 8 };  table[0xE1] = { "SET", bind(&Cpu::opCB0xE1), 8 };
-		table[0xE2] = { "SET", bind(&Cpu::opCB0xE2), 8 };  table[0xE3] = { "SET", bind(&Cpu::opCB0xE3), 8 };
-		table[0xE4] = { "SET", bind(&Cpu::opCB0xE4), 8 };  table[0xE5] = { "SET", bind(&Cpu::opCB0xE5), 8 };
-		table[0xE6] = { "SET", bind(&Cpu::opCB0xE6), 16 }; table[0xE7] = { "SET", bind(&Cpu::opCB0xE7), 8 };
-		table[0xE8] = { "SET", bind(&Cpu::opCB0xE8), 8 };  table[0xE9] = { "SET", bind(&Cpu::opCB0xE9), 8 };
-		table[0xEA] = { "SET", bind(&Cpu::opCB0xEA), 8 };  table[0xEB] = { "SET", bind(&Cpu::opCB0xEB), 8 };
-		table[0xEC] = { "SET", bind(&Cpu::opCB0xEC), 8 };  table[0xED] = { "SET", bind(&Cpu::opCB0xED), 8 };
-		table[0xEE] = { "SET", bind(&Cpu::opCB0xEE), 16 }; table[0xEF] = { "SET", bind(&Cpu::opCB0xEF), 8 };
+		cbTable[0xE0] = { "SET", bind(&Cpu::opCB0xE0), 8 };  cbTable[0xE1] = { "SET", bind(&Cpu::opCB0xE1), 8 };
+		cbTable[0xE2] = { "SET", bind(&Cpu::opCB0xE2), 8 };  cbTable[0xE3] = { "SET", bind(&Cpu::opCB0xE3), 8 };
+		cbTable[0xE4] = { "SET", bind(&Cpu::opCB0xE4), 8 };  cbTable[0xE5] = { "SET", bind(&Cpu::opCB0xE5), 8 };
+		cbTable[0xE6] = { "SET", bind(&Cpu::opCB0xE6), 16 }; cbTable[0xE7] = { "SET", bind(&Cpu::opCB0xE7), 8 };
+		cbTable[0xE8] = { "SET", bind(&Cpu::opCB0xE8), 8 };  cbTable[0xE9] = { "SET", bind(&Cpu::opCB0xE9), 8 };
+		cbTable[0xEA] = { "SET", bind(&Cpu::opCB0xEA), 8 };  cbTable[0xEB] = { "SET", bind(&Cpu::opCB0xEB), 8 };
+		cbTable[0xEC] = { "SET", bind(&Cpu::opCB0xEC), 8 };  cbTable[0xED] = { "SET", bind(&Cpu::opCB0xED), 8 };
+		cbTable[0xEE] = { "SET", bind(&Cpu::opCB0xEE), 16 }; cbTable[0xEF] = { "SET", bind(&Cpu::opCB0xEF), 8 };
 
 
 		/* Sixteenth row */
-		table[0xF0] = { "SET", bind(&Cpu::opCB0xF0), 8 };  table[0xF1] = { "SET", bind(&Cpu::opCB0xF1), 8 };
-		table[0xF2] = { "SET", bind(&Cpu::opCB0xF2), 8 };  table[0xF3] = { "SET", bind(&Cpu::opCB0xF3), 8 };
-		table[0xF4] = { "SET", bind(&Cpu::opCB0xF4), 8 };  table[0xF5] = { "SET", bind(&Cpu::opCB0xF5), 8 };
-		table[0xF6] = { "SET", bind(&Cpu::opCB0xF6), 16 }; table[0xF7] = { "SET", bind(&Cpu::opCB0xF7), 8 };
-		table[0xF8] = { "SET", bind(&Cpu::opCB0xF8), 8 };  table[0xF9] = { "SET", bind(&Cpu::opCB0xF9), 8 };
-		table[0xFA] = { "SET", bind(&Cpu::opCB0xFA), 8 };  table[0xFB] = { "SET", bind(&Cpu::opCB0xFB), 8 };
-		table[0xFC] = { "SET", bind(&Cpu::opCB0xFC), 8 };  table[0xFD] = { "SET", bind(&Cpu::opCB0xFD), 8 };
-		table[0xFE] = { "SET", bind(&Cpu::opCB0xFE), 16 }; table[0xFF] = { "SET", bind(&Cpu::opCB0xFF), 8 };
+		cbTable[0xF0] = { "SET", bind(&Cpu::opCB0xF0), 8 };  cbTable[0xF1] = { "SET", bind(&Cpu::opCB0xF1), 8 };
+		cbTable[0xF2] = { "SET", bind(&Cpu::opCB0xF2), 8 };  cbTable[0xF3] = { "SET", bind(&Cpu::opCB0xF3), 8 };
+		cbTable[0xF4] = { "SET", bind(&Cpu::opCB0xF4), 8 };  cbTable[0xF5] = { "SET", bind(&Cpu::opCB0xF5), 8 };
+		cbTable[0xF6] = { "SET", bind(&Cpu::opCB0xF6), 16 }; cbTable[0xF7] = { "SET", bind(&Cpu::opCB0xF7), 8 };
+		cbTable[0xF8] = { "SET", bind(&Cpu::opCB0xF8), 8 };  cbTable[0xF9] = { "SET", bind(&Cpu::opCB0xF9), 8 };
+		cbTable[0xFA] = { "SET", bind(&Cpu::opCB0xFA), 8 };  cbTable[0xFB] = { "SET", bind(&Cpu::opCB0xFB), 8 };
+		cbTable[0xFC] = { "SET", bind(&Cpu::opCB0xFC), 8 };  cbTable[0xFD] = { "SET", bind(&Cpu::opCB0xFD), 8 };
+		cbTable[0xFE] = { "SET", bind(&Cpu::opCB0xFE), 16 }; cbTable[0xFF] = { "SET", bind(&Cpu::opCB0xFF), 8 };
 	}
 }
