@@ -153,7 +153,7 @@ namespace gbEmu {
 
 
 		/* 
-			Bit shift operations
+			Bit shift instructions
 		*/
 
 		//Rotate left circular register N
@@ -172,6 +172,21 @@ namespace gbEmu {
 		void SRA_N(u8& reg);
 		//Swap upper 4 bits in register N and lower 4 ones
 		void SWAP_N(u8& reg);
+		//Shifts register N to the right with bit 0 moved to the carry flag
+		//and bit 7 zeroed
+		void SRL_N(u8& reg);
+		
+
+		/*
+			Bit operations
+		*/
+
+		//Test bit B in register N, set the zero flag if bit not set
+		void BIT_B_N(u8 bit, u8 reg);
+		//Set bit B in register N to zero
+		void RES_B_N(u8 bit, u8& reg);
+		//Set bit B in register N to one
+		void SET_B_N(u8 bit, u8& reg);
 
 
 		/*

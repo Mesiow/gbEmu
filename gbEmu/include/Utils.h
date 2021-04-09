@@ -24,7 +24,7 @@ namespace gbEmu {
 
 	/*
 		Tests whether a bit is 1 or 0 in val
-		Returns 1 is On and 0 if off
+		Returns 1 if On and 0 if off
 	*/
 	u8 testBit(u8 val, u8 bitToTest);
 }
