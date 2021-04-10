@@ -102,21 +102,34 @@ namespace gbEmu {
     void DebugUI::update()
     {
         handleButtonPresses();
+        if (running) {
+            cpu->clock();
+        }
     }
 
     void DebugUI::handleButtonPresses()
     {
         if (stepPressed) {
               cpu->clock();
-              while (cpu->cycles > 0)
-                  cpu->clock();
+              //while (cpu->cycles > 0)
+                //  cpu->clock();
         }
         if (runPressed) {
             printf("Running cpu emulation\n");
+            running = true;
         }
         if (haltPressed) {
+            running = false;
             printf("Halting cpu emulation");
         }
     }
 
+    void DebugUI::handleEvents(sf::Event& ev)
+    {
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::Space) {
+                running = !running;
+            }
+        }
+    }
 }

@@ -16,5 +16,7 @@ namespace gbEmu {
 
 		u8 memory[MAX_MEM];
 		u8 bootrom[0x100];
+
+		bool bootRomEnabled = false;
 	};
 }

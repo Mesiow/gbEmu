@@ -1,6 +1,8 @@
 #pragma once
 #include "imgui.h"
 #include "imgui_memory_editor.h"
+#include <SFML/Graphics.hpp>
+#include <string>
 
 namespace gbEmu {
 	struct MMU;
@@ -10,6 +12,7 @@ namespace gbEmu {
 		void render();
 		void update();
 		void handleButtonPresses();
+		void handleEvents(sf::Event& ev);
 
 		static MemoryEditor mainMemory;
 		static MemoryEditor bootRomMemory;
@@ -19,5 +22,7 @@ namespace gbEmu {
 		bool stepPressed = false;
 		bool runPressed = false;
 		bool haltPressed = false;
+		bool running = false;
+		std::string msg = "";
 	};
 }

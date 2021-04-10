@@ -45,7 +45,7 @@ namespace gbEmu {
 		*/
 		void testFunc();
 
-		void clock();
+		u8 clock();
 		
 		u8 read(u16 address);
 		void write(u16 address, u8 value);

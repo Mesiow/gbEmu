@@ -12,13 +12,13 @@
 int main(int arc, char* argv[]) {
 
     sf::RenderWindow window(sf::VideoMode(768, 560), "gbEmu");
-    window.setFramerateLimit(60);
+    //window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
 
    
    
     gbEmu::MMU mmu;
-    mmu.loadRom("DMG_ROM.bin", true);
+    mmu.loadRom("roms/DMG_ROM.GB", true);
 
     gbEmu::Cpu cpu(&mmu);
     gbEmu::DebugUI ui(&mmu, &cpu);
@@ -30,6 +30,7 @@ int main(int arc, char* argv[]) {
         sf::Event event;
         while (window.pollEvent(event)) {
             ImGui::SFML::ProcessEvent(event);
+            ui.handleEvents(event);
 
             if (event.type == sf::Event::Closed) {
                 window.close();
@@ -37,7 +38,7 @@ int main(int arc, char* argv[]) {
         }
 
         ImGui::SFML::Update(window, deltaClock.restart());
-
+       
         ui.update();
         ui.render();
 

@@ -25,9 +25,22 @@ namespace gbEmu {
 		HL.value = 0x0000;
 
 		PC = 0x0000;
-		SP = 0xFFFE;
+		SP = 0x0000;
+
+		//stub FF44 in memory to pass 0068 in bootrom
+		write(0xFF44, 0x90);
 
 		testFunc();
+
+		//Set CPU status to right before where the bug was (0x0099)
+		{
+			/*AF.value = 0xCE00;
+			BC.value = 0x04CE;
+			DE.value = 0x0104;
+			HL.value = 0x8010;
+			SP = 0xFFFA;
+			PC = 0x0099;*/
+		}
 	}
 
 	void Cpu::testFunc()
@@ -163,22 +176,36 @@ namespace gbEmu {
 		//mmu->write(0x1, 0x30);
 	}
 
-	void Cpu::clock()
+	//TODO: TESTING BOOTROM, left of AT PC:0093
+	u8 Cpu::clock()
 	{
-		if (cycles == 0) {
+		//if (cycles == 0) {
 			//Read opcode
 			u8 opcode = read(PC);
 			PC++;
 
-			//Get instruction associated with that opcode
-			Instruction ins = table[opcode];
+			if (opcode == 0xCB) {
+				//Get instruction associated with that opcode
+				u8 cbOpcode = read(PC++);
+				Instruction ins = cbTable[cbOpcode];
 
-			//Base number of cycles required
-			cycles = ins.cycles;
-			//May require more cycles based on certain conditions
-			cycles += ins.execute();
-		}
-		cycles--;
+				//Base number of cycles required
+				cycles = ins.cycles;
+				//May require more cycles based on certain conditions
+				cycles += ins.execute();
+			}
+			else {
+				//Get instruction associated with that opcode
+				Instruction ins = table[opcode];
+
+				//Base number of cycles required
+				cycles = ins.cycles;
+				//May require more cycles based on certain conditions
+				cycles += ins.execute();
+			}
+		//}
+		//cycles--;
+		return cycles;
 	}
 
 	u8 Cpu::read(u16 address)
@@ -469,12 +496,9 @@ namespace gbEmu {
 
 	void Cpu::RET()
 	{
-		u8 lo;
-		u8 hi;
-
-		lo = read(SP);
+		u8 lo = read(SP);
 		SP++;
-	    hi = read(SP);
+	    u8 hi = read(SP);
 		SP++;
 
 		u16 returnAddr = ((hi << 8) | lo);
@@ -822,7 +846,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x12()
 	{
-		write(BC.value, AF.hi);
+		write(DE.value, AF.hi);
 		return 0;
 	}
 
@@ -1870,15 +1894,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCB()
 	{
-		//Execute CB table instruction
-		u8 cb_table_opcode = read(PC);
-		PC++;
-
-		Instruction ins = cbTable[cb_table_opcode];
-
-		cycles += ins.cycles;
-		cycles += ins.execute();
-
+		//CB prefix
 		return 0;
 	}
 	u8 Cpu::op0xCC()
