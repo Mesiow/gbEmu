@@ -176,7 +176,7 @@ namespace gbEmu {
 		//mmu->write(0x1, 0x30);
 	}
 
-	//TODO: TESTING BOOTROM, left of AT PC:0093
+	//TODO: TESTING BOOTROM, left of AT PC:00FA (AF reg not correct)
 	u8 Cpu::clock()
 	{
 		//if (cycles == 0) {
@@ -195,10 +195,8 @@ namespace gbEmu {
 				cycles += ins.execute();
 			}
 			else {
-				//Get instruction associated with that opcode
+			
 				Instruction ins = table[opcode];
-
-				//Base number of cycles required
 				cycles = ins.cycles;
 				//May require more cycles based on certain conditions
 				cycles += ins.execute();

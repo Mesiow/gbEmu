@@ -103,7 +103,12 @@ namespace gbEmu {
     {
         handleButtonPresses();
         if (running) {
-            cpu->clock();
+            int cycles_this_frame = 0;
+            static int delta_cycles = 0;         //each scanline takes 456 t cycles. There are 154 scanlines per frame
+            while (cycles_this_frame < 70224) { //(456 * 154) = 70224
+                cycles_this_frame += cpu->clock();
+            }
+            delta_cycles += cycles_this_frame - 70224;
         }
     }
 
