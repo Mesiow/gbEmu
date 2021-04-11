@@ -18,8 +18,9 @@ int main(int arc, char* argv[]) {
    
    
     gbEmu::MMU mmu;
+   
+    mmu.loadRom("test_roms/06-ld r,r.GB");
     mmu.loadRom("roms/DMG_ROM.GB", true);
-   // mmu.loadRom("test_roms/06-ld r,r.GB");
 
     gbEmu::Cpu cpu(&mmu);
     gbEmu::DebugUI ui(&mmu, &cpu);
