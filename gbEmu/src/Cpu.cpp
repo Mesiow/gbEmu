@@ -176,14 +176,15 @@ namespace gbEmu {
 		//mmu->write(0x1, 0x30);
 	}
 
-	//TODO: TESTING BOOTROM, left of AT PC:00FA (AF reg not correct)
+	//TODO: TESTING Blargs test 06, problem/bug after executing PC:C0A8
 	u8 Cpu::clock()
 	{
 		//if (cycles == 0) {
 			//Read opcode
-			u8 opcode = read(PC);
+		
 
 			if (!halt) {
+				u8 opcode = read(PC);
 				PC++;
 				if (opcode == 0xCB) {
 					//Get instruction associated with that opcode
@@ -470,10 +471,8 @@ namespace gbEmu {
 		return 0;
 	}
 
-	void Cpu::CALL()
+	void Cpu::CALL(u16 address)
 	{
-		u16 addr = fetchU16();
-
 		u8 lo = (PC & 0xFF);
 		u8 hi = (PC & 0xFF00) >> 8;
 
@@ -482,16 +481,16 @@ namespace gbEmu {
 		SP--;
 		write(SP, lo);
 
-		PC = addr;
+		PC = address;
 	}
 
-	u8 Cpu::CALL_COND(bool condition)
+	u8 Cpu::CALL_COND(u16 address, bool condition)
 	{
-		u16 addr = fetchU16();
 		if (condition) {
-			CALL();
+			CALL(address);
 			return 8;
 		}
+		PC += 2;
 		return 0;
 	}
 
@@ -1860,7 +1859,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC4()
 	{
-		u8 extra_cycles = CALL_COND((getFlag(FLAG_Z) == 0));
+		u8 extra_cycles = CALL_COND(fetchU16(), (getFlag(FLAG_Z) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xC5()
@@ -1900,12 +1899,12 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCC()
 	{
-		u8 extra_cycles = CALL_COND(getFlag(FLAG_Z));
+		u8 extra_cycles = CALL_COND(fetchU16(), getFlag(FLAG_Z));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xCD()
 	{
-		CALL();
+		CALL(fetchU16());
 		return 0;
 	}
 	u8 Cpu::op0xCE()
@@ -1940,7 +1939,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xD4()
 	{
-		u8 extra_cycles = CALL_COND((getFlag(FLAG_C) == 0));
+		u8 extra_cycles = CALL_COND(fetchU16(), (getFlag(FLAG_C) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xD5()
@@ -1981,7 +1980,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xDC()
 	{
-		u8 extra_cycles = CALL_COND(getFlag(FLAG_C));
+		u8 extra_cycles = CALL_COND(fetchU16(), getFlag(FLAG_C));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xDD()

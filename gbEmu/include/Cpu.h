@@ -135,9 +135,9 @@ namespace gbEmu {
 
 		//Call 16 bit immediate address. This pushes the address of the instruction
 		//after the CALL on the stack, so that RET can pop it later
-		void CALL();
+		void CALL(u16 address);
 		//Call with a condition
-		u8 CALL_COND(bool condition);
+		u8 CALL_COND(u16 address, bool condition);
 
 		//Return from a subroutine. This is basically a POP PC
 		void RET();

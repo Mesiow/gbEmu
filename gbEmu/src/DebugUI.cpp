@@ -107,8 +107,8 @@ namespace gbEmu {
             static int delta_cycles = 0;         //each scanline takes 456 t cycles. There are 154 scanlines per frame
             while (cycles_this_frame < 70224) { //(456 * 154) = 70224
                 cycles_this_frame += cpu->clock();
-                if (haltAtPos) {
-                    if (cpu->PC == 0xF4) {
+                if (haltAtPos) { //Stop PC at this position for debugging
+                    if (cpu->PC == 0xC0A8) {
                         cpu->halt = true;
                     }
                 }
@@ -151,7 +151,7 @@ namespace gbEmu {
 
         if (ev.type == sf::Event::KeyReleased) {
             if (ev.key.code == sf::Keyboard::F) {
-                //Halt at PC F4
+                //Halt at PC C000
                 haltAtPos = !haltAtPos;
             }
         }

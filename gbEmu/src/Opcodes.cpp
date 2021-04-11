@@ -130,11 +130,11 @@ namespace gbEmu {
 		/* Thirteenth row */
 		table[0xC0] = { "RET", bind(&Cpu::op0xC0), 8 };  table[0xC1] = { "POP", bind(&Cpu::op0xC1), 12 };
 		table[0xC2] = { "JP", bind(&Cpu::op0xC2), 12 };  table[0xC3] = { "JP", bind(&Cpu::op0xC3), 16 };
-		table[0xC4] = { "CALL", bind(&Cpu::op0xC4), 12 };  table[0xC5] = { "PUSH", bind(&Cpu::op0xC5), 16 };
+		table[0xC4] = { "CALL", bind(&Cpu::op0xC4), 12 };table[0xC5] = { "PUSH", bind(&Cpu::op0xC5), 16 };
 		table[0xC6] = { "ADD", bind(&Cpu::op0xC6), 8 };  table[0xC7] = { "RST", bind(&Cpu::op0xC7), 16 };
 		table[0xC8] = { "RET", bind(&Cpu::op0xC8), 8 };  table[0xC9] = { "RET", bind(&Cpu::op0xC9), 16 };
 		table[0xCA] = { "JP", bind(&Cpu::op0xCA), 12 };  table[0xCB] = { "CB", bind(&Cpu::op0xCB), 4 };
-		table[0xCC] = { "CALL", bind(&Cpu::op0xCC), 12 };  table[0xCD] = { "CALL", bind(&Cpu::op0xCD), 24 };
+		table[0xCC] = { "CALL", bind(&Cpu::op0xCC), 12 };table[0xCD] = { "CALL", bind(&Cpu::op0xCD), 24 };
 		table[0xCE] = { "ADC", bind(&Cpu::op0xCE), 8 };  table[0xCF] = { "RST", bind(&Cpu::op0xCF), 16 };
 
 		/* Fourteenth row */
