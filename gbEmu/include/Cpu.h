@@ -497,6 +497,7 @@ namespace gbEmu {
 
 		u8 cycles = 0;
 		bool interruptsEnabled = false;
+		bool halt = false;
 
 		//1. Pneumonic
 		//2. Function pointer to the opcode implementation

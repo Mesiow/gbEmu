@@ -107,6 +107,14 @@ namespace gbEmu {
             static int delta_cycles = 0;         //each scanline takes 456 t cycles. There are 154 scanlines per frame
             while (cycles_this_frame < 70224) { //(456 * 154) = 70224
                 cycles_this_frame += cpu->clock();
+                if (haltAtPos) {
+                    if (cpu->PC == 0xF4) {
+                        cpu->halt = true;
+                    }
+                }
+                else {
+                    cpu->halt = false;
+                }
             }
             delta_cycles += cycles_this_frame - 70224;
         }
@@ -115,9 +123,8 @@ namespace gbEmu {
     void DebugUI::handleButtonPresses()
     {
         if (stepPressed) {
+              cpu->halt = false;
               cpu->clock();
-              //while (cpu->cycles > 0)
-                //  cpu->clock();
         }
         if (runPressed) {
             printf("Running cpu emulation\n");
@@ -134,6 +141,18 @@ namespace gbEmu {
         if (ev.type == sf::Event::KeyReleased) {
             if (ev.key.code == sf::Keyboard::Space) {
                 running = !running;
+            }
+        }
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::S) {
+                cpu->halt = false;
+            }
+        }
+
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::F) {
+                //Halt at PC F4
+                haltAtPos = !haltAtPos;
             }
         }
     }

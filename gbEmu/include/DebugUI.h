@@ -24,5 +24,7 @@ namespace gbEmu {
 		bool haltPressed = false;
 		bool running = false;
 		std::string msg = "";
+
+		bool haltAtPos = false;
 	};
 }

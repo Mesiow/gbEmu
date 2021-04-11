@@ -182,25 +182,28 @@ namespace gbEmu {
 		//if (cycles == 0) {
 			//Read opcode
 			u8 opcode = read(PC);
-			PC++;
 
-			if (opcode == 0xCB) {
-				//Get instruction associated with that opcode
-				u8 cbOpcode = read(PC++);
-				Instruction ins = cbTable[cbOpcode];
+			if (!halt) {
+				PC++;
+				if (opcode == 0xCB) {
+					//Get instruction associated with that opcode
+					u8 cbOpcode = read(PC++);
+					Instruction ins = cbTable[cbOpcode];
 
-				//Base number of cycles required
-				cycles = ins.cycles;
-				//May require more cycles based on certain conditions
-				cycles += ins.execute();
+					//Base number of cycles required
+					cycles = ins.cycles;
+					//May require more cycles based on certain conditions
+					cycles += ins.execute();
+				}
+				else {
+
+					Instruction ins = table[opcode];
+					cycles = ins.cycles;
+					//May require more cycles based on certain conditions
+					cycles += ins.execute();
+				}
 			}
-			else {
 			
-				Instruction ins = table[opcode];
-				cycles = ins.cycles;
-				//May require more cycles based on certain conditions
-				cycles += ins.execute();
-			}
 		//}
 		//cycles--;
 		return cycles;
@@ -378,14 +381,14 @@ namespace gbEmu {
 	u8 Cpu::SBC_A_N(u8 reg)
 	{
 		u8 carry = getFlag(FLAG_C);
-		u8 result = AF.hi - (reg + carry);
+		u8 result = AF.hi - reg - carry;
 
 		setFlag(FLAG_Z, (result == 0));
 		setFlag(FLAG_N);
 		setFlag(FLAG_H, ((AF.hi & 0xF) - (reg & 0xF) - carry) < 0);
 		setFlag(FLAG_C, ((reg + carry) > AF.hi));
 
-		AF.hi = AF.hi - (reg + carry);
+		AF.hi = result;
 		return 0;
 	}
 

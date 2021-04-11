@@ -91,7 +91,7 @@ namespace gbEmu {
 		table[0x80] = { "ADD", bind(&Cpu::op0x80), 4 };  table[0x81] = { "ADD", bind(&Cpu::op0x81), 4 };
 		table[0x82] = { "ADD", bind(&Cpu::op0x82), 4 };  table[0x83] = { "ADD", bind(&Cpu::op0x83), 4 };
 		table[0x84] = { "ADD", bind(&Cpu::op0x84), 4 };  table[0x85] = { "ADD", bind(&Cpu::op0x85), 4 };
-		table[0x86] = { "ADD", bind(&Cpu::op0x86), 8 };table[0x87] = { "ADD", bind(&Cpu::op0x87), 4 };
+		table[0x86] = { "ADD", bind(&Cpu::op0x86), 8 };  table[0x87] = { "ADD", bind(&Cpu::op0x87), 4 };
 		table[0x88] = { "ADC", bind(&Cpu::op0x88), 4 };  table[0x89] = { "ADC", bind(&Cpu::op0x89), 4 };
 		table[0x8A] = { "ADC", bind(&Cpu::op0x8A), 4 };  table[0x8B] = { "ADC", bind(&Cpu::op0x8B), 4 };
 		table[0x8C] = { "ADC", bind(&Cpu::op0x8C), 4 };  table[0x8D] = { "ADC", bind(&Cpu::op0x8D), 4 };
