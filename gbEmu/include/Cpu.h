@@ -128,10 +128,10 @@ namespace gbEmu {
 		*/
 
 		//Jump PC to immediate 16 bit address
-		void JP();
+		void JP(u16 address);
 		//Jump PC to immediate 16 bit address if condition passes
 		//Returns extra cycles or zero if none
-		u8 JP_COND(bool condition);
+		u8 JP_COND(u16 address, bool condition);
 
 		//Call 16 bit immediate address. This pushes the address of the instruction
 		//after the CALL on the stack, so that RET can pop it later

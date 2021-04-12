@@ -108,7 +108,7 @@ namespace gbEmu {
             while (cycles_this_frame < 70224) { //(456 * 154) = 70224
                 cycles_this_frame += cpu->clock();
                 if (haltAtPos) { //Stop PC at this position for debugging
-                    if (cpu->PC == 0xC0A8) {
+                    if (cpu->PC == 0xC4AB) {
                         cpu->halt = true;
                     }
                 }

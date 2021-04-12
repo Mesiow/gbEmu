@@ -455,19 +455,18 @@ namespace gbEmu {
 		SP++;
 	}
 
-	void Cpu::JP()
+	void Cpu::JP(u16 address)
 	{
-		u16 addr = fetchU16();
-		PC = addr;
+		PC = address;
 	}
 
-	u8 Cpu::JP_COND(bool condition)
+	u8 Cpu::JP_COND(u16 address, bool condition)
 	{
-		u16 addr = fetchU16();
 		if (condition) {
-			PC = addr;
+			JP(address);
 			return 4;
 		}
+		PC += 2;
 		return 0;
 	}
 
@@ -545,43 +544,49 @@ namespace gbEmu {
 	void Cpu::RLC_N(u8& reg)
 	{
 		u8 msb = ((reg & 0x80) >> 7);
-		u8 result = (reg << 1);
-
-		setFlag(FLAG_Z, (result == 0));
 		clearFlag((FLAG_N | FLAG_H));
 
-		//Carry will store old bit 7 data
-		if (msb)
-			setFlag(FLAG_C);
-		else
-			clearFlag(FLAG_C);
-
 		reg <<= 1;
+
+		//Carry will store old bit 7 data,
+		//bit 7 will also be moved to bit 0
+		if (msb) {
+			setFlag(FLAG_C);
+			reg = setBit(reg, 0);
+		}
+		else {
+			clearFlag(FLAG_C);
+			reg = resetBit(reg, 0);
+		}
+
+		setFlag(FLAG_Z, (reg == 0));
 	}
 
 	void Cpu::RRC_N(u8& reg)
 	{
 		u8 lsb = (reg & 0x1);
 		u8 result = (reg >> 1) & 0xFF;
-
-		setFlag(FLAG_Z, (result == 0));
 		clearFlag((FLAG_N | FLAG_H));
 
-		if (lsb)
-			setFlag(FLAG_C);
-		else
-			clearFlag(FLAG_C);
-
 		reg >>= 1;
+
+
+		if (lsb) {
+			setFlag(FLAG_C);
+			reg = setBit(reg, 7);
+		}
+		else {
+			clearFlag(FLAG_C);
+			reg = resetBit(reg, 7);
+		}
+
+		setFlag(FLAG_Z, (reg == 0));
 	}
 
 	void Cpu::RL_N(u8& reg)
 	{
 		u8 carry = ((AF.lo & FLAG_C) >> 4);
-		u8 msb = ((reg & 0x80) >> 7);
-		u8 result = (reg << 1);
-
-		setFlag(FLAG_Z, (result == 0));
+		u8 msb = ((reg & 0x80) >> 7);	
 		clearFlag((FLAG_N | FLAG_H));
 
 		reg <<= 1;
@@ -595,15 +600,14 @@ namespace gbEmu {
 		else {
 			clearFlag(FLAG_C);
 		}
+
+		setFlag(FLAG_Z, (reg == 0));
 	}
 
 	void Cpu::RR_N(u8& reg)
 	{
 		u8 carry = ((AF.lo & FLAG_C));
 		u8 lsb = (reg & 0x1);
-		u8 result = (reg >> 1);
-
-		setFlag(FLAG_Z, (result == 0));
 		clearFlag((FLAG_N | FLAG_H));
 
 		reg >>= 1;
@@ -618,6 +622,8 @@ namespace gbEmu {
 		else {
 			clearFlag(FLAG_C);
 		}
+
+		setFlag(FLAG_Z, (reg == 0));
 	}
 
 	void Cpu::SLA_N(u8& reg)
@@ -640,11 +646,12 @@ namespace gbEmu {
 
 	void Cpu::SRA_N(u8& reg)
 	{
-		u8 lsb = (reg & 0x1);
-		u8 result = (reg >> 1);
-
-		setFlag(FLAG_Z, (result == 0));
+		u8 lsb = (reg & 0x1);	
+		u8 msb = ((reg & 0x80));
 		clearFlag((FLAG_N | FLAG_H));
+
+		reg >>= 1;
+		reg |= (msb);
 
 		if (lsb) {
 			setFlag(FLAG_C);
@@ -652,7 +659,8 @@ namespace gbEmu {
 		else {
 			clearFlag(FLAG_C);
 		}
-		reg >>= 1;
+		
+		setFlag(FLAG_Z, (reg == 0));
 	}
 
 	void Cpu::SWAP_N(u8& reg)
@@ -689,6 +697,7 @@ namespace gbEmu {
 	void Cpu::BIT_B_N(u8 bit, u8 reg)
 	{
 		setFlag(FLAG_H);
+		clearFlag(FLAG_N);
 		if (testBit(reg, bit) == 0) {
 			setFlag(FLAG_Z);
 		}
@@ -753,17 +762,21 @@ namespace gbEmu {
 	u8 Cpu::op0x07()
 	{
 		u8 msb = ((AF.hi & 0x80) >> 7);
-		u8 result = (AF.hi << 1);
-
 		clearFlag((FLAG_Z | FLAG_N | FLAG_H));
 
-		//Carry will store old bit 7 data
-		if (msb)
-			setFlag(FLAG_C);
-		else
-			clearFlag(FLAG_C);
-
 		AF.hi <<= 1;
+
+		//Carry will store old bit 7 data, bit 7 will be
+		//moved to bit 0
+		if (msb) {
+			setFlag(FLAG_C);
+			AF.hi = setBit(AF.hi, 0);
+		}
+		else {
+			clearFlag(FLAG_C);
+			AF.hi = resetBit(AF.hi, 0);
+		}
+
 		return 0;
 	}
 
@@ -820,16 +833,19 @@ namespace gbEmu {
 	u8 Cpu::op0x0F()
 	{
 		u8 lsb = (AF.hi & 0x1);
-		u8 result = (AF.hi >> 1) & 0xFF;
-
 		clearFlag((FLAG_Z | FLAG_N | FLAG_H));
 
-		if (lsb)
-			setFlag(FLAG_C);
-		else
-			clearFlag(FLAG_C);
-		
 		AF.hi >>= 1;
+
+		if (lsb) {
+			setFlag(FLAG_C);
+			AF.hi = setBit(AF.hi, 7);
+		}
+		else {
+			clearFlag(FLAG_C);
+			AF.hi = resetBit(AF.hi, 7);
+		}
+		
 		return 0;
 	}
 
@@ -966,12 +982,13 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x20()
 	{
-		s8 i8 = fetchU8();
 		//Jump if Zero is not set
 		if (getFlag(FLAG_Z) == 0) {
+			s8 i8 = fetchU8();
 			PC = PC + i8;
 			return 4;
 		}
+		PC++;
 		return 0;
 	}
 	u8 Cpu::op0x21()
@@ -1022,7 +1039,7 @@ namespace gbEmu {
 			of the PSW and accumulator.
 		
 		*/
-		u8 a = AF.hi;
+		s32 a = AF.hi;
 
 		if (!getFlag(FLAG_N)) {
 			if ((getFlag(FLAG_H)) || (a & 0x0F) > 9)
@@ -1054,13 +1071,13 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x28()
 	{
-		s8 i8 = fetchU8();
 		//Jump if Zero is set
 		if (getFlag(FLAG_Z)) {
+			s8 i8 = fetchU8();
 			PC = PC + i8;
 			return 4;
 		}
-
+		PC++;
 		return 0;
 	}
 	u8 Cpu::op0x29()
@@ -1103,12 +1120,13 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x30()
 	{
-		s8 i8 = fetchU8();
 		//Jump if Carry is not set
 		if (getFlag(FLAG_C) == 0) {
+			s8 i8 = fetchU8();
 			PC = PC + i8;
 			return 4;
 		}
+		PC++;
 		return 0;
 	}
 	u8 Cpu::op0x31()
@@ -1129,13 +1147,17 @@ namespace gbEmu {
 	u8 Cpu::op0x34()
 	{
 		u8 data = read(HL.value);
-		write(HL.value, ++data);
+		INC_N(data);
+		write(HL.value, data);
+
 		return 0;
 	}
 	u8 Cpu::op0x35()
 	{
 		u8 data = read(HL.value);
-		write(HL.value, --data);
+		DEC_N(data);
+		write(HL.value, data);
+
 		return 0;
 	}
 	u8 Cpu::op0x36()
@@ -1152,11 +1174,13 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x38()
 	{
-		s8 i8 = fetchU8();
+		
 		if (getFlag(FLAG_C)) {
+			s8 i8 = fetchU8();
 			PC = PC + i8;
 			return 4;
 		}
+		PC++;
 		return 0;
 	}
 	u8 Cpu::op0x39()
@@ -1849,12 +1873,12 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC2()
 	{
-		u8 extra_cycles = JP_COND((getFlag(FLAG_Z) == 0));
+		u8 extra_cycles = JP_COND(fetchU16(), (getFlag(FLAG_Z) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xC3()
 	{
-		JP();
+		JP(fetchU16());
 		return 0;
 	}
 	u8 Cpu::op0xC4()
@@ -1889,7 +1913,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCA()
 	{
-		u8 extra_cycles = JP_COND(getFlag(FLAG_Z));
+		u8 extra_cycles = JP_COND(fetchU16(), getFlag(FLAG_Z));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xCB()
@@ -1929,7 +1953,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xD2()
 	{
-		u8 extra_cycles = JP_COND((getFlag(FLAG_C) == 0));
+		u8 extra_cycles = JP_COND(fetchU16(), (getFlag(FLAG_C) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xD3()
@@ -1970,7 +1994,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xDA()
 	{
-		u8 extra_cycles = JP_COND(getFlag(FLAG_C));
+		u8 extra_cycles = JP_COND(fetchU16(), getFlag(FLAG_C));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xDB()
@@ -2041,12 +2065,12 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xE8()
 	{
-		u8 i8 = fetchU8();
+		s8 i8 = fetchU8();
 		u16 result = SP + i8;
 
 		clearFlag((FLAG_Z | FLAG_N));
-		setFlag(FLAG_H, (SP & 0xFFF) + (i8 & 0xFFF) > 0xFFF);
-		setFlag(FLAG_C, (SP & 0xFFFF) + (i8 & 0xFFFF) > 0xFFFF);
+		setFlag(FLAG_H, (SP & 0xF) + (i8 & 0xF) > 0xF);
+		setFlag(FLAG_C, (SP & 0xFF) + (i8 & 0xFF) > 0xFF);
 
 		SP += i8;
 		return 0;
@@ -2096,6 +2120,10 @@ namespace gbEmu {
 	u8 Cpu::op0xF1()
 	{
 		POP_NN(AF);
+
+		//Make sure lower nibble is cleared to get correct flag value
+		AF.lo &= 0xF0; 
+
 		return 0;
 	}
 	u8 Cpu::op0xF2()
@@ -2130,12 +2158,12 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xF8()
 	{
-		u8 i8 = fetchU8();
+		s8 i8 = fetchU8();
 		u16 result = SP + i8;
 
 		clearFlag((FLAG_Z | FLAG_N));
-		setFlag(FLAG_H, (SP & 0xFFF) + (i8 & 0xFFF) > 0xFFF);
-		setFlag(FLAG_C, (SP & 0xFFFF) + (i8 & 0xFFFF) > 0xFFFF);
+		setFlag(FLAG_H, (SP & 0xF) + (i8 & 0xF) > 0xF);
+		setFlag(FLAG_C, (SP & 0xFF) + (i8 & 0xFF) > 0xFF);
 
 		HL.value = result;
 		return 0;
@@ -2216,21 +2244,9 @@ namespace gbEmu {
 	u8 Cpu::opCB0x06()
 	{
 		u8 data = read(HL.value);
-
-		u8 msb = ((data & 0x80) >> 7);
-		u8 result = (data << 1);
-
-		setFlag(FLAG_Z, (result == 0));
-		clearFlag((FLAG_N | FLAG_H));
-
-		//Carry will store old bit 7 data
-		if (msb)
-			setFlag(FLAG_C);
-		else
-			clearFlag(FLAG_C);
-
-		data <<= 1;
+		RLC_N(data);
 		write(HL.value, data);
+	
 		return 0;
 	}
 	u8 Cpu::opCB0x07()
@@ -2271,20 +2287,9 @@ namespace gbEmu {
 	u8 Cpu::opCB0x0E()
 	{
 		u8 data = read(HL.value);
-
-		u8 lsb = (data & 0x1);
-		u8 result = (data >> 1) & 0xFF;
-
-		setFlag(FLAG_Z, (result == 0));
-		clearFlag((FLAG_N | FLAG_H));
-
-		if (lsb)
-			setFlag(FLAG_C);
-		else
-			clearFlag(FLAG_C);
-
-		data >>= 1;
+		RRC_N(data);
 		write(HL.value, data);
+
 		return 0;
 	}
 	u8 Cpu::opCB0x0F()
@@ -2325,26 +2330,9 @@ namespace gbEmu {
 	u8 Cpu::opCB0x16()
 	{
 		u8 data = read(HL.value);
-
-		u8 carry = ((AF.lo & FLAG_C) >> 4);
-		u8 msb = ((data & 0x80) >> 7);
-		u8 result = (data << 1);
-
-		setFlag(FLAG_Z, (result == 0));
-		clearFlag((FLAG_N | FLAG_H));
-
-		data <<= 1;
-
-		//Carry put into bit 0
-		(data |= carry);
-		//Msb put into carry
-		if (msb) {
-			setFlag(FLAG_C);
-		}
-		else {
-			clearFlag(FLAG_C);
-		}
+		RL_N(data);
 		write(HL.value, data);
+
 		return 0;
 	}
 	u8 Cpu::opCB0x17()
@@ -2385,27 +2373,9 @@ namespace gbEmu {
 	u8 Cpu::opCB0x1E()
 	{
 		u8 data = read(HL.value);
-
-		u8 carry = ((AF.lo & FLAG_C));
-		u8 lsb = (data & 0x1);
-		u8 result = (data >> 1);
-
-		setFlag(FLAG_Z, (result == 0));
-		clearFlag((FLAG_N | FLAG_H));
-
-		data >>= 1;
-
-		//Carry put into bit 7
-		(data |= (carry << 3));
-
-		//Msb put into carry
-		if (lsb) {
-			setFlag(FLAG_C);
-		}
-		else {
-			clearFlag(FLAG_C);
-		}
+		RR_N(data);
 		write(HL.value, data);
+
 		return 0;
 	}
 	u8 Cpu::opCB0x1F()
@@ -2503,21 +2473,9 @@ namespace gbEmu {
 	u8 Cpu::opCB0x2E()
 	{
 		u8 data = read(HL.value);
-
-		u8 lsb = (data & 0x1);
-		u8 result = (data >> 1);
-
-		setFlag(FLAG_Z, (result == 0));
-		clearFlag((FLAG_N | FLAG_H));
-
-		if (lsb) {
-			setFlag(FLAG_C);
-		}
-		else {
-			clearFlag(FLAG_C);
-		}
-		data >>= 1;
+		SRA_N(data);
 		write(HL.value, data);
+
 		return 0;
 	}
 	u8 Cpu::opCB0x2F()
