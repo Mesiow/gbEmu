@@ -1174,7 +1174,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x38()
 	{
-		
+		//Jump if carry is set
 		if (getFlag(FLAG_C)) {
 			s8 i8 = fetchU8();
 			PC = PC + i8;
@@ -1943,7 +1943,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xD0()
 	{
-		u8 extra_cycles = RET_COND((getFlag(FLAG_C == 0)));
+		u8 extra_cycles = RET_COND((getFlag(FLAG_C) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xD1()
