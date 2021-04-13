@@ -171,42 +171,76 @@ namespace gbEmu {
 	//TODO: TESTING Blargs test 07
 	u8 Cpu::clock()
 	{
-		//if (cycles == 0) {
-			//Read opcode
-		
+		if (!halt) {
+			u8 opcode = read(PC);
+			PC++;
+			if (opcode == 0xCB) {
+				//Get instruction associated with that opcode
+				u8 cbOpcode = read(PC++);
+				Instruction ins = cbTable[cbOpcode];
 
-			if (!halt) {
-				u8 opcode = read(PC);
-				PC++;
-				if (opcode == 0xCB) {
-					//Get instruction associated with that opcode
-					u8 cbOpcode = read(PC++);
-					Instruction ins = cbTable[cbOpcode];
-
-					//Base number of cycles required
-					cycles = ins.cycles;
-					//May require more cycles based on certain conditions
-					cycles += ins.execute();
-				}
-				else {
-
-					Instruction ins = table[opcode];
-					cycles = ins.cycles;
-					//May require more cycles based on certain conditions
-					cycles += ins.execute();
-				}
-				handleTimer(cycles);
-				handleInterrupts();
+				//Base number of cycles required
+				cycles = ins.cycles;
+				//May require more cycles based on certain conditions
+				cycles += ins.execute();
 			}
-			
-		//}
-		//cycles--;
+			else {
+
+				Instruction ins = table[opcode];
+				cycles = ins.cycles;
+				//May require more cycles based on certain conditions
+				cycles += ins.execute();
+			}
+			handleTimer(cycles);
+			handleInterrupts();
+		}
 		return cycles;
 	}
 
-	void Cpu::handleTimer(u32 cycles)
+	void Cpu::handleTimer(s32 cycles)
 	{
+		//set divider
+		divClocksum += cycles;
+		if (divClocksum >= 256) {
+			divClocksum -= 256;
+			addToMem(0xFF04, 1); //reset div timer to 0 by writing to it
+		}
 
+		//Control timer register(used for configuring behavior of timers)
+		u8 control = read(0xFF07);
+		//Check if timer is on
+		if ((control >> 2) & 0x1) {
+			timerClocksum += cycles;
+
+			//First 2 bits of control tell us the freq to set the timer to
+			s32 freq = 4096;
+			if ((control & 0x3) == 0x1) {
+				freq = 262144;
+			}
+			else if ((control & 0x3) == 0x2) {
+				freq = 65536;
+			}
+			else if ((control & 0x3) == 0x3) {
+				freq = 16384;
+			}
+
+			//increment timer according to the freq
+			while (timerClocksum >= (4194304 / freq)) {
+				//Increase TIMA
+				addToMem(0xFF05, 1);
+				//Check for TIMA overflow(if overflow, trigger interrupt)
+				u8 TIMA = read(0xFF05);
+				if (TIMA == 0x00) {
+					//Set interrupt request flag for timer overflow
+					u8 IF = read(0xFF0F);
+					write(0xFF0F, IF | 0x4);
+
+					//When counter overflows to 0, it's reset to start at Modulo
+					write(0xFF05, read(0xFF06));
+				}
+				timerClocksum -= (4194304 / freq);
+			}
+		}
 	}
 
 	void Cpu::handleInterrupts()
@@ -361,6 +395,13 @@ namespace gbEmu {
 		if (fl & FLAG_C) {
 			AF.lo = resetBit(AF.lo, FLAG_BIT_C);
 		}
+	}
+
+	void Cpu::addToMem(u16 address, u8 data)
+	{
+		u8 d = read(address);
+		d += data;
+		write(address, d);
 	}
 
 
@@ -1561,6 +1602,7 @@ namespace gbEmu {
 	u8 Cpu::op0x76()
 	{
 		//Halt
+		halt = true;
 		return 0;
 	}
 	u8 Cpu::op0x77()

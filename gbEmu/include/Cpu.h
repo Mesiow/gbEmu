@@ -46,6 +46,7 @@ namespace gbEmu {
 		void testFunc();
 
 		u8 clock();
+		void handleTimer(s32 cycles);
 		void handleInterrupts();
 		
 		u8 read(u16 address);
@@ -79,6 +80,8 @@ namespace gbEmu {
 		void setFlag(u8 flags, bool condition);
 		void setFlag(u8 flags);
 		void clearFlag(u8 flags);
+
+		void addToMem(u16 address, u8 data);
 
 		/*
 			Maps all opcodes to their instruction
@@ -501,6 +504,10 @@ namespace gbEmu {
 		u8 cycles = 0;
 		bool interruptsEnabled = false;
 		bool halt = false;
+
+		//Timer variables
+		s32 divClocksum;
+		s32 timerClocksum;
 
 		//1. Pneumonic
 		//2. Function pointer to the opcode implementation
