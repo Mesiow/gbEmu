@@ -10,6 +10,7 @@
 *.userosscache
 *.sln.docstates
 gbEmu/roms/
+log7.h
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

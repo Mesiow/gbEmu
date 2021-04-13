@@ -31,16 +31,6 @@ namespace gbEmu {
 		write(0xFF44, 0x90);
 
 		testFunc();
-
-		//Set CPU status to right before where the bug was (0x0099)
-		{
-			/*AF.value = 0xCE00;
-			BC.value = 0x04CE;
-			DE.value = 0x0104;
-			HL.value = 0x8010;
-			SP = 0xFFFA;
-			PC = 0x0099;*/
-		}
 	}
 
 	void Cpu::testFunc()
@@ -174,9 +164,11 @@ namespace gbEmu {
 		//BC.hi = 0x23;
 		//mmu->write(0x0, 0xCB);
 		//mmu->write(0x1, 0x30);
+
 	}
 
-	//TODO: TESTING Blargs test 06, problem/bug after executing PC:C0A8
+
+	//TODO: TESTING Blargs test 07
 	u8 Cpu::clock()
 	{
 		//if (cycles == 0) {
@@ -203,11 +195,81 @@ namespace gbEmu {
 					//May require more cycles based on certain conditions
 					cycles += ins.execute();
 				}
+				handleTimer(cycles);
+				handleInterrupts();
 			}
 			
 		//}
 		//cycles--;
 		return cycles;
+	}
+
+	void Cpu::handleTimer(u32 cycles)
+	{
+
+	}
+
+	void Cpu::handleInterrupts()
+	{
+		//IF - interrupt flag request register at 0xFF0F (that shows that the condition for a interrupt was met (user pressed a button, for example)
+		//IE - interrupt enable register at 0xFFFF (only interrupts that are enabled in this register
+		//will be handled, once they are flagged in IF
+
+		//Interrupts should be handled
+		if (interruptsEnabled) {
+			u8 IF = read(0xFF0F);
+			u8 IE = read(0xFFFF);
+
+			//Interrupt service routine addresses(ISR)
+			//VBlank - 0x40
+			//LCD Status triggers - 0x48
+			//Timer overflow - 0x50
+			//Serial link - 0x58
+			//Joypad press - 0x60
+
+
+			//If an interrupt is enabled and allowed
+			if (IE & IF) {
+				//Handle interrupts starting from 
+				//Bit 0 (vblank)
+				if ((IE & 0x1) & (IF & 0x1)) {
+					CALL(0x40);
+					//Clear IF after jumping to ISR address
+					IF &= ~0x1;
+					write(0xFF0F, IF);
+				}
+
+				//When 0, off, when 1, on
+				//Bit 1 (LCD stat) 
+				if ((IE & 0x2) & (IF & 0x2)) {
+					CALL(0x48);
+					//Clear IF after jumping to ISR address
+					IF &= ~0x2;
+					write(0xFF0F, IF);
+				}
+
+				//Bit 2 (Timer)
+				if ((IE & 0x4) & (IF & 0x4)) {
+					CALL(0x50);
+					IF &= ~0x4;
+					write(0xFF0F, IF);
+				}
+
+				//Bit 3 (Serial)
+				if ((IE & 0x8) & (IF & 0x8)) {
+					CALL(0x58);
+					IF &= ~0x8;
+					write(0xFF0F, IF);
+				}
+
+				//Bit 4 (Joypad)
+				if ((IE & 0x10) & (IF & 0x10)) {
+					CALL(0x60);
+					IF &= ~0x10;
+					write(0xFF0F, IF);
+				}
+			}
+		}
 	}
 
 	u8 Cpu::read(u16 address)
@@ -445,6 +507,11 @@ namespace gbEmu {
 		write(SP, reg.hi);
 		SP--;
 		write(SP, reg.lo);
+	}
+
+	void Cpu::PUSH_PC()
+	{
+
 	}
 
 	void Cpu::POP_NN(Register& reg)

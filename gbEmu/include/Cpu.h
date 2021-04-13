@@ -46,6 +46,7 @@ namespace gbEmu {
 		void testFunc();
 
 		u8 clock();
+		void handleInterrupts();
 		
 		u8 read(u16 address);
 		void write(u16 address, u8 value);
@@ -118,8 +119,10 @@ namespace gbEmu {
 			Stack operations
 		*/
 
-		//Push 16 bit register into the stack
+		//Push 16 bit register onto the stack
 		void PUSH_NN(Register reg);
+		//Push the program counter onto the stack
+		void PUSH_PC();
 		//Pop 16 bit register from the stack
 		void POP_NN(Register& reg);
 

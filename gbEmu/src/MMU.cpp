@@ -82,10 +82,12 @@ namespace gbEmu {
 	{
 		assert(address >= 0 && address < MAX_MEM);
 
+		//Read character from serial
 		if (address == 0xFF02 && value == 0x81) {
 			std::cout << read(0xFF01);
 			memory[0xFF01] = 0xFF;
 		}
+
 		memory[address] = value;
 	}
 
