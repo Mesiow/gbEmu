@@ -201,12 +201,15 @@ namespace gbEmu {
 				//May require more cycles based on certain conditions
 				cycles += ins.execute();
 			}
-			handleTimer(cycles);
-			handleInterrupts();
 		}
+		else
+			cycles = 4;
+
+		handleTimer(cycles);
+		handleInterrupts();
 
 		if (read(0xA000) == 0x80) {
-			for (int i = 0xA000; i != '\0'; i++) {
+			for(int i = 0xA000; i != '\0'; i++) {
 				std::cout << read(i);
 			}
 		}
@@ -281,6 +284,7 @@ namespace gbEmu {
 
 			//If an interrupt is enabled and allowed
 			if (IE & IF) {
+				halt = false;
 				//Handle interrupts starting from 
 				//Bit 0 (vblank)
 				if ((IE & 0x1) & (IF & 0x1)) {
@@ -1613,8 +1617,26 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x76()
 	{
-		//Halt
-		halt = true;
+		u8 IF = read(0xFF0F);
+		u8 IE = read(0xFFFF);
+
+		//IME enabled
+		if (interruptsEnabled) {
+			halt = true;
+		}
+		else {
+			//IME not enabled
+			if ((IE & IF & 0x1F) == 0) {
+				//halt mode entered
+				halt = true;
+			}
+			else if ((IE & IF & 0x1F) != 0) {
+				//halt mode not entered, increment PC by 1 to
+				//prevent halt bug
+				PC++;
+			}
+		}
+
 		return 0;
 	}
 	u8 Cpu::op0x77()

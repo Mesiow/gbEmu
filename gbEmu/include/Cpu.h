@@ -504,8 +504,8 @@ namespace gbEmu {
 		bool halt = false;
 
 		//Timer variables
-		s32 divClocksum;
-		s32 timerClocksum;
+		s32 divClocksum = 0;
+		s32 timerClocksum = 0;
 
 		//1. Pneumonic
 		//2. Function pointer to the opcode implementation
