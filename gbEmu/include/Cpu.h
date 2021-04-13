@@ -124,8 +124,6 @@ namespace gbEmu {
 
 		//Push 16 bit register onto the stack
 		void PUSH_NN(Register reg);
-		//Push the program counter onto the stack
-		void PUSH_PC();
 		//Pop 16 bit register from the stack
 		void POP_NN(Register& reg);
 
@@ -137,13 +135,13 @@ namespace gbEmu {
 		void JP(u16 address);
 		//Jump PC to immediate 16 bit address if condition passes
 		//Returns extra cycles or zero if none
-		u8 JP_COND(u16 address, bool condition);
+		u8 JP_COND(bool condition);
 
 		//Call 16 bit immediate address. This pushes the address of the instruction
 		//after the CALL on the stack, so that RET can pop it later
 		void CALL(u16 address);
 		//Call with a condition
-		u8 CALL_COND(u16 address, bool condition);
+		u8 CALL_COND(bool condition);
 
 		//Return from a subroutine. This is basically a POP PC
 		void RET();

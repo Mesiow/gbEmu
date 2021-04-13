@@ -19,8 +19,8 @@ int main(int arc, char* argv[]) {
    
     gbEmu::MMU mmu;
    
-    mmu.loadRom("test_roms/instr_timing.GB");
-    mmu.loadRom("roms/DMG_ROM.GB", true);
+    mmu.loadRom("test_roms/02-interrupts.GB");
+  //  mmu.loadRom("roms/DMG_ROM.GB", true);
 
     gbEmu::Cpu cpu(&mmu);
     gbEmu::DebugUI ui(&mmu, &cpu);

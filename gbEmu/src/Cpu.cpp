@@ -19,16 +19,26 @@ namespace gbEmu {
 
 	void Cpu::reset()
 	{
-		AF.value = 0x0000;
+		//Before bootrom
+		/*AF.value = 0x0000;
 		BC.value = 0x0000;
 		DE.value = 0x0000;
 		HL.value = 0x0000;
 
 		PC = 0x0000;
-		SP = 0x0000;
+		SP = 0x0000;*/
+
+		//after bootrom done
+		AF.value = 0x01B0;
+		BC.value = 0x0013;
+		DE.value = 0x00D8;
+		HL.value = 0x014D;
+
+		PC = 0x0100;
+		SP = 0xFFFE;
 
 		//stub FF44 in memory to pass 0068 in bootrom
-		write(0xFF44, 0x90);
+		//write(0xFF44, 0x90);
 
 		testFunc();
 	}
@@ -168,7 +178,7 @@ namespace gbEmu {
 	}
 
 
-	//TODO: TESTING Blargs test 07
+	//TODO: Pass interrupts test
 	u8 Cpu::clock()
 	{
 		if (!halt) {
@@ -194,6 +204,13 @@ namespace gbEmu {
 			handleTimer(cycles);
 			handleInterrupts();
 		}
+
+		if (read(0xA000) == 0x80) {
+			for (int i = 0xA000; i != '\0'; i++) {
+				std::cout << read(i);
+			}
+		}
+
 		return cycles;
 	}
 
@@ -550,11 +567,6 @@ namespace gbEmu {
 		write(SP, reg.lo);
 	}
 
-	void Cpu::PUSH_PC()
-	{
-
-	}
-
 	void Cpu::POP_NN(Register& reg)
 	{
 		reg.lo = read(SP);
@@ -568,9 +580,10 @@ namespace gbEmu {
 		PC = address;
 	}
 
-	u8 Cpu::JP_COND(u16 address, bool condition)
+	u8 Cpu::JP_COND(bool condition)
 	{
 		if (condition) {
+			u16 address = fetchU16();
 			JP(address);
 			return 4;
 		}
@@ -591,9 +604,10 @@ namespace gbEmu {
 		PC = address;
 	}
 
-	u8 Cpu::CALL_COND(u16 address, bool condition)
+	u8 Cpu::CALL_COND(bool condition)
 	{
 		if (condition) {
+			u16 address = fetchU16();
 			CALL(address);
 			return 8;
 		}
@@ -893,7 +907,7 @@ namespace gbEmu {
 		u16 addr = fetchU16();
 		
 		u8 lo = (SP & 0xFF);
-		u8 hi = ((SP >> 8) & 0xFF);
+		u8 hi = (SP & 0xFF00) >> 8;
 
 		write(addr, lo);
 		write(addr + 1, hi);
@@ -1023,7 +1037,7 @@ namespace gbEmu {
 
 	u8 Cpu::op0x18()
 	{
-		s8 i8 = fetchU8();
+		s8 i8 = (s8)fetchU8();
 		PC = PC + i8;
 		return 0;
 	}
@@ -1070,8 +1084,6 @@ namespace gbEmu {
 	{
 		u8 carry = ((AF.lo & FLAG_C));
 		u8 lsb = (AF.hi & 0x1);
-		u8 result = (AF.hi >> 1);
-
 		clearFlag((FLAG_Z | FLAG_N | FLAG_H));
 
 		AF.hi >>= 1;
@@ -1092,7 +1104,7 @@ namespace gbEmu {
 	{
 		//Jump if Zero is not set
 		if (getFlag(FLAG_Z) == 0) {
-			s8 i8 = fetchU8();
+			s8 i8 = (s8)fetchU8();
 			PC = PC + i8;
 			return 4;
 		}
@@ -1181,7 +1193,7 @@ namespace gbEmu {
 	{
 		//Jump if Zero is set
 		if (getFlag(FLAG_Z)) {
-			s8 i8 = fetchU8();
+			s8 i8 = (s8)fetchU8();
 			PC = PC + i8;
 			return 4;
 		}
@@ -1284,7 +1296,7 @@ namespace gbEmu {
 	{
 		//Jump if carry is set
 		if (getFlag(FLAG_C)) {
-			s8 i8 = fetchU8();
+			s8 i8 = (s8)fetchU8();
 			PC = PC + i8;
 			return 4;
 		}
@@ -1982,7 +1994,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC2()
 	{
-		u8 extra_cycles = JP_COND(fetchU16(), (getFlag(FLAG_Z) == 0));
+		u8 extra_cycles = JP_COND((getFlag(FLAG_Z) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xC3()
@@ -1992,7 +2004,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xC4()
 	{
-		u8 extra_cycles = CALL_COND(fetchU16(), (getFlag(FLAG_Z) == 0));
+		u8 extra_cycles = CALL_COND((getFlag(FLAG_Z) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xC5()
@@ -2022,7 +2034,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCA()
 	{
-		u8 extra_cycles = JP_COND(fetchU16(), getFlag(FLAG_Z));
+		u8 extra_cycles = JP_COND(getFlag(FLAG_Z));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xCB()
@@ -2032,7 +2044,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xCC()
 	{
-		u8 extra_cycles = CALL_COND(fetchU16(), getFlag(FLAG_Z));
+		u8 extra_cycles = CALL_COND(getFlag(FLAG_Z));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xCD()
@@ -2062,7 +2074,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xD2()
 	{
-		u8 extra_cycles = JP_COND(fetchU16(), (getFlag(FLAG_C) == 0));
+		u8 extra_cycles = JP_COND((getFlag(FLAG_C) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xD3()
@@ -2072,7 +2084,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xD4()
 	{
-		u8 extra_cycles = CALL_COND(fetchU16(), (getFlag(FLAG_C) == 0));
+		u8 extra_cycles = CALL_COND((getFlag(FLAG_C) == 0));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xD5()
@@ -2103,7 +2115,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xDA()
 	{
-		u8 extra_cycles = JP_COND(fetchU16(), getFlag(FLAG_C));
+		u8 extra_cycles = JP_COND(getFlag(FLAG_C));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xDB()
@@ -2113,7 +2125,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0xDC()
 	{
-		u8 extra_cycles = CALL_COND(fetchU16(), getFlag(FLAG_C));
+		u8 extra_cycles = CALL_COND(getFlag(FLAG_C));
 		return extra_cycles;
 	}
 	u8 Cpu::op0xDD()
