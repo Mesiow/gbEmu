@@ -178,40 +178,35 @@ namespace gbEmu {
 	}
 
 
-	//TODO: Pass interrupts test
+	//TODO: Pass interrupts test 02
 	u8 Cpu::clock()
 	{
-		if (!halt) {
-			u8 opcode = read(PC);
-			PC++;
-			if (opcode == 0xCB) {
-				//Get instruction associated with that opcode
-				u8 cbOpcode = read(PC++);
-				Instruction ins = cbTable[cbOpcode];
+		if (!paused) {
+			if (!halt) {
+				u8 opcode = read(PC);
+				PC++;
+				if (opcode == 0xCB) {
+					//Get instruction associated with that opcode
+					u8 cbOpcode = read(PC++);
+					Instruction ins = cbTable[cbOpcode];
 
-				//Base number of cycles required
-				cycles = ins.cycles;
-				//May require more cycles based on certain conditions
-				cycles += ins.execute();
+					//Base number of cycles required
+					cycles = ins.cycles;
+					//May require more cycles based on certain conditions
+					cycles += ins.execute();
+				}
+				else {
+					Instruction ins = table[opcode];
+					cycles = ins.cycles;
+					cycles += ins.execute();
+				}
 			}
-			else {
-
-				Instruction ins = table[opcode];
-				cycles = ins.cycles;
-				//May require more cycles based on certain conditions
-				cycles += ins.execute();
+			else { //Halted
+				cycles += 4;
 			}
-		}
-		else
-			cycles = 4;
 
-		handleTimer(cycles);
-		handleInterrupts();
-
-		if (read(0xA000) == 0x80) {
-			for(int i = 0xA000; i != '\0'; i++) {
-				std::cout << read(i);
-			}
+			handleTimer(cycles);
+			handleInterrupts();
 		}
 
 		return cycles;
@@ -270,7 +265,7 @@ namespace gbEmu {
 		//will be handled, once they are flagged in IF
 
 		//Interrupts should be handled
-		if (interruptsEnabled) {
+		
 			u8 IF = read(0xFF0F);
 			u8 IE = read(0xFFFF);
 
@@ -281,50 +276,57 @@ namespace gbEmu {
 			//Serial link - 0x58
 			//Joypad press - 0x60
 
+			//If IME flag is true
+			if (interruptsEnabled) {
 
 			//If an interrupt is enabled and allowed
-			if (IE & IF) {
-				halt = false;
-				//Handle interrupts starting from 
-				//Bit 0 (vblank)
-				if ((IE & 0x1) & (IF & 0x1)) {
-					CALL(0x40);
-					//Clear IF after jumping to ISR address
-					IF &= ~0x1;
-					write(0xFF0F, IF);
-				}
+				if (IE & IF) {
 
-				//When 0, off, when 1, on
-				//Bit 1 (LCD stat) 
-				if ((IE & 0x2) & (IF & 0x2)) {
-					CALL(0x48);
-					//Clear IF after jumping to ISR address
-					IF &= ~0x2;
-					write(0xFF0F, IF);
-				}
+					if (halt) {
+						halt = false;
+						cycles += 4;
+					}
 
-				//Bit 2 (Timer)
-				if ((IE & 0x4) & (IF & 0x4)) {
-					CALL(0x50);
-					IF &= ~0x4;
-					write(0xFF0F, IF);
-				}
+					//Handle interrupts starting from 
+					//Bit 0 (vblank)
+					if ((IE & 0x1) & (IF & 0x1)) {
+						CALL(0x40);
+						//Clear IF after jumping to ISR address
+						IF &= ~0x1;
+						write(0xFF0F, IF);
+					}
 
-				//Bit 3 (Serial)
-				if ((IE & 0x8) & (IF & 0x8)) {
-					CALL(0x58);
-					IF &= ~0x8;
-					write(0xFF0F, IF);
-				}
+					//When 0, off, when 1, on
+					//Bit 1 (LCD stat) 
+					if ((IE & 0x2) & (IF & 0x2)) {
+						CALL(0x48);
+						//Clear IF after jumping to ISR address
+						IF &= ~0x2;
+						write(0xFF0F, IF);
+					}
 
-				//Bit 4 (Joypad)
-				if ((IE & 0x10) & (IF & 0x10)) {
-					CALL(0x60);
-					IF &= ~0x10;
-					write(0xFF0F, IF);
+					//Bit 2 (Timer)
+					if ((IE & 0x4) & (IF & 0x4)) {
+						CALL(0x50);
+						IF &= ~0x4;
+						write(0xFF0F, IF);
+					}
+
+					//Bit 3 (Serial)
+					if ((IE & 0x8) & (IF & 0x8)) {
+						CALL(0x58);
+						IF &= ~0x8;
+						write(0xFF0F, IF);
+					}
+
+					//Bit 4 (Joypad)
+					if ((IE & 0x10) & (IF & 0x10)) {
+						CALL(0x60);
+						IF &= ~0x10;
+						write(0xFF0F, IF);
+					}
 				}
 			}
-		}
 	}
 
 	u8 Cpu::read(u16 address)
@@ -1617,26 +1619,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x76()
 	{
-		u8 IF = read(0xFF0F);
-		u8 IE = read(0xFFFF);
-
-		//IME enabled
-		if (interruptsEnabled) {
-			halt = true;
-		}
-		else {
-			//IME not enabled
-			if ((IE & IF & 0x1F) == 0) {
-				//halt mode entered
-				halt = true;
-			}
-			else if ((IE & IF & 0x1F) != 0) {
-				//halt mode not entered, increment PC by 1 to
-				//prevent halt bug
-				PC++;
-			}
-		}
-
+		halt = true;
 		return 0;
 	}
 	u8 Cpu::op0x77()

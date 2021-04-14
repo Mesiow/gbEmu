@@ -502,6 +502,7 @@ namespace gbEmu {
 		u8 cycles = 0;
 		bool interruptsEnabled = false;
 		bool halt = false;
+		bool paused = false;
 
 		//Timer variables
 		s32 divClocksum = 0;

@@ -108,12 +108,12 @@ namespace gbEmu {
             while (cycles_this_frame < 70224) { //(456 * 154) = 70224
                 cycles_this_frame += cpu->clock();
                 if (haltAtPos) { //Stop PC at this position for debugging
-                    if (cpu->PC == 0xC840) {
-                        cpu->halt = true;
+                    if (cpu->PC == 0xC36F) {
+                        cpu->paused = true;
                     }
                 }
                 else {
-                    cpu->halt = false;
+                    cpu->paused = false;
                 }
             }
             delta_cycles += cycles_this_frame - 70224;
@@ -145,7 +145,7 @@ namespace gbEmu {
         }
         if (ev.type == sf::Event::KeyReleased) {
             if (ev.key.code == sf::Keyboard::S) {
-                cpu->halt = false;
+                cpu->paused = false;
             }
         }
 
