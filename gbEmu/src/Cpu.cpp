@@ -20,25 +20,25 @@ namespace gbEmu {
 	void Cpu::reset()
 	{
 		//Before bootrom
-		/*AF.value = 0x0000;
+		AF.value = 0x0000;
 		BC.value = 0x0000;
 		DE.value = 0x0000;
 		HL.value = 0x0000;
 
 		PC = 0x0000;
-		SP = 0x0000;*/
+		SP = 0x0000;
 
 		//after bootrom done
-		AF.value = 0x01B0;
+		/*AF.value = 0x01B0;
 		BC.value = 0x0013;
 		DE.value = 0x00D8;
 		HL.value = 0x014D;
 
 		PC = 0x0100;
-		SP = 0xFFFE;
+		SP = 0xFFFE;*/
 
 		//stub FF44 in memory to pass 0068 in bootrom
-		//write(0xFF44, 0x90);
+		write(0xFF44, 0x90);
 
 		testFunc();
 	}

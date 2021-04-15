@@ -3,6 +3,7 @@
 #include "include/DebugUI.h"
 #include "include/MMU.h"
 #include "include/Cpu.h"
+#include "include\Ppu.h"
 
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -19,11 +20,13 @@ int main(int arc, char* argv[]) {
    
     gbEmu::MMU mmu;
    
-    mmu.loadRom("test_roms/02-interrupts.GB");
-  //  mmu.loadRom("roms/DMG_ROM.GB", true);
+   // mmu.loadRom("test_roms/02-interrupts.GB");
+    mmu.loadRom("roms/DMG_ROM.GB", true);
 
     gbEmu::Cpu cpu(&mmu);
     gbEmu::DebugUI ui(&mmu, &cpu);
+    gbEmu::Ppu ppu(&mmu);
+    ppu.init();
    
 
 
@@ -41,11 +44,14 @@ int main(int arc, char* argv[]) {
 
         ImGui::SFML::Update(window, deltaClock.restart());
        
-        ui.update();
-        ui.render();
+       // ui.update();
+       // ui.render();
 
         window.clear(sf::Color(100, 149, 237, 255));
+
         ImGui::SFML::Render(window);
+        ppu.draw(window);
+
         window.display();
     }
 
