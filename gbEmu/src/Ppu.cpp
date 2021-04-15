@@ -30,6 +30,45 @@ namespace gbEmu {
 		sprite.setTexture(texture);
 	}
 
+	void Ppu::update(u32 cycles)
+	{
+		setLCDStatus();
+
+		if (isLCDEnabled()) {
+			//subtract by the amount of clock cycles the lasst opcode took to execute
+			//to keep the graphics in sync with the cpu
+			scanlineCounter -= cycles; 
+		}
+		else
+			return;
+
+		//if negative move to next scanline
+		if (scanlineCounter <= 0) {
+			//move onto the next scanline
+
+			//Register 0xFF44 is the current scanline
+			u8 currentScanline = read(0xFF44);
+			currentScanline++;
+			write(0xFF44, currentScanline);
+
+			//set counter back to 456(each scanline takes 456 t cycles)
+			scanlineCounter = 456;
+
+			//VBlank period entered
+			if (currentScanline == 144) {
+				requestInterrupt(0);
+			}
+			//if past line 153, reset to 0
+			else if (currentScanline > 153) {
+				write(0xFF44, 0);
+			}
+			//draw current scanline
+			else if (currentScanline < 144) {
+				//drawLine();
+			}
+		}
+	}
+
 	void Ppu::draw(sf::RenderTarget& target)
 	{
 		for (size_t row = 0; row < 144; ++row) {
@@ -116,5 +155,35 @@ namespace gbEmu {
 		}
 
 		
+	}
+
+	void Ppu::setLCDStatus()
+	{
+		u8 STAT = read(0xFF41);
+		if (!isLCDEnabled()) {
+			//Set mode to 1 during lcd disabled and reset
+			//scanline
+			scanlineCounter = 456;
+			write(0xFF44, 0);
+			STAT &= 0xFC;
+			STAT = setBit(STAT, 0);
+			write(0xFF41, STAT);
+
+			return;
+		}
+	}
+
+	bool Ppu::isLCDEnabled()
+	{
+		u8 lcdc = read(0xFF40);
+		return ((lcdc & (0x80)) >> 7);
+	}
+
+	void Ppu::requestInterrupt(u8 interruptBit)
+	{
+		//interrupt request flag
+		u8 IF = read(0xFF0F);
+		IF = setBit(IF, interruptBit);
+		write(0xFF0F, IF);
 	}
 }

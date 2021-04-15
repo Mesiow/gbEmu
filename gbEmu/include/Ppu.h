@@ -20,9 +20,22 @@ namespace gbEmu {
 
 
 		void init();
+		void update(u32 cycles);
 		void draw(sf::RenderTarget &target);
 
 		void drawBackground();
+
+
+
+
+
+		void setLCDStatus();
+		bool isLCDEnabled();
+
+		/*
+			Takes in bit of interrupt to request
+		*/
+		void requestInterrupt(u8 interruptBit);
 
 		sf::Image image;
 		sf::Texture texture;
@@ -39,6 +52,8 @@ namespace gbEmu {
 		u8 framebuf[160 * 144 * 3]; //3 bytes per pixel, RGB24
 		u8 framebufA[160 * 144 * 4]; //4 bytes per pixel, RGBA24
 		u8 backgroundMapA[256 * 256 * 4];
+
+		s16 scanlineCounter = 0;
 
 		MMU* mmu;
 		bool disablePpu = false;
