@@ -4,3 +4,5 @@
     - PPU: WIP
  - Current Stage: PPU
  - A learning project and not meant to be 100% accurate
+
+![](gifs/bios.gif)
