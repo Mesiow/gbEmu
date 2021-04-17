@@ -10,6 +10,27 @@
 */
 
 namespace gbEmu {
+	//Ppu register locations
+	#define LY 0xFF44
+	#define LCDC 0xFF40
+	#define STAT 0xFF41
+	#define SCX 0xFF43
+	#define SCY 0xFF42
+	#define COINCIDENCE 0xFF45
+	#define PALETTE 0xFF47
+
+	#define WINDOWX 0xFF4B
+	#define WINDOWY 0xFF4A
+
+
+	enum class PpuMode {
+		HBlank = 0,
+		VBlank,
+		OAMScan,
+		Drawing
+	};
+
+
 	struct MMU;
 	struct Ppu {
 		Ppu(MMU* mmu);
@@ -21,9 +42,11 @@ namespace gbEmu {
 
 		void init();
 		void update(u32 cycles);
-		void draw(sf::RenderTarget &target);
 
-		void drawBackground();
+		void drawLine();
+		void drawTiles();
+
+		sf::Color getColor(u8 val, u8 pal);
 
 
 
@@ -36,10 +59,10 @@ namespace gbEmu {
 			Takes in bit of interrupt to request
 		*/
 		void requestInterrupt(u8 interruptBit);
+		void bufferPixels();
 
 		sf::Image image;
 		sf::Texture texture;
-		sf::Sprite sprite;
 		
 
 		/*
@@ -48,10 +71,10 @@ namespace gbEmu {
 
 			*main framebuffer is 160 x 144 pixels
 			*The background map is a larger size of 256 x 256
-		*/
-		u8 framebuf[160 * 144 * 3]; //3 bytes per pixel, RGB24
-		u8 framebufA[160 * 144 * 4]; //4 bytes per pixel, RGBA24
-		u8 backgroundMapA[256 * 256 * 4];
+		//*/
+		//u8 framebuf[160 * 144 * 3]; //3 bytes per pixel, RGB24
+		//u8 framebufA[160 * 144 * 4]; //4 bytes per pixel, RGBA24
+		//u8 backgroundMapA[256 * 256 * 4];
 
 		s16 scanlineCounter = 0;
 

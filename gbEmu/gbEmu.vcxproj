@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="src\DebugUI.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Gb.cpp" />
     <ClCompile Include="src\imgui\imgui-SFML.cpp" />
     <ClCompile Include="src\imgui\imgui.cpp" />
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="include\Cpu.h" />
     <ClInclude Include="include\DebugUI.h" />
+    <ClInclude Include="include\Gb.h" />
     <ClInclude Include="include\MMU.h" />
     <ClInclude Include="include\Ppu.h" />
     <ClInclude Include="include\Utils.h" />

@@ -40,11 +40,6 @@ namespace gbEmu {
 
 		void reset();
 
-		/*
-			Area to test instructions
-		*/
-		void testFunc();
-
 		u8 clock();
 		void handleTimer(s32 cycles);
 		void handleInterrupts();

@@ -5,6 +5,12 @@ namespace gbEmu {
 	MMU::MMU()
 	{
 		std::memset(memory, 0x00, MAX_MEM);
+		std::memset(bootrom, 0x0, 0x100);
+	}
+
+	void MMU::loadCartridge(Cartridge* cart)
+	{
+		this->cart = cart;
 	}
 
 	void MMU::loadRom(const std::string& file, bool isBootRom)
@@ -26,9 +32,9 @@ namespace gbEmu {
 					bootrom[i] = buf[i];
 				}
 
-				for (size_t i = 0; i < size; i++) {
+			/*	for (size_t i = 0; i < size; i++) {
 					memory[i] = bootrom[i];
-				}
+				}*/
 
 				//Load scrolling Nintendo graphic into memory
 				/*
@@ -94,6 +100,11 @@ namespace gbEmu {
 	u8 MMU::read(u16 address)
 	{
 		assert(address >= 0 && address < MAX_MEM);
+
+		if (address < 0x0100 && bootRomEnabled) {
+			return bootrom[address];
+		}
+
 		return memory[address];
 	}
 }

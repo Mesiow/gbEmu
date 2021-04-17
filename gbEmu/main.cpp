@@ -9,24 +9,17 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include "include\Gb.h"
 
 int main(int arc, char* argv[]) {
 
-    sf::RenderWindow window(sf::VideoMode(768, 560), "gbEmu");
-    //window.setFramerateLimit(60);
+    sf::RenderWindow window(sf::VideoMode(540, 580), "gbEmu");
     ImGui::SFML::Init(window);
 
    
-   
-    gbEmu::MMU mmu;
-   
-   // mmu.loadRom("test_roms/02-interrupts.GB");
-    mmu.loadRom("roms/DMG_ROM.GB", true);
-
-    gbEmu::Cpu cpu(&mmu);
-    gbEmu::DebugUI ui(&mmu, &cpu);
-    gbEmu::Ppu ppu(&mmu);
-    ppu.init();
+    gbEmu::Gb gb;
+    gbEmu::DebugUI ui(&gb.mmu, &gb.cpu);
+  
    
 
 
@@ -44,13 +37,18 @@ int main(int arc, char* argv[]) {
 
         ImGui::SFML::Update(window, deltaClock.restart());
        
-       // ui.update();
-       // ui.render();
+        ui.update();
+        ui.render();
+        
+        gb.update();
 
-        window.clear(sf::Color(100, 149, 237, 255));
+       //window.clear(sf::Color(100, 149, 237, 255);
+        window.clear(sf::Color::Black);
 
-        ImGui::SFML::Render(window);
-        ppu.draw(window);
+      
+        gb.render(window);
+       // ImGui::SFML::Render(window);
+      
 
         window.display();
     }
