@@ -1,15 +1,13 @@
 #include "../include/DebugUI.h"
-#include "../include/MMU.h"
-#include "../include/Cpu.h"
+#include "../include/Gb.h"
 
 namespace gbEmu {
 
     MemoryEditor DebugUI::mainMemory;
     MemoryEditor DebugUI::bootRomMemory;
 
-    DebugUI::DebugUI(MMU* mmu, Cpu *cpu) {
-        this->mmu = mmu;
-        this->cpu = cpu;
+    DebugUI::DebugUI(Gb *gb) {
+        this->gb = gb;
     }
 
     void DebugUI::render() {
@@ -18,6 +16,9 @@ namespace gbEmu {
 
         ImGui::Text("Status: ");
         ImGui::SameLine();
+
+        Cpu* cpu = &gb->cpu;
+        MMU* mmu = &gb->mmu;
 
         if (cpu->getFlag(FLAG_Z)) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(133, 245, 29, 255)));
@@ -103,28 +104,25 @@ namespace gbEmu {
     {
         handleButtonPresses();
         if (running) {
-            //int cycles_this_frame = 0;
-            //static int delta_cycles = 0;         //each scanline takes 456 t cycles. There are 154 scanlines per frame
-            //while (cycles_this_frame < 70224) { //(456 * 154) = 70224
-            //    cycles_this_frame += cpu->clock();
-            //    //if (haltAtPos) { //Stop PC at this position for debugging
-            //    //    if (cpu->PC == 0xC36F) {
-            //    //        cpu->paused = true;
-            //    //    }
-            //    //}
-            //    //else {
-            //    //    cpu->paused = false;
-            //    //}
-            //}
-            //delta_cycles += cycles_this_frame - 70224;
-        }
+           //gb->update();
+            gb->cpu.clock();
+            if (haltAtPos) { //Stop PC at this position for debugging
+                   if (gb->cpu.PC == 0x0100) {
+                       gb->cpu.paused = true;
+                   }
+               }
+               else {
+                   gb->cpu.paused = false;
+               }
+         }
     }
 
     void DebugUI::handleButtonPresses()
     {
         if (stepPressed) {
-              cpu->halt = false;
-              cpu->clock();
+            gb->cpu.paused = false;
+            gb->cpu.clock();
+            
         }
         if (runPressed) {
             printf("Running cpu emulation\n");
@@ -145,14 +143,14 @@ namespace gbEmu {
         }
         if (ev.type == sf::Event::KeyReleased) {
             if (ev.key.code == sf::Keyboard::S) {
-                cpu->paused = false;
+                gb->cpu.paused = false;
             }
         }
 
         if (ev.type == sf::Event::KeyReleased) {
             if (ev.key.code == sf::Keyboard::F) {
-                //Halt at PC C000
                 haltAtPos = !haltAtPos;
+                std::cout << "halt\n";
             }
         }
     }

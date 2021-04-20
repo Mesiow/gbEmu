@@ -1,19 +1,16 @@
 #include "../include/MMU.h"
+#include "../include/Cartridge.h"
 
 namespace gbEmu {
 
 	MMU::MMU()
 	{
+		cart = nullptr;
 		std::memset(memory, 0x00, MAX_MEM);
 		std::memset(bootrom, 0x0, 0x100);
 	}
 
-	void MMU::loadCartridge(Cartridge* cart)
-	{
-		this->cart = cart;
-	}
-
-	void MMU::loadRom(const std::string& file, bool isBootRom)
+	void MMU::loadBios(const std::string& file)
 	{
 		std::ifstream rom(file, std::ios::binary | std::ios::ate);
 
@@ -25,24 +22,23 @@ namespace gbEmu {
 			rom.read((char*)buf, size);
 			rom.close();
 
-			if (isBootRom) {
-				bootRomEnabled = true;
-				//Load bootrom into memory
-				for (size_t i = 0; i < size; ++i) {
-					bootrom[i] = buf[i];
-				}
+			bootRomEnabled = true;
+			//Load bootrom into memory
+			for (size_t i = 0; i < size; ++i) {
+				bootrom[i] = buf[i];
+			}
+			delete[] buf;
 
-			/*	for (size_t i = 0; i < size; i++) {
-					memory[i] = bootrom[i];
-				}*/
-
-				//Load scrolling Nintendo graphic into memory
-				/*
-					scrolling nintengo graphic
-					CE ED 66 66 CC 0D 00 0B 03 73 00 83 00 0C 00 0D
-					00 08 11 1F 88 89 00 0E DC CC 6E E6 DD DD D9 99
-					BB BB 67 63 6E 0E EC CC DD DC 99 9F BB B9 33 3E
-				*/
+			//Load scrolling Nintendo graphic into memory
+			/*
+				scrolling nintengo graphic
+				CE ED 66 66 CC 0D 00 0B 03 73 00 83 00 0C 00 0D
+				00 08 11 1F 88 89 00 0E DC CC 6E E6 DD DD D9 99
+				BB BB 67 63 6E 0E EC CC DD DC 99 9F BB B9 33 3E
+			*/
+			//If no cartridge loaded, load nintendo logo manually
+			//to display bootrom
+			if (!cart) {
 				u8 graphic[0x30];
 				graphic[0] = 0xCE; graphic[1] = 0xED; graphic[2] = 0x66;
 				graphic[3] = 0x66; graphic[4] = 0xCC; graphic[5] = 0x0D;
@@ -66,27 +62,31 @@ namespace gbEmu {
 					memory[0x104 + i] = graphic[i];
 				}
 			}
-			else {
-				//Load into normal memory
-				for (size_t i = 0; i < size; ++i) {
-					memory[i] = buf[i];
-				}
-			}
-			delete[] buf;
-
-			std::cout << file << " rom loaded sucessfully\n" << std::endl;
 		}
-		else {
-			std::cerr << file << " rom failed to open\n";
-			return;
+	}
+
+	void MMU::loadCartridge(Cartridge* cart)
+	{
+		this->cart = cart;
+
+		u32 size = this->cart->size;
+		u8 *cart_mem = this->cart->memory;
+
+		for (size_t i = 0; i < size; ++i) {
+			memory[i] = cart_mem[i];
 		}
-
-
 	}
 
 	void MMU::write(u16 address, u8 value)
 	{
 		assert(address >= 0 && address < MAX_MEM);
+
+		//if (address == 0xFF00) return;
+
+		//Disable bootrom
+		if (address == 0xFF50 && bootRomEnabled) {
+			bootRomEnabled = false;
+		}
 
 		//Read character from serial
 		if (address == 0xFF02 && value == 0x81) {

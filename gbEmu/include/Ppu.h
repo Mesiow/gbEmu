@@ -23,7 +23,7 @@ namespace gbEmu {
 	#define WINDOWY 0xFF4A
 
 
-	enum class PpuMode {
+	enum class PpuMode : u8 {
 		HBlank = 0,
 		VBlank,
 		OAMScan,

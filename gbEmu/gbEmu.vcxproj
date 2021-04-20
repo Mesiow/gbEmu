@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Cartridge.cpp" />
     <ClCompile Include="src\DebugUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Gb.cpp" />
@@ -154,15 +155,18 @@
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Cpu.cpp" />
+    <ClCompile Include="src\Joypad.cpp" />
     <ClCompile Include="src\MMU.cpp" />
     <ClCompile Include="src\Opcodes.cpp" />
     <ClCompile Include="src\Ppu.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Cartridge.h" />
     <ClInclude Include="include\Cpu.h" />
     <ClInclude Include="include\DebugUI.h" />
     <ClInclude Include="include\Gb.h" />
+    <ClInclude Include="include\Joypad.h" />
     <ClInclude Include="include\MMU.h" />
     <ClInclude Include="include\Ppu.h" />
     <ClInclude Include="include\Utils.h" />

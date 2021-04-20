@@ -3,6 +3,8 @@
 #include "Cpu.h"
 #include "MMU.h"
 #include "Ppu.h"
+#include "Joypad.h"
+#include "Cartridge.h"
 
 namespace gbEmu {
 	struct Gb {
@@ -13,7 +15,10 @@ namespace gbEmu {
 		MMU mmu;
 		Cpu cpu;
 		Ppu ppu;
+		Joypad joypad;
 
 		sf::Sprite view;
+
+		Cartridge cart;
 	};
 }

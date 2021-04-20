@@ -28,6 +28,8 @@ namespace gbEmu {
 		PC = 0x0000;
 		SP = 0x0000;
 
+
+		write(0xFF00, 0xFF);
 		//after bootrom done
 		/*AF.value = 0x01B0;
 		BC.value = 0x0013;
@@ -41,7 +43,7 @@ namespace gbEmu {
 		write(0xFF44, 0x90);
 	}
 
-	//TODO: Pass interrupts test 02
+	//TODO: Pass interrupts test 02 (HALT #5)
 	u8 Cpu::clock()
 	{
 		if (!paused) {
@@ -67,11 +69,9 @@ namespace gbEmu {
 			else { //Halted
 				cycles += 4;
 			}
-
 			handleTimer(cycles);
 			handleInterrupts();
 		}
-
 		return cycles;
 	}
 
@@ -127,69 +127,74 @@ namespace gbEmu {
 		//IE - interrupt enable register at 0xFFFF (only interrupts that are enabled in this register
 		//will be handled, once they are flagged in IF
 
-		//Interrupts should be handled
-		
+	
+
+		//Interrupt service routine addresses(ISR)
+		//VBlank - 0x40
+		//LCD Status triggers - 0x48
+		//Timer overflow - 0x50
+		//Serial link - 0x58
+		//Joypad press - 0x60
+
+		//If IME flag is true
+		if (interruptsEnabled) {
+
+			//Interrupts should be handled
+
 			u8 IF = read(0xFF0F);
 			u8 IE = read(0xFFFF);
 
-			//Interrupt service routine addresses(ISR)
-			//VBlank - 0x40
-			//LCD Status triggers - 0x48
-			//Timer overflow - 0x50
-			//Serial link - 0x58
-			//Joypad press - 0x60
+			//If an interrupt is requested
+			if (IF > 0) {
+				
+				if (halt) {
+					halt = false;
+					cycles += 4;
+				}
 
-			//If IME flag is true
-			if (interruptsEnabled) {
+				//Check if requested interrupt matches
+				//in the enabled flag
 
-			//If an interrupt is enabled and allowed
-				if (IE & IF) {
+				//Handle interrupts starting from 
+				//Bit 0 (VBlank)
+				if ((IE & 0x1) & (IF & 0x1)) {
+					CALL(0x40);
+					//Clear IF after jumping to ISR address
+					IF &= ~0x1;
+					write(0xFF0F, IF);
+				}
 
-					if (halt) {
-						halt = false;
-						cycles += 4;
-					}
+				//When 0, off, when 1, on
+				//Bit 1 (LCD stat) 
+				else if ((IE & 0x2) & (IF & 0x2)) {
+					CALL(0x48);
+					//Clear IF after jumping to ISR address
+					IF &= ~0x2;
+					write(0xFF0F, IF);
+				}
 
-					//Handle interrupts starting from 
-					//Bit 0 (vblank)
-					if ((IE & 0x1) & (IF & 0x1)) {
-						CALL(0x40);
-						//Clear IF after jumping to ISR address
-						IF &= ~0x1;
-						write(0xFF0F, IF);
-					}
+				//Bit 2 (Timer)
+				else if ((IE & 0x4) & (IF & 0x4)) {
+					CALL(0x50);
+					IF &= ~0x4;
+					write(0xFF0F, IF);
+				}
 
-					//When 0, off, when 1, on
-					//Bit 1 (LCD stat) 
-					if ((IE & 0x2) & (IF & 0x2)) {
-						CALL(0x48);
-						//Clear IF after jumping to ISR address
-						IF &= ~0x2;
-						write(0xFF0F, IF);
-					}
+				//Bit 3 (Serial)
+				else if ((IE & 0x8) & (IF & 0x8)) {
+					CALL(0x58);
+					IF &= ~0x8;
+					write(0xFF0F, IF);
+				}
 
-					//Bit 2 (Timer)
-					if ((IE & 0x4) & (IF & 0x4)) {
-						CALL(0x50);
-						IF &= ~0x4;
-						write(0xFF0F, IF);
-					}
-
-					//Bit 3 (Serial)
-					if ((IE & 0x8) & (IF & 0x8)) {
-						CALL(0x58);
-						IF &= ~0x8;
-						write(0xFF0F, IF);
-					}
-
-					//Bit 4 (Joypad)
-					if ((IE & 0x10) & (IF & 0x10)) {
-						CALL(0x60);
-						IF &= ~0x10;
-						write(0xFF0F, IF);
-					}
+				//Bit 4 (Joypad)
+				else if ((IE & 0x10) & (IF & 0x10)) {
+					CALL(0x60);
+					IF &= ~0x10;
+					write(0xFF0F, IF);
 				}
 			}
+		}
 	}
 
 	u8 Cpu::read(u16 address)

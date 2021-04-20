@@ -5,10 +5,9 @@
 #include <string>
 
 namespace gbEmu {
-	struct MMU;
-	struct Cpu;
+	struct Gb;
 	struct DebugUI {
-		DebugUI(MMU* mmu, Cpu *cpu);
+		DebugUI(Gb *gb);
 		void render();
 		void update();
 		void handleButtonPresses();
@@ -16,8 +15,7 @@ namespace gbEmu {
 
 		static MemoryEditor mainMemory;
 		static MemoryEditor bootRomMemory;
-		MMU* mmu;
-		Cpu* cpu;
+		Gb* gb;
 
 		bool stepPressed = false;
 		bool runPressed = false;

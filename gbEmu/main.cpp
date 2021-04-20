@@ -13,12 +13,13 @@
 
 int main(int arc, char* argv[]) {
 
-    sf::RenderWindow window(sf::VideoMode(540, 580), "gbEmu");
+    sf::RenderWindow window(sf::VideoMode(560, 504), "gbEmu");
+    window.setVerticalSyncEnabled(true);
     ImGui::SFML::Init(window);
 
    
     gbEmu::Gb gb;
-    gbEmu::DebugUI ui(&gb.mmu, &gb.cpu);
+    gbEmu::DebugUI ui(&gb);
   
    
 
@@ -42,12 +43,10 @@ int main(int arc, char* argv[]) {
         
         gb.update();
 
-       //window.clear(sf::Color(100, 149, 237, 255);
         window.clear(sf::Color::Black);
-
       
         gb.render(window);
-       // ImGui::SFML::Render(window);
+        //ImGui::SFML::Render(window);
       
 
         window.display();

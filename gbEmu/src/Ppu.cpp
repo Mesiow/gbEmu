@@ -76,6 +76,9 @@ namespace gbEmu {
 		//otherwise we don't
 		if (testBit(lcdc, 0))
 			drawTiles();
+
+		//if (testBit(lcdc, 1))
+			;//drawSprites();
 	}
 
 	void Ppu::drawTiles ()
@@ -102,6 +105,13 @@ namespace gbEmu {
 
 		*/
 
+		bool window = false;
+		//Display window?
+		if (testBit(lcdc, 5)) {
+			if (winy <= currentScanline)
+				window = true;
+		}
+
 
 		/*
 			*Addressing methods for tile data:
@@ -119,13 +129,16 @@ namespace gbEmu {
 		*/
 
 		u16 tile_data_region;
+		bool sign = false;
 		//Bit 4 - determines tile data addressing mode
 		u8 bit4 = (lcdc & (0x10)) >> 4;
 		if (bit4) { //bit is on fetch tile data using 8000 mode
 			tile_data_region = 0x8000;
 		}
 		else { //bit is off use 8800 mode(0x9000 as base pointer)
+			//This region uses signed bytes as tile identifiers
 			tile_data_region = 0x8800;
+			sign = true;
 		}
 		
 
@@ -136,23 +149,40 @@ namespace gbEmu {
 			our BG-array, pixel per pixel, in RGB format.
 		*/
 		
-		//ypos used to calc which of the 32 vertical tiles the
-		//current scanline is drawing
-		//u8 ypos = 0;
-		//ypos = scy + currentScanline;
+	
+		u16 tile_map_region = 0;
+		if (!window) {
+			//Background memory region
+			if (testBit(lcdc, 3))
+				tile_map_region = 0x9C00;
+			else
+				tile_map_region = 0x9800;
+		}
+		else {
+			//Window memory region
+			if (testBit(lcdc, 6))
+				tile_map_region = 0x9C00;
+			else
+				tile_map_region = 0x9800;
+		}
+	
 
-		//Which of the 8 vertical pixels
-		//of the current tile is the scanline on
-		//u16 tileRow = (((u8)(ypos / 8)) * 32);
-
-		u16 tile_map = 0;
-		bool window = false;
-
+		//Palette (2 bits per color)
+		//bits 7-6 mapts to color id 11
+		//bits 5-4 map to color id 10
+		//bits 3-2 map to color id 01
+		//bits 1-0 map to color id 00
+		/*
+			00: White
+			01: Light Grey
+			10: Dark Grey
+			11: Black
+		*/
 		u8 palette = read(PALETTE);
 		u8 offx = 0; u8 offy = 0;
 
 		//Start drawing 160 horizontal pixels for this scanline
-		for (size_t x = 0; x < 256; x++) {
+		for (size_t x = 0; x < 160; x++) {
 
 			//Is window on?
 			u8 bit5 = (lcdc & (0x20)) >> 5;
@@ -161,25 +191,6 @@ namespace gbEmu {
 					window = true;
 			}
 
-			if (!window) {
-				////Bit 3 - determines Background tile map
-				u8 bit3 = (lcdc & (0x8)) >> 3;
-				if (bit3) { //bit is on, the background will use the bg map located at 0x9C00 - 0x9FFF
-					tile_map = 0x9C00;
-				}
-				else { //use bg map at 0x9800 - 0x9BFF
-					tile_map = 0x9800;
-				}
-			}
-			else {
-				//Window tile map select
-				u8 bit6 = (lcdc & (0x40)) >> 6;
-				if (bit6) {
-					tile_map = 0x9C00;
-				}
-				else
-					tile_map = 0x9800;
-			}
 
 			if (!window) {
 				offx = x + scx;
@@ -195,10 +206,10 @@ namespace gbEmu {
 			u8 tilexc = offx % 8; u8 tileyc = offy % 8;
 
 			u16 offset = (tiley * 32) + tilex;
-			u8 tilen = read(tile_map + offset);
+			u8 tilen = read(tile_map_region + offset);
 			u8 colorval = 0;
 
-			if (tile_data_region == 0x8800) {
+			if (sign) {
 				//Signed data region
 				s8 tile_num = (s8)tilen;
 				u16 tileaddr = tile_data_region + 0x8000 + (tile_num * 16);
@@ -218,7 +229,7 @@ namespace gbEmu {
 
 				u8 byte1 = mmu->read(tile_line);
 				u8 byte2 = mmu->read(tile_line + 1);
-				
+
 				u8 bit1 = (byte1 >> (7 - tilexc)) & 0x1;
 				u8 bit2 = (byte2 >> (7 - tilexc)) & 0x1;
 
@@ -233,7 +244,7 @@ namespace gbEmu {
 	{
 		u8 colorfrompal = (pal >> (2 * val)) & 0x3;
 		if (colorfrompal == 0)
-			return sf::Color::White;
+			return sf::Color(224, 248, 208, 255);
 		else if (colorfrompal == 1)
 			return sf::Color(192, 192, 192, 255);
 		else if (colorfrompal == 2)
@@ -273,27 +284,27 @@ namespace gbEmu {
 			reqInterrupt = testBit(stat, 4);
 		}
 		else {
-			s32 mode2bounds = 456 - 80;
-			s32 mode3bounds = mode2bounds - 172;
+			s32	Oambounds = 456 - 80;
+			s32 Drawingbounds = Oambounds - 172;
 
 			//In mode 2 (OAM Scan)
-			if (scanlineCounter >= mode2bounds) {
+			if (scanlineCounter >= Oambounds) {
 				mode = PpuMode::OAMScan;
 				stat = setBit(stat, 1);
 				stat = resetBit(stat, 0);
 				reqInterrupt = testBit(stat, 5);
 			}
 			//In mode 3 (Drawing)
-			else if (scanlineCounter >= mode3bounds) {
+			else if (scanlineCounter >= Drawingbounds) {
 				mode = PpuMode::Drawing;
-				stat = setBit(stat, 0);
 				stat = setBit(stat, 1);
+				stat = setBit(stat, 0);
 			}
 			else {
 				//In mode 0 (HBlank)
 				mode = PpuMode::HBlank;
-				stat = resetBit(stat, 0);
 				stat = resetBit(stat, 1);
+				stat = resetBit(stat, 0);
 				reqInterrupt = testBit(stat, 3);
 			}
 		}

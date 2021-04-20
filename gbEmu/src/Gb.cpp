@@ -1,10 +1,13 @@
 #include "../include/Gb.h"
 
 gbEmu::Gb::Gb()
-	:mmu(), cpu(&mmu), ppu(&mmu)
+	:mmu(), cpu(&mmu), ppu(&mmu), joypad(&mmu)
 {
-	mmu.loadRom("roms/DMG_ROM.GB", true);
-    //mmu.loadRom("roms/Dr. Mario.GB");
+    cart.load("roms/Tetris.GB");
+
+	mmu.loadBios("roms/DMG_ROM.GB");
+    mmu.loadCartridge(&cart);
+  
 	ppu.init();
 
     view = sf::Sprite(ppu.texture);
