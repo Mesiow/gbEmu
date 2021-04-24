@@ -4,14 +4,11 @@ gbEmu::Gb::Gb()
 	:mmu(), cpu(&mmu), ppu(&mmu), joypad(&mmu)
 {
     cart.load("roms/Tetris.GB");
-
-	mmu.loadBios("roms/DMG_ROM.GB");
+    mmu.loadBios("roms/DMG_ROM.GB");
+   // mmu.loadTestRom("test_roms/ppu/dmg-acid2.gb");
     mmu.loadCartridge(&cart);
-  
+	
 	ppu.init();
-
-    view = sf::Sprite(ppu.texture);
-    view.setScale(3.5, 3.5);
 }
 
 void gbEmu::Gb::update()
@@ -30,5 +27,5 @@ void gbEmu::Gb::update()
 
 void gbEmu::Gb::render(sf::RenderTarget& target)
 {
-    target.draw(view);
+    ppu.render(target);
 }

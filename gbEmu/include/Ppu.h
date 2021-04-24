@@ -41,16 +41,21 @@ namespace gbEmu {
 
 
 		void init();
+		void render(sf::RenderTarget& target);
 		void update(u32 cycles);
 
 		void drawLine();
 		void drawTiles();
+		void drawBackground();
+		void drawWindow();
+		void drawSprites();
 
-		sf::Color getColor(u8 val, u8 pal);
+		void updateBackgroundTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY,
+			u8 tileId);
+		void updateWindowTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY,
+			u8 tileId);
 
-
-
-
+		sf::Color getPixelColor(u8 palette, u8 top, u8 bottom, s32 bit);
 
 		void setLCDStatus();
 		bool isLCDEnabled();
@@ -61,22 +66,22 @@ namespace gbEmu {
 		void requestInterrupt(u8 interruptBit);
 		void bufferPixels();
 
-		sf::Image image;
-		sf::Texture texture;
-		
+		sf::Image bgPixels;
+		sf::Texture bgTexture;
 
-		/*
-			One framebuffer for background layer
-			and one for window layer
+		sf::Image winPixels;
+		sf::Texture winTexture;
 
-			*main framebuffer is 160 x 144 pixels
-			*The background map is a larger size of 256 x 256
-		//*/
-		//u8 framebuf[160 * 144 * 3]; //3 bytes per pixel, RGB24
-		//u8 framebufA[160 * 144 * 4]; //4 bytes per pixel, RGBA24
-		//u8 backgroundMapA[256 * 256 * 4];
+		sf::Image spritePixels;
+		sf::Texture spriteTexture;
+
+		sf::Sprite bgLayer;
+		sf::Sprite winLayer;
+		sf::Sprite spriteLayer;
+	
 
 		s16 scanlineCounter = 0;
+		s16 scanlinesRendered = 0;
 
 		MMU* mmu;
 		bool disablePpu = false;

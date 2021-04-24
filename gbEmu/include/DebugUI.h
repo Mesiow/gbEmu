@@ -9,6 +9,7 @@ namespace gbEmu {
 	struct DebugUI {
 		DebugUI(Gb *gb);
 		void render();
+		void renderGPU();
 		void update();
 		void handleButtonPresses();
 		void handleEvents(sf::Event& ev);

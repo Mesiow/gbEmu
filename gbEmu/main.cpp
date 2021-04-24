@@ -13,8 +13,7 @@
 
 int main(int arc, char* argv[]) {
 
-    sf::RenderWindow window(sf::VideoMode(560, 504), "gbEmu");
-    window.setVerticalSyncEnabled(true);
+    sf::RenderWindow window(sf::VideoMode(160 * 3, 144 * 3), "gbEmu");
     ImGui::SFML::Init(window);
 
    
@@ -22,14 +21,12 @@ int main(int arc, char* argv[]) {
     gbEmu::DebugUI ui(&gb);
   
    
-
-
     sf::Clock deltaClock;
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
-            ui.handleEvents(event);
+            //ImGui::SFML::ProcessEvent(event);
+            //ui.handleEvents(event);
 
             if (event.type == sf::Event::Closed) {
                 window.close();
@@ -38,13 +35,13 @@ int main(int arc, char* argv[]) {
 
         ImGui::SFML::Update(window, deltaClock.restart());
        
-        ui.update();
-        ui.render();
+       // ui.update();
+       // ui.render();
         
         gb.update();
 
-        window.clear(sf::Color::Black);
-      
+        window.clear(sf::Color::Transparent);
+
         gb.render(window);
         //ImGui::SFML::Render(window);
       

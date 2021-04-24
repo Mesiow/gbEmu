@@ -19,14 +19,28 @@ namespace gbEmu {
 
 	void Ppu::init()
 	{
-		/*std::memset(framebuf, 0x0, 160 * 144 * 3);
-		std::memset(framebufA, 0x00, 160 * 144 * 4);
-		std::memset(backgroundMapA, 0x0, 256 * 256 * 4);*/
+		bgPixels.create(160, 144, sf::Color::White);
+		bgTexture.loadFromImage(bgPixels);
 
-		//store pixels in image
-		//load texture with image pixel data
-		image.create(256, 256, sf::Color::White);
-		texture.loadFromImage(image);
+		winPixels.create(160, 144, sf::Color::Transparent);
+		winTexture.loadFromImage(winPixels);
+
+		spritePixels.create(160, 144, sf::Color::Transparent);
+		spriteTexture.loadFromImage(spritePixels);
+
+
+		bgLayer = sf::Sprite(bgTexture);
+		bgLayer.setScale(3, 3);
+
+		winLayer = sf::Sprite(winTexture);
+		winLayer.setScale(3, 3);
+	}
+
+	void Ppu::render(sf::RenderTarget& target)
+	{
+		target.draw(bgLayer);
+		target.draw(winLayer);
+		//target.draw(spriteLayer);
 	}
 
 	void Ppu::update(u32 cycles)
@@ -36,10 +50,15 @@ namespace gbEmu {
 		if (isLCDEnabled()) {
 			//subtract by the amount of clock cycles the lasst opcode took to execute
 			//to keep the graphics in sync with the cpu
-			scanlineCounter -= cycles; 
+			scanlineCounter -= cycles;
 		}
-		else
+		else {
 			return;
+		}
+
+	
+		if (read(LY) > 153)
+			write(LY, 0);
 
 		//if negative move to next scanline
 		if (scanlineCounter <= 0) {
@@ -62,7 +81,7 @@ namespace gbEmu {
 				write(LY, 0);
 			}
 			//draw current scanline
-			else if (currentScanline < 144) {
+			else if (currentScanline <= 144) {
 				drawLine();
 			}
 		}
@@ -72,185 +91,230 @@ namespace gbEmu {
 	{
 		u8 lcdc = read(LCDC);
 
-		//If bit 0 is on, we render the background tiles,
-		//otherwise we don't
-		if (testBit(lcdc, 0))
-			drawTiles();
+		if (testBit(lcdc, 7)) {
+			//If bit 0 is on, we render the background tiles,
+			//otherwise we don't
+			if (testBit(lcdc, 0))
+				drawBackground();
 
-		//if (testBit(lcdc, 1))
-			;//drawSprites();
+			if (testBit(lcdc, 5))
+				drawWindow();
+		}
 	}
 
-	void Ppu::drawTiles ()
+	void Ppu::drawBackground()
 	{
-		//LCDC reg
 		u8 lcdc = read(LCDC);
 		u8 scx = read(SCX);
 		u8 scy = read(SCY);
 		u8 currentScanline = read(LY);
 
-		u8 winx = read(WINDOWX) - 7;
-		u8 winy = read(WINDOWY);
-
-
-		/*
-			In order to set which tiles should be displayed in the Background / Window grids,
-			background maps are used. The VRAM sections $9800-$9BFF and
-			$9C00-$9FFF each contain one of these background maps.
-			A background map consists of 32x32 bytes representing tile numbers
-			organized row by row. This means that the first byte in a background map
-			is the Tile Number of the Tile at the very top left.
-			The byte after is the Tile Number of the Tile to the right of it and so on.
-			The 33rd byte would represent the Tile Number of the leftmost tile in the second tile row.
-
-		*/
-
-		bool window = false;
-		//Display window?
-		if (testBit(lcdc, 5)) {
-			if (winy <= currentScanline)
-				window = true;
-		}
-
-
-		/*
-			*Addressing methods for tile data:
-
-			8000 method uses $8000 as a base pointer and adds (TILE_NUMBER * 16) to it,
-			where TILE_NUMBER is an unsigned 8 bit int. Thus, the Tile Number 0 would refer
-			to address $8000, 1 would refer to $8010, 2 to $8020 and so on.
-
-			The 8800 method uses $9000 as a base pointer and adds (SIGNED_TILE_NUMBER * 16) to it,
-			where SIGNED_TILE_NUMBER is a signed 8-bit integer. Thus, the tile number 0 would refer
-			to address $9000, 1 would refer to $9010, 2 to $9020 and so on.
-			However, 0xFF would refer to $8FF0, 0xFE to $8FE0 and so on.
-
-			*Which of these addressing methods is used depends on bit 4 of the LCDC register
-		*/
-
-		u16 tile_data_region;
-		bool sign = false;
-		//Bit 4 - determines tile data addressing mode
-		u8 bit4 = (lcdc & (0x10)) >> 4;
-		if (bit4) { //bit is on fetch tile data using 8000 mode
-			tile_data_region = 0x8000;
-		}
-		else { //bit is off use 8800 mode(0x9000 as base pointer)
-			//This region uses signed bytes as tile identifiers
-			tile_data_region = 0x8800;
-			sign = true;
-		}
-		
-
-		/*
-			So, we will read out the tile IDs at the tile_map, 
-			and then read the actual graphic at tile_data, 
-			identified by the tileID. The graphic data will then go into 
-			our BG-array, pixel per pixel, in RGB format.
-		*/
-		
-	
-		u16 tile_map_region = 0;
-		if (!window) {
-			//Background memory region
-			if (testBit(lcdc, 3))
-				tile_map_region = 0x9C00;
-			else
-				tile_map_region = 0x9800;
+		u16 backgroundMapRegion;
+		if (testBit(lcdc, 3)) {
+			backgroundMapRegion = 0x9C00;
 		}
 		else {
-			//Window memory region
-			if (testBit(lcdc, 6))
-				tile_map_region = 0x9C00;
-			else
-				tile_map_region = 0x9800;
+			backgroundMapRegion = 0x9800;
 		}
-	
 
-		//Palette (2 bits per color)
-		//bits 7-6 mapts to color id 11
-		//bits 5-4 map to color id 10
-		//bits 3-2 map to color id 01
-		//bits 1-0 map to color id 00
-		/*
-			00: White
-			01: Light Grey
-			10: Dark Grey
-			11: Black
-		*/
 		u8 palette = read(PALETTE);
-		u8 offx = 0; u8 offy = 0;
 
-		//Start drawing 160 horizontal pixels for this scanline
-		for (size_t x = 0; x < 160; x++) {
+		// For each pixel in the 160x1 scanline:
+		// 1. Calculate where the pixel resides in the overall 256x256 background map
+		// 2. Get the tile ID where that pixel is located
+		// 3. Get the pixel color based on that coordinate relative to the 8x8 tile grid
+		// 4. Plot pixel in 160x144 display view
 
-			//Is window on?
-			u8 bit5 = (lcdc & (0x20)) >> 5;
-			if (bit5) {
-				if (x >= winx && currentScanline >= winy)
-					window = true;
-			}
+		s32 y = currentScanline;
+		for (size_t x = 0; x < 160; ++x) {
+			//1. Get pixel x,y in overall background map, offset by scroll x and y
+			s32 mapx = (s32)scx + x;
+			s32 mapy = (s32)scy + y;
 
+			//Make sure coords loop around if exceeding 256 x 256 area
+			if (mapx >= 256) mapx = mapx - 256;
+			else mapx = mapx;
 
-			if (!window) {
-				offx = x + scx;
-				offy = scy + currentScanline;
-			}
-			else {
-				//window
-				offx = x - winx;
-				offy = currentScanline - winy;
-			}
+			if (mapy >= 256) mapy = mapy - 256;
+			else mapy = mapy;
 
-			u8 tilex = offx / 8; u8 tiley = offy / 8;
-			u8 tilexc = offx % 8; u8 tileyc = offy % 8;
+			//2. Get tile id where that pixel is located
+			s32 tileCol = floor(mapx / 8);
+			s32 tileRow = floor(mapy / 8);
+			s32 tileMapId = (tileRow * 32) + tileCol;
+			u16 location = backgroundMapRegion + tileMapId;
+			u8 tileId = read(location);
 
-			u16 offset = (tiley * 32) + tilex;
-			u8 tilen = read(tile_map_region + offset);
-			u8 colorval = 0;
+			//3. Get pixel color based on that coord relative to
+			//the 8x8 tile grid
+			s32 tileXPixel = mapx % 8;
+			s32 tileYPixel = mapy % 8;
 
-			if (sign) {
-				//Signed data region
-				s8 tile_num = (s8)tilen;
-				u16 tileaddr = tile_data_region + 0x8000 + (tile_num * 16);
-				u16 tile_line = tileaddr + (tileyc * 2);
+			//Invert x pixels because they're stored backwards
+			tileXPixel = abs(tileXPixel - 7);
 
-				u8 byte1 = read(tile_line);
-				u8 byte2 = read(tile_line + 1);
-
-				u8 bit1 = (byte1 >> (7 - tilexc) & 0x1);
-				u8 bit2 = (byte2 >> (7 - tilexc) & 0x1);
-
-				colorval = (bit2 << 1) | bit1;
-			}
-			else {
-				u16 tileaddr = tile_data_region + (tilen * 16);
-				u16 tile_line = tileaddr + (tileyc * 2);
-
-				u8 byte1 = mmu->read(tile_line);
-				u8 byte2 = mmu->read(tile_line + 1);
-
-				u8 bit1 = (byte1 >> (7 - tilexc)) & 0x1;
-				u8 bit2 = (byte2 >> (7 - tilexc)) & 0x1;
-
-				colorval = (bit2 << 1) | bit1;
-			}
-			sf::Color colr = getColor(colorval, palette);
-			image.setPixel(x, currentScanline, colr);
-		}	
+			//4. Plot pixel in 160 x 144 display view
+			updateBackgroundTilePx(palette, x, y, tileXPixel, tileYPixel, tileId);
+		}
 	}
 
-	sf::Color Ppu::getColor(u8 val, u8 pal)
+	void Ppu::drawWindow()
 	{
-		u8 colorfrompal = (pal >> (2 * val)) & 0x3;
-		if (colorfrompal == 0)
-			return sf::Color(224, 248, 208, 255);
-		else if (colorfrompal == 1)
-			return sf::Color(192, 192, 192, 255);
-		else if (colorfrompal == 2)
-			return sf::Color(96, 96, 96, 255);
-		else if (colorfrompal == 3)
-			return sf::Color::Black;
+		u8 lcdc = read(LCDC);
+		u8 currentScanline = read(LY);
+
+		u16 windowMemoryRegion;
+		if (testBit(lcdc, 6)) {
+			windowMemoryRegion = 0x9C00;
+		}
+		else
+			windowMemoryRegion = 0x9800;
+
+		s32 winx = (s32)read(WINDOWX);
+		s32 winy = (s32)read(WINDOWY);
+
+		u8 palette = read(PALETTE);
+
+		s32 y = (s32)currentScanline;
+
+		for (size_t x = 0; x < 160; ++x) {
+			//Window is relative to the screen
+			//Shift x & y pixels based on window register value
+			s32 displayX = x + winx - 7;
+			s32 displayY = y;
+
+			//1. Get tile id where that pixel is located
+			s32 tileCol = floor(x / 8);
+			s32 tileRow = floor((y - winy) / 8);
+			s32 tileMapId = (tileRow * 32) + tileCol;
+			u16 location = windowMemoryRegion + tileMapId;
+			u8 tileId = read(location);
+
+			// 2. Get the pixel color based on that coordinate relative to the 8x8 tile grid
+			// 3. Plot pixel in 160x144 display view
+			s32 tileXPixel = x % 8;
+			s32 tileYPixel = y % 8;
+
+			//Inver x pixels because theyre stored backwards
+			tileXPixel = abs(tileXPixel - 7);
+
+			if (currentScanline < winy) {
+				winPixels.setPixel(x, y, sf::Color::Transparent);
+			}
+			else {
+				updateWindowTilePx(palette, displayX, displayY, tileXPixel, tileYPixel, tileId);
+			}
+		}
+	}
+
+	void Ppu::drawSprites()
+	{
+
+	}
+
+	void Ppu::updateBackgroundTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY, u8 tileId)
+	{
+		u8 lcdc = read(LCDC);
+		// Figure out where the current background character data is being stored
+		// if selection=0 bg area is 0x8800-0x97FF and tile ID is determined by SIGNED -128 to 127
+		// 0x9000 represents the zero ID address in that range
+		u16 tileDataLocation;
+		bool sign = false;
+		u16 offset;
+
+		if (testBit(lcdc, 4)) {
+			tileDataLocation = 0x8000;
+		}
+		else {
+			tileDataLocation = 0x9000;
+			sign = true;
+		}
+
+		if (sign) { // 0x8800 - 0x97FF signed
+			s8 id = (s8)tileId;
+			u16 tempoffset = (tileDataLocation) + (id * 16);
+			offset = (u16)tempoffset;
+		}
+		else { // 0x8000 - 0x8FFF unsigned 
+			offset = (tileId * 16) + tileDataLocation;
+		}
+
+		u8 hi = read(offset + (tileY * 2) + 1),
+			lo = read(offset + (tileY * 2));
+
+		sf::Color color = getPixelColor(palette, lo, hi, tileX);
+		bgPixels.setPixel(displayX, displayY, color);
+	}
+
+	void Ppu::updateWindowTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY, u8 tileId)
+	{
+		if (displayX >= 160 || displayX < 0) return;
+		if (displayY >= 144 || displayY < 0) return;
+
+		u8 lcdc = read(LCDC);
+
+		u16 tileDataLocation;
+		bool sign = false;
+		u16 offset;
+		if (testBit(lcdc, 4)) {
+			tileDataLocation = 0x8000;
+		}
+		else {
+			tileDataLocation = 0x9000;
+			sign = true;
+		}
+
+		// 0x8800 - 0x97FF signed
+		if (sign) {
+			s8 id = (s8)tileId;
+			u16 tempoffset = (tileDataLocation)+(id * 16);
+			offset = (u16)tempoffset;
+		}
+		else {// 0x8000 - 0x8FFF unsigned 
+			offset = (tileId * 16) + tileDataLocation;
+		}
+
+		u8 hi = read(offset + (tileY * 2) + 1),
+			lo = read(offset + (tileY * 2));
+
+		sf::Color color = getPixelColor(palette, lo, hi, tileX);
+		winPixels.setPixel(displayX, displayY, color);
+	}
+
+	sf::Color Ppu::getPixelColor(u8 palette, u8 top, u8 bottom, s32 bit)
+	{
+		u8 color3 = (palette >> 6); //extract bits 7 & 6
+		u8 color2 = (palette >> 4) & 0x3;
+		u8 color1 = (palette >> 2) & 0x3;
+		u8 color0 = (palette & 0x3);
+
+
+		//Get color code from the two bytes
+		u8 first = testBit(top, bit);
+		u8 second = testBit(bottom, bit);
+		u8 colorCode = (second << 1) | first;
+
+		sf::Color shadesOfGrey[4];
+		shadesOfGrey[0x0] = sf::Color(224, 248, 208, 255); // 0x0 - White
+		shadesOfGrey[0x1] = sf::Color(198, 198, 198); // 0x1 - Light Gray
+		shadesOfGrey[0x2] = sf::Color(127, 127, 127); // 0x2 - Drak Gray
+		shadesOfGrey[0x3] = sf::Color(0, 0, 0);
+
+		if (colorCode == 0x0) {
+			return shadesOfGrey[color0];
+		}
+		else if (colorCode == 0x1) {
+			return shadesOfGrey[color1];
+		}
+		else if (colorCode == 0x2) {
+			return shadesOfGrey[color2];
+		}
+		else if (colorCode == 0x03) {
+			return shadesOfGrey[color3];
+		}
+		else {
+			return sf::Color(255, 0, 255);
+		}
 	}
 
 	void Ppu::setLCDStatus()
@@ -311,7 +375,7 @@ namespace gbEmu {
 
 		//Check if there is an interrupt request
 		//and we entered a new mode
-		if (reqInterrupt && (mode != currentMode)) {
+		if (reqInterrupt && (currentMode != mode)) {
 			requestInterrupt(1);
 		}
 
@@ -338,7 +402,7 @@ namespace gbEmu {
 	bool Ppu::isLCDEnabled()
 	{
 		u8 lcdc = read(LCDC);
-		return ((lcdc & (0x80)) >> 7);
+		return testBit(lcdc, 7);
 	}
 
 	void Ppu::requestInterrupt(u8 interruptBit)
@@ -351,6 +415,7 @@ namespace gbEmu {
 
 	void Ppu::bufferPixels()
 	{
-		texture.loadFromImage(image);
+		bgTexture.loadFromImage(bgPixels);
+		winTexture.loadFromImage(winPixels);
 	}
 }

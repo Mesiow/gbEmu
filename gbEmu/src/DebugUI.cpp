@@ -98,6 +98,71 @@ namespace gbEmu {
         bootRomMemory.DrawWindow("Boot Rom", mmu->bootrom, 0x100);
 
         ImGui::End();
+
+        renderGPU();
+    }
+
+    void DebugUI::renderGPU()
+    {
+        ImGui::SetNextWindowSizeConstraints(ImVec2(100.f, 100.f), ImVec2(800.f, 800.f));
+        ImGui::Begin("GPU");
+        {
+            //Tabs
+
+
+            ImGui::BeginTabBar("Options");
+            if (ImGui::TabItemButton("Display")) {
+
+            }
+            if (ImGui::TabItemButton("Background")) {
+
+            }
+            if (ImGui::TabItemButton("Tiles")) {
+
+            }
+            if (ImGui::TabItemButton("Sprites")) {
+
+            }
+            ImGui::EndTabBar();
+
+
+
+            /*  ImVec2 imgPos = ImGui::GetCursorScreenPos();
+                if (selectedTab == 0)
+                {
+                    ImGui::Image((ImTextureID)screenTexture, ImVec2(SCREEN_WIDTH * 2.f, SCREEN_HEIGHT * 2.f));
+                }
+                else if (selectedTab == 1)
+                {
+                    set_texture(screenBgTexture, SCREEN_WIDTH, SCREEN_HEIGHT, GB_bgscreen());
+                    ImGui::Image((ImTextureID)screenBgTexture, ImVec2(SCREEN_WIDTH * 2.f, SCREEN_HEIGHT * 2.f));
+                    imgui_drawgrid(imgPos, 20, 18, SCREEN_WIDTH * 2.f, SCREEN_HEIGHT * 2.f);
+                }
+                else if (selectedTab == 2)
+                {
+                    set_texture(tileTexture, TILES_WIDTH, TILES_HEIGHT, GB_tiledata());
+                    ImGui::Image((ImTextureID)tileTexture, ImVec2(TILES_WIDTH * 2.f, TILES_HEIGHT * 2.f));
+                    imgui_drawgrid(imgPos, 16, 24, TILES_WIDTH * 2.f, TILES_HEIGHT * 2.f);
+                }
+                else if (selectedTab == 3)
+                {
+                    set_texture(tileTexture, TILES_WIDTH, TILES_HEIGHT, GB_tiledata());
+                    const Sprite* sprites = reinterpret_cast<Sprite*>(&gb.memory[0xFE00]);
+                    ImGui::Columns(8);
+                    for (int i = 0; i < 8 * 5; i++)
+                    {
+                        const Sprite& sprite = sprites[i];
+                        ImVec2 pos = ImVec2((sprite.TileNum % 16) / 16.f, (sprite.TileNum / 16) / 24.f);
+                        ImGui::Image((ImTextureID)tileTexture, ImVec2(16.f * 2.f, 16.f * 2.f), pos, ImVec2(pos.x + 1.f / 16.f, pos.y + 1.f / 24.f));
+                        ImGui::SameLine();
+                        ImGui::Text("%02X\n%02X\n%02X\n%02X", sprite.YPos, sprite.XPos, sprite.TileNum, sprite.Attributes);
+                        ImGui::NextColumn();
+                    }
+                    ImGui::Columns(1);
+                }
+            }
+            ImGui::End();*/
+        }
     }
 
     void DebugUI::update()

@@ -17,8 +17,6 @@ namespace gbEmu {
 		Ppu ppu;
 		Joypad joypad;
 
-		sf::Sprite view;
-
 		Cartridge cart;
 	};
 }

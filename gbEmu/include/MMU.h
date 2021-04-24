@@ -39,17 +39,24 @@ namespace gbEmu {
 	struct MMU {
 		MMU();
 
+		void loadTestRom(const std::string& file);
 		void loadBios(const std::string& file);
 		void loadCartridge(Cartridge* cart);
 
 		void write(u16 address, u8 value);
 		u8 read(u16 address);
 
+		void handleBanking(u16 address, u8 value);
+		void enableRamBank(u16 address, u8 value);
+
 		u8 memory[MAX_MEM];
 		u8 bootrom[0x100];
 
 
 		Cartridge* cart;
+		u8 currentRomBank = 1;
+		u8 currentRamBank = 0;
+
 		bool bootRomEnabled = false;
 	};
 }

@@ -152,46 +152,46 @@ namespace gbEmu {
 					cycles += 4;
 				}
 
-				//Check if requested interrupt matches
-				//in the enabled flag
+				if (IE & IF) {
+					interruptsEnabled = false;
+					//Check if requested interrupt matches
+					//in the enabled flag
 
-				//Handle interrupts starting from 
-				//Bit 0 (VBlank)
-				if ((IE & 0x1) & (IF & 0x1)) {
-					CALL(0x40);
-					//Clear IF after jumping to ISR address
-					IF &= ~0x1;
-					write(0xFF0F, IF);
-				}
+					//Handle interrupts starting from 
+					//Bit 0 (VBlank)
 
-				//When 0, off, when 1, on
-				//Bit 1 (LCD stat) 
-				else if ((IE & 0x2) & (IF & 0x2)) {
-					CALL(0x48);
-					//Clear IF after jumping to ISR address
-					IF &= ~0x2;
-					write(0xFF0F, IF);
-				}
+					if ((IE & 0x1) & (IF & 0x1)) {
 
-				//Bit 2 (Timer)
-				else if ((IE & 0x4) & (IF & 0x4)) {
-					CALL(0x50);
-					IF &= ~0x4;
-					write(0xFF0F, IF);
-				}
+						CALL(0x40);
+						//Clear IF after jumping to ISR address
+						write(0xFF0F, IF & ~0x1);
+					}
 
-				//Bit 3 (Serial)
-				else if ((IE & 0x8) & (IF & 0x8)) {
-					CALL(0x58);
-					IF &= ~0x8;
-					write(0xFF0F, IF);
-				}
+					//When 0, off, when 1, on
+					//Bit 1 (LCD stat) 
+					else if ((IE & 0x2) & (IF & 0x2)) {
+						CALL(0x48);
+						write(0xFF0F, IF & ~0x2);
+					}
 
-				//Bit 4 (Joypad)
-				else if ((IE & 0x10) & (IF & 0x10)) {
-					CALL(0x60);
-					IF &= ~0x10;
-					write(0xFF0F, IF);
+					//Bit 2 (Timer)
+					else if ((IE & 0x4) & (IF & 0x4)) {
+						CALL(0x50);
+						IF &= ~0x4;
+						write(0xFF0F, IF & ~0x4);
+					}
+
+					//Bit 3 (Serial)
+					else if ((IE & 0x8) & (IF & 0x8)) {
+						CALL(0x58);
+						write(0xFF0F, IF & ~0x8);
+					}
+
+					//Bit 4 (Joypad)
+					else if ((IE & 0x10) & (IF & 0x10)) {
+						CALL(0x60);
+						write(0xFF0F, IF & ~0x10);
+					}
 				}
 			}
 		}

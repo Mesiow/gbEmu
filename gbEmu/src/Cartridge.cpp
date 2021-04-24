@@ -5,6 +5,7 @@ namespace gbEmu {
 	Cartridge::Cartridge()
 	{
 		memory = nullptr;
+		std::memset(ramBanks, 0x00, MAX_RAM_BANKS);
 		mbc1 = false;
 	}
 
@@ -25,7 +26,7 @@ namespace gbEmu {
 			rom.read((char*)buf, size);
 			rom.close();
 
-			//Check cart type (ROM only or MBC)
+			//Check cart type (ROM only or MBC1)
 			u8 type = buf[0x147];
 
 			if (type == 0x00) {
