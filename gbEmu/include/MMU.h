@@ -49,6 +49,14 @@ namespace gbEmu {
 		void handleBanking(u16 address, u8 value);
 		void enableRamBank(u16 address, u8 value);
 
+
+		//Two methods a game uses to change rom banks
+		void switchLoRomBank(u8 value);
+		void switchHiRomBank(u8 value);
+
+		void switchRamBank(u8 value);
+		void switchRomRamMode(u8 value);
+
 		u8 memory[MAX_MEM];
 		u8 bootrom[0x100];
 
@@ -57,6 +65,8 @@ namespace gbEmu {
 		u8 currentRomBank = 1;
 		u8 currentRamBank = 0;
 
+		bool romBanking = false;
+		bool ramBanking = false;
 		bool bootRomEnabled = false;
 	};
 }

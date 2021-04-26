@@ -128,6 +128,9 @@ namespace gbEmu {
 	}
 	void MMU::handleBanking(u16 address, u8 value)
 	{
+		//Depending on the mem address where its trying to write 
+		//to rom, we need to take action.
+
 		//If address is between 0x0 and 0x2000, then it enables RAM 
 		//bank writing
 		if (address < 0x2000) {
@@ -136,20 +139,44 @@ namespace gbEmu {
 			}
 		}
 
-		//Depending on the mem address where its trying to write 
-		//to rom, we need to take action.
+		
 		//If address is between 0x2000 and 0x4000, it is a ROM bank change.
-
 		else if (address >= 0x2000 && address <= 0x3FFF) {
+			if (cart->mbc1) {
+				//If game tries to write to 0x2000 - 0x3FFF then it changes
+				//the lower 5 bits of the current rom bank but not bits 5 and 6.
 
+				switchLoRomBank(value);
+			}
 		}
 
 		//If the address is between 0x4000 and 0x6000, it is a RAM bank change
 		//or a ROM bank change depending on what current ROM/RAM mode is selected.
 
 		else if (address >= 0x4000 && address <= 0x5FFF) {
+			//No rambank in mbc2, so always use rambank 0
+			if (cart->mbc1) {
+				if (romBanking) {
+					//If game tries to write to 0x4000 - 0x5FFF then it changes
+					//bits 5 and 6  of the current rom bank but not bits 0 - 4
 
+					//Switch hi rom bank
+					switchHiRomBank(value);
+				}
+				else {
+					//Game writing to 0x4000 - 0x5FFF,
+					//change ram bank
+					switchRamBank(value);
+				}
+			}
 		}	
+
+		//This will change whether we are doing rom banking
+		//or ram banking with the above if statement
+		else if (address >= 0x6000 && address <= 0x7FFF) {
+			if (cart->mbc1);
+				switchRomRamMode(value);
+		}
 	}
 
 	void MMU::enableRamBank(u16 address, u8 value)
@@ -158,10 +185,61 @@ namespace gbEmu {
 		//is 0xA, then ram bank writing is enabled.
 		//Else, if the lower nibble is 0, then ram bank writing is disabled.
 
+
+		//handle MBC2 here
+		
+		
 		u8 nibble = value & 0xF;
 		if (nibble == 0xA)
 			ramBanking = true;
 		else if (nibble == 0x0)
 			ramBanking = false;
+	}
+
+	void MMU::switchLoRomBank(u8 value)
+	{
+		//MBC1
+
+		//lower 5 bits
+		u8 lo5 = value & 0x1F;
+
+		//Clear lower 5 bits
+		currentRomBank &= 0xE0; 
+		currentRomBank |= lo5;
+
+		//if zero, must always be 1 or greater, so add 1 to it
+		if (currentRomBank == 0)
+			currentRomBank++;
+	}
+
+	void MMU::switchHiRomBank(u8 value)
+	{
+		//bits 5 - 7
+		u8 hi = value & 0xE0;
+
+		//Clear bits 5 - 7
+		currentRomBank &= 0x1F;
+		currentRomBank |= hi;
+
+		if (currentRomBank == 0)
+			currentRomBank++;
+	}
+
+	void MMU::switchRamBank(u8 value)
+	{
+		currentRamBank = value & 0x3;
+	}
+
+	void MMU::switchRomRamMode(u8 value)
+	{
+		//If lsb of data writing here is 0, rom banking will be enabled
+		//otherwise there will be a ram bank change
+
+		u8 lsb = value & 0x1;
+		romBanking = (lsb == 0) ? true : false;
+
+		//Set current ram bank to 0 whenever romBanking is true because
+		//the gameboy can only use rambank 0 in this mode
+		if (romBanking) currentRamBank = 0;
 	}
 }
