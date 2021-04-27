@@ -10,26 +10,6 @@ namespace gbEmu {
 		std::memset(bootrom, 0x0, 0x100);
 	}
 
-	void MMU::loadTestRom(const std::string& file)
-	{
-		std::ifstream rom(file, std::ios::binary | std::ios::ate);
-
-		if (rom.is_open()) {
-			u32 size = static_cast<u32>(rom.tellg());
-			u8* buf = new u8[size];
-
-			rom.seekg(0, std::ios::beg);
-			rom.read((char*)buf, size);
-			rom.close();
-
-			for (size_t i = 0; i < size; ++i) {
-				memory[i] = buf[i];
-			}
-			delete[] buf;
-			std::cout << "Test " << file << " loaded\n";
-		}
-	}
-
 	void MMU::loadBios(const std::string& file)
 	{
 		std::ifstream rom(file, std::ios::binary | std::ios::ate);
@@ -57,7 +37,7 @@ namespace gbEmu {
 
 		u32 size = this->cart->size;
 		u8 *cart_mem = this->cart->memory;
-
+		
 		for (size_t i = 0; i < size; ++i) {
 			memory[i] = cart_mem[i];
 		}
@@ -85,7 +65,14 @@ namespace gbEmu {
 			//If game tries to write to rom,
 			//We need to figure out why and change banks accordingly
 			handleBanking(address, value);
-			return;
+		}
+		
+		//8kb external cartridge ram
+		else if (address >= 0xA000 && address <= 0xBFFF) {
+			if (ramBanking) {
+				u16 newaddr = address - 0xA000;
+				cart->ramBanks[newaddr + (currentRamBank * 0x2000)] = value;
+			}
 		}
 
 		//Writing here also mirrors into WRAM
@@ -97,6 +84,11 @@ namespace gbEmu {
 		//Not usable 0xFEA0 - 0xFEFF
 		else if (address >= 0xFEA0 && address <= 0xFEFF)
 			return;
+		
+		//DMA
+		else if (address == 0xFF46) {
+			dmaTransfer(value);
+		}
 		
 		else {
 			memory[address] = value;
@@ -241,5 +233,19 @@ namespace gbEmu {
 		//Set current ram bank to 0 whenever romBanking is true because
 		//the gameboy can only use rambank 0 in this mode
 		if (romBanking) currentRamBank = 0;
+	}
+
+	void MMU::dmaTransfer(u8 value)
+	{
+		//Destination of DMA is the sprite RAM between 0xFE00 and 0xFE9F
+		//Which means a total of 0xA0 bytes will be copied to this area.
+		
+		//The source address is the data being written to 0xFF46, except
+		//this vale is the source address divided by 100, so to get the correct
+		//address we multiply it by 100(or shift left by 8)
+
+		u16 address = value << 8;
+		for (size_t i = 0; i < 0xA0; ++i)
+			write(0xFE00 + i, read(address + i));
 	}
 }

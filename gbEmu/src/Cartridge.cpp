@@ -19,7 +19,13 @@ namespace gbEmu {
 		std::ifstream rom(file, std::ios::binary | std::ios::ate);
 
 		if (rom.is_open()) {
-			u32 size = static_cast<u32>(rom.tellg());
+			size = static_cast<u32>(rom.tellg());
+
+			if (size > 0x200000) {
+				std::cerr << "Cartridge size is too large.\n";
+				return;
+			}
+
 			u8* buf = new u8[size];
 
 			rom.seekg(0, std::ios::beg);
@@ -29,16 +35,11 @@ namespace gbEmu {
 			//Check cart type (ROM only or MBC1)
 			u8 type = buf[0x147];
 
-			if (type == 0x00) {
-				memory = new u8[ROM_SIZE];
-				this->size = ROM_SIZE;
-			}
 			//MBC1
-			else if (type == 0x01) {
+			if (type == 0x01) {
 				mbc1 = true;
-				memory = new u8[MBC1_SIZE];
-				this->size = MBC1_SIZE;
 			}
+			memory = new u8[MBC1_SIZE];
 
 			for (size_t i = 0; i < size; ++i) {
 				memory[i] = buf[i];

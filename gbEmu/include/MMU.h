@@ -35,11 +35,11 @@ FFFF	FFFF	Interrupts Enable Register (IE)
 
 namespace gbEmu {
 	#define MAX_MEM 0x10000
+	#define ROM_SIZE 0x8000
 	struct Cartridge;
 	struct MMU {
 		MMU();
 
-		void loadTestRom(const std::string& file);
 		void loadBios(const std::string& file);
 		void loadCartridge(Cartridge* cart);
 
@@ -56,6 +56,8 @@ namespace gbEmu {
 
 		void switchRamBank(u8 value);
 		void switchRomRamMode(u8 value);
+
+		void dmaTransfer(u8 value);
 
 		u8 memory[MAX_MEM];
 		u8 bootrom[0x100];

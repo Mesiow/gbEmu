@@ -154,6 +154,7 @@ namespace gbEmu {
 
 				if (IE & IF) {
 					interruptsEnabled = false;
+					
 					//Check if requested interrupt matches
 					//in the enabled flag
 
@@ -161,7 +162,6 @@ namespace gbEmu {
 					//Bit 0 (VBlank)
 
 					if ((IE & 0x1) & (IF & 0x1)) {
-
 						CALL(0x40);
 						//Clear IF after jumping to ISR address
 						write(0xFF0F, IF & ~0x1);
@@ -1487,7 +1487,9 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x76()
 	{
-		halt = true;
+		if(interruptsEnabled)
+			halt = true;
+
 		return 0;
 	}
 	u8 Cpu::op0x77()
