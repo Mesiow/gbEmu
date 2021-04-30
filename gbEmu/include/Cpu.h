@@ -43,6 +43,7 @@ namespace gbEmu {
 		u8 clock();
 		void handleTimer(s32 cycles);
 		void handleInterrupts();
+		void serviceInterrupt(u8 bit);
 		
 		u8 read(u16 address);
 		void write(u16 address, u8 value);

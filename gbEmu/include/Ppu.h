@@ -32,7 +32,6 @@ namespace gbEmu {
 		Drawing
 	};
 
-
 	struct MMU;
 	struct Ppu {
 		Ppu(MMU* mmu);
