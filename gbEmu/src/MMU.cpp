@@ -34,11 +34,9 @@ namespace gbEmu {
 	void MMU::loadCartridge(Cartridge* cart)
 	{
 		this->cart = cart;
-
-		u32 size = this->cart->size;
 		u8 *cart_mem = this->cart->memory;
 		
-		for (size_t i = 0; i < size; ++i) {
+		for (size_t i = 0; i < ROM_SIZE; ++i) {
 			memory[i] = cart_mem[i];
 		}
 	}

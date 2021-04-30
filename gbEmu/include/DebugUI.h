@@ -21,7 +21,8 @@ namespace gbEmu {
 		bool stepPressed = false;
 		bool runPressed = false;
 		bool haltPressed = false;
-		bool running = false;
+		bool running = true;
+		bool show = false;
 		std::string msg = "";
 
 		bool haltAtPos = false;

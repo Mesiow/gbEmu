@@ -19,6 +19,16 @@ namespace gbEmu {
 
 	void Ppu::init()
 	{
+		shadesOfGrey[0x0] = sf::Color(224, 248, 208, 255); // 0x0 - White
+		shadesOfGrey[0x1] = sf::Color(198, 198, 198); // 0x1 - Light Gray
+		shadesOfGrey[0x2] = sf::Color(127, 127, 127); // 0x2 - Dark Gray
+		shadesOfGrey[0x3] = sf::Color(0, 0, 0);
+
+		superGbShades[0x0] = sf::Color(255, 239, 206, 255); // 0x0 - White
+		superGbShades[0x1] = sf::Color(222, 148, 74, 255); // 0x1 - Light Gray
+		superGbShades[0x2] = sf::Color(173, 41, 33, 255); // 0x2 - Dark Gray
+		superGbShades[0x3] = sf::Color(49, 24, 82, 255);
+
 		bgPixels.create(160, 144, sf::Color::White);
 		bgTexture.loadFromImage(bgPixels);
 
@@ -28,19 +38,23 @@ namespace gbEmu {
 		spritePixels.create(160, 144, sf::Color::Transparent);
 		spriteTexture.loadFromImage(spritePixels);
 
+		int scaleFactor = 3;
 
 		bgLayer = sf::Sprite(bgTexture);
-		bgLayer.setScale(3, 3);
+		bgLayer.setScale(scaleFactor, scaleFactor);
 
 		winLayer = sf::Sprite(winTexture);
-		winLayer.setScale(3, 3);
+		winLayer.setScale(scaleFactor, scaleFactor);
+
+		spriteLayer = sf::Sprite(spriteTexture);
+		spriteLayer.setScale(scaleFactor, scaleFactor);
 	}
 
 	void Ppu::render(sf::RenderTarget& target)
 	{
 		target.draw(bgLayer);
 		target.draw(winLayer);
-		//target.draw(spriteLayer);
+		target.draw(spriteLayer);
 	}
 
 	void Ppu::update(u32 cycles)
@@ -92,13 +106,16 @@ namespace gbEmu {
 		u8 lcdc = read(LCDC);
 
 		if (testBit(lcdc, 7)) {
+
 			//If bit 0 is on, we render the background tiles,
-			//otherwise we don't
 			if (testBit(lcdc, 0))
 				drawBackground();
 
 			if (testBit(lcdc, 5))
 				drawWindow();
+
+			if (testBit(lcdc, 1))
+				drawSprites();
 		}
 	}
 
@@ -209,7 +226,58 @@ namespace gbEmu {
 
 	void Ppu::drawSprites()
 	{
+		u8 lcdc = read(0xFF40);
+		u16 oamLocation = 0xFE00;
 
+		//Sprite size to display
+		//If bit 2 is on sprites are displayed as 1x2 tiles(8 x 16 pixel),
+		//otherwise 1x1 tile(8x8 pixel)
+		bool sprite8x16 = testBit(lcdc, 2);
+
+		u8 palette0 = read(OBP0);
+		u8 palette1 = read(OBP1);
+
+		//Each sprite is 4 bytes in OAM, there are 160 bytes of 
+		//sprite data, 160 / 4 = 40 sprites total can be rendered.
+		u8 spriteSize = 4;
+		//Start from the right
+		for (size_t id = 40; id > 0; id--) {
+			u16 offset = oamLocation + (id * spriteSize);
+
+			//Byte 0
+			//Sub 16 to determine actual y position
+			s32 ypos = read(offset) - 16;
+
+			//Byte 1
+			//Sub 8 to determine actual x position
+			s32 xpos = read(offset + 1) - 8;
+
+			//Byte 2
+			//Tile Number used for fetching the graphics data
+			//for the sprite
+			u8 tileNum = read(offset + 2);
+
+			//Byte 3
+			//Bit flags to apply certain effects and options to a sprite
+			u8 flags = read(offset + 3);
+
+			//Check which sprite palette to use
+			u8 paletteNum = testBit(flags, 4);
+			u8 spritePalette = paletteNum ? palette1 : palette0;
+
+			if (sprite8x16) {
+				// If in 8x16 mode, the tile pattern for the top is tileNum & 0xFE
+				// Lower 8x8 tile is tileNum | 0x1
+				tileNum = tileNum & 0xFE;
+				u8 tileNumBottom = tileNum | 0x1;
+
+				updateSpriteTilePx(spritePalette, xpos, ypos, tileNum, flags);
+				updateSpriteTilePx(spritePalette, xpos, ypos + 8, tileNumBottom, flags);
+			}
+			else {
+				updateSpriteTilePx(spritePalette, xpos, ypos, tileNum, flags);
+			}
+		}
 	}
 
 	void Ppu::updateBackgroundTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY, u8 tileId)
@@ -281,7 +349,48 @@ namespace gbEmu {
 		winPixels.setPixel(displayX, displayY, color);
 	}
 
-	sf::Color Ppu::getPixelColor(u8 palette, u8 top, u8 bottom, s32 bit)
+	void Ppu::updateSpriteTilePx(u8 palette, s32 startX, s32 startY, u8 tileId, u8 flags)
+	{
+		//Sprites always use the 8000 addressing method (always unsigned 8 bit integer)
+		u16 address = 0x8000;
+
+		//If priority is set to 0, then sprite is rendered above background
+		//If set to 1, sprite is hidden behind background and window
+		//unless color of bg or win is white, the sprite is then rendered on top of that
+		bool priority = testBit(flags, 7);
+		bool yflip = testBit(flags, 6);
+		bool xflip = testBit(flags, 5);
+
+		for (size_t y = 0; y < 8; y++) {
+			s32 offset = (tileId * 16) + address;
+
+			u8 hi = read(offset + (y * 2) + 1),
+				lo = read(offset + (y * 2));
+
+			for (size_t x = 0; x < 8; x++) {
+				s32 pixelX = xflip ? (startX + x) : (startX + 7 - x);
+				s32 pixelY = yflip ? (startY + 7 - y) : (startY + y);
+
+				s32 boundsX = spritePixels.getSize().x;
+				s32 boundsY = spritePixels.getSize().y;
+
+				if (pixelX < 0 || pixelX >= boundsX) continue;
+				if (pixelY < 0 || pixelY >= boundsY) continue;
+
+				sf::Color color = getPixelColor(palette, lo, hi, x, true);
+
+				//If color in bg/win is not white, hide the sprite pixel
+				sf::Color bgColor = bgPixels.getPixel(pixelX, pixelY);
+				
+				if (priority) {
+					if (bgColor != shadesOfGrey[0]) continue;
+				}
+				spritePixels.setPixel(pixelX, pixelY, color);
+			}
+		}
+	}
+
+	sf::Color Ppu::getPixelColor(u8 palette, u8 top, u8 bottom, s32 bit, bool sprite)
 	{
 		u8 color3 = (palette >> 6); //extract bits 7 & 6
 		u8 color2 = (palette >> 4) & 0x3;
@@ -294,23 +403,26 @@ namespace gbEmu {
 		u8 second = testBit(bottom, bit);
 		u8 colorCode = (second << 1) | first;
 
-		sf::Color shadesOfGrey[4];
-		shadesOfGrey[0x0] = sf::Color(224, 248, 208, 255); // 0x0 - White
-		shadesOfGrey[0x1] = sf::Color(198, 198, 198); // 0x1 - Light Gray
-		shadesOfGrey[0x2] = sf::Color(127, 127, 127); // 0x2 - Drak Gray
-		shadesOfGrey[0x3] = sf::Color(0, 0, 0);
+		
 
 		if (colorCode == 0x0) {
-			return shadesOfGrey[color0];
+			if (sprite) {
+				return sf::Color::Transparent;
+			}
+			//return shadesOfGrey[color0];
+			return superGbShades[color0];
 		}
 		else if (colorCode == 0x1) {
-			return shadesOfGrey[color1];
+			//return shadesOfGrey[color1];
+			return superGbShades[color1];
 		}
 		else if (colorCode == 0x2) {
-			return shadesOfGrey[color2];
+			//return shadesOfGrey[color2];
+			return superGbShades[color2];
 		}
 		else if (colorCode == 0x03) {
-			return shadesOfGrey[color3];
+			//return shadesOfGrey[color3];
+			return superGbShades[color3];
 		}
 		else {
 			return sf::Color(255, 0, 255);
@@ -417,5 +529,6 @@ namespace gbEmu {
 	{
 		bgTexture.loadFromImage(bgPixels);
 		winTexture.loadFromImage(winPixels);
+		spriteTexture.loadFromImage(spritePixels);
 	}
 }

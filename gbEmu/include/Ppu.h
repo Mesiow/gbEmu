@@ -18,6 +18,8 @@ namespace gbEmu {
 	#define SCY 0xFF42
 	#define COINCIDENCE 0xFF45
 	#define PALETTE 0xFF47
+	#define OBP0 0xFF48
+	#define OBP1 0xFF49
 
 	#define WINDOWX 0xFF4B
 	#define WINDOWY 0xFF4A
@@ -45,7 +47,6 @@ namespace gbEmu {
 		void update(u32 cycles);
 
 		void drawLine();
-		void drawTiles();
 		void drawBackground();
 		void drawWindow();
 		void drawSprites();
@@ -54,8 +55,10 @@ namespace gbEmu {
 			u8 tileId);
 		void updateWindowTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY,
 			u8 tileId);
+		void updateSpriteTilePx(u8 palette, s32 startX, s32 startY, u8 tileId, u8 flags);
 
-		sf::Color getPixelColor(u8 palette, u8 top, u8 bottom, s32 bit);
+		sf::Color getPixelColor(u8 palette, u8 top, u8 bottom, s32 bit,
+			bool sprite = false);
 
 		void setLCDStatus();
 		bool isLCDEnabled();
@@ -78,8 +81,10 @@ namespace gbEmu {
 		sf::Sprite bgLayer;
 		sf::Sprite winLayer;
 		sf::Sprite spriteLayer;
-	
 
+		sf::Color shadesOfGrey[4];
+		sf::Color superGbShades[4];
+	
 		s16 scanlineCounter = 0;
 		s16 scanlinesRendered = 0;
 

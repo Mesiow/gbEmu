@@ -3,8 +3,9 @@
 gbEmu::Gb::Gb()
 	:mmu(), cpu(&mmu), ppu(&mmu), joypad(&mmu)
 {
-    //cart.load("roms/Tetris.GB");
-    cart.load("test_roms/02-interrupts.gb");
+    cart.load("roms/Tetris.GB");
+    //cart.load("roms/ZELDA.gbc");
+    //cart.load("test_roms/02-interrupts.gb");
     mmu.loadBios("roms/DMG_ROM.GB");
     mmu.loadCartridge(&cart);
 	
