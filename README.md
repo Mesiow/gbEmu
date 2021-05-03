@@ -1,8 +1,8 @@
 # Gameboy Emulator
  - Components: 
-    - CPU: Mostly working (passes all blarggs tests except 02)
+    - CPU: Mostly working (passes all blarggs tests except 02 HALT #5)
     - PPU: WIP
  - Current Stage: PPU
- - A learning project and not meant to be 100% accurate
+ - A learning project and not meant to be accurate
 
 ![](gifs/bios.gif)
