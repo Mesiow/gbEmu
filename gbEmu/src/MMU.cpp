@@ -55,7 +55,7 @@ namespace gbEmu {
 
 		//Read character from serial
 		if (address == 0xFF02 && value == 0x81) {
-			std::cout << read(0xFF01);
+			//std::cout << read(0xFF01);
 			memory[0xFF01] = 0xFF;
 		}
 
@@ -103,6 +103,10 @@ namespace gbEmu {
 
 		if (address < 0x0100 && bootRomEnabled) {
 			return bootrom[address];
+		}
+
+		if (address == 0xFF00) {
+			return 0xFF;
 		}
 
 		//Switchable rom bank

@@ -3,7 +3,8 @@
 gbEmu::Gb::Gb()
 	:mmu(), cpu(&mmu), ppu(&mmu), joypad(&mmu)
 {
-    cart.load("roms/Dr. Mario.gb");
+    cart.load("roms/SUPERMAR.GBC");
+    //cart.load("roms/Dr. Mario.gb");
     //cart.load("roms/Tetris.GB");
     //cart.load("roms/ZELDA.gbc");
     //cart.load("test_roms/02-interrupts.gb");
