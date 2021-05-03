@@ -24,9 +24,9 @@ namespace gbEmu {
 		shadesOfGrey[0x2] = sf::Color(127, 127, 127); // 0x2 - Dark Gray
 		shadesOfGrey[0x3] = sf::Color(0, 0, 0);
 
-		superGbShades[0x0] = sf::Color(255, 239, 206, 255); // 0x0 - White
-		superGbShades[0x1] = sf::Color(222, 148, 74, 255); // 0x1 - Light Gray
-		superGbShades[0x2] = sf::Color(173, 41, 33, 255); // 0x2 - Dark Gray
+		superGbShades[0x0] = sf::Color(255, 239, 206, 255); 
+		superGbShades[0x1] = sf::Color(222, 148, 74, 255); 
+		superGbShades[0x2] = sf::Color(173, 41, 33, 255);
 		superGbShades[0x3] = sf::Color(49, 24, 82, 255);
 
 		bgPixels.create(160, 144, sf::Color::White);
@@ -38,7 +38,7 @@ namespace gbEmu {
 		spritePixels.create(160, 144, sf::Color::Transparent);
 		spriteTexture.loadFromImage(spritePixels);
 
-		int scaleFactor = 3;
+		int scaleFactor = 5;
 
 		bgLayer = sf::Sprite(bgTexture);
 		bgLayer.setScale(scaleFactor, scaleFactor);
@@ -57,12 +57,12 @@ namespace gbEmu {
 		target.draw(spriteLayer);
 	}
 
-	void Ppu::update(u32 cycles)
+	void Ppu::update(s32 cycles)
 	{
 		setLCDStatus();
 
 		if (isLCDEnabled()) {
-			//subtract by the amount of clock cycles the lasst opcode took to execute
+			//subtract by the amount of clock cycles the last opcode took to execute
 			//to keep the graphics in sync with the cpu
 			scanlineCounter -= cycles;
 		}
@@ -70,9 +70,6 @@ namespace gbEmu {
 			return;
 		}
 
-	
-		if (read(LY) > 153)
-			write(LY, 0);
 
 		//if negative move to next scanline
 		if (scanlineCounter <= 0) {
@@ -86,16 +83,18 @@ namespace gbEmu {
 			//set counter back to 456(each scanline takes 456 t cycles)
 			scanlineCounter = 456;
 
+			
+
 			//VBlank period entered
-			if (currentScanline == 144) {
+			if (currentScanline == 144 && isLCDEnabled()) {
 				requestInterrupt(0);
 			}
-			//if past line 153, reset to 0
+			////if past line 153, reset to 0
 			else if (currentScanline > 153) {
 				write(LY, 0);
 			}
 			//draw current scanline
-			else if (currentScanline <= 144) {
+			else if (currentScanline < 144) {
 				drawLine();
 			}
 		}
@@ -105,18 +104,16 @@ namespace gbEmu {
 	{
 		u8 lcdc = read(LCDC);
 
-		if (testBit(lcdc, 7)) {
+		//If bit 0 is on, we render the background tiles,
+		if (testBit(lcdc, 0))
+			drawBackground();
 
-			//If bit 0 is on, we render the background tiles,
-			if (testBit(lcdc, 0))
-				drawBackground();
+		if (testBit(lcdc, 5))
+			drawWindow();
 
-			if (testBit(lcdc, 5))
-				drawWindow();
-
-			if (testBit(lcdc, 1))
-				drawSprites();
-		}
+		if (testBit(lcdc, 1))
+			drawSprites();
+	
 	}
 
 	void Ppu::drawBackground()
@@ -125,7 +122,7 @@ namespace gbEmu {
 		u8 scx = read(SCX);
 		u8 scy = read(SCY);
 		u8 currentScanline = read(LY);
-
+	
 		u16 backgroundMapRegion;
 		if (testBit(lcdc, 3)) {
 			backgroundMapRegion = 0x9C00;
@@ -142,11 +139,11 @@ namespace gbEmu {
 		// 3. Get the pixel color based on that coordinate relative to the 8x8 tile grid
 		// 4. Plot pixel in 160x144 display view
 
-		s32 y = currentScanline;
+		u8 y = currentScanline;
 		for (size_t x = 0; x < 160; ++x) {
 			//1. Get pixel x,y in overall background map, offset by scroll x and y
-			s32 mapx = (s32)scx + x;
-			s32 mapy = (s32)scy + y;
+			u16 mapx = (s32)scx + x;
+			u16 mapy = (s32)scy + y;
 
 			//Make sure coords loop around if exceeding 256 x 256 area
 			if (mapx >= 256) mapx = mapx - 256;
@@ -328,7 +325,7 @@ namespace gbEmu {
 			tileDataLocation = 0x8000;
 		}
 		else {
-			tileDataLocation = 0x9000;
+			tileDataLocation = 0x8800;
 			sign = true;
 		}
 
@@ -437,8 +434,10 @@ namespace gbEmu {
 			//scanline
 			scanlineCounter = 456;
 			write(LY, 0);
+
 			stat &= 0xFC;
 			stat = setBit(stat, 0);
+
 			write(STAT, stat);
 
 			return;
@@ -460,8 +459,8 @@ namespace gbEmu {
 			reqInterrupt = testBit(stat, 4);
 		}
 		else {
-			s32	Oambounds = 456 - 80;
-			s32 Drawingbounds = Oambounds - 172;
+			s16	Oambounds = 456 - 80;
+			s16 Drawingbounds = Oambounds - 172;
 
 			//In mode 2 (OAM Scan)
 			if (scanlineCounter >= Oambounds) {
@@ -487,7 +486,7 @@ namespace gbEmu {
 
 		//Check if there is an interrupt request
 		//and we entered a new mode
-		if (reqInterrupt && (currentMode != mode)) {
+		if (reqInterrupt && (mode != currentMode)) {
 			requestInterrupt(1);
 		}
 
@@ -495,8 +494,7 @@ namespace gbEmu {
 			LYC is used to compare a value to the LY register.
 			If they match, the match flag is set in the STAT register.
 		*/
-		u8 ly = read(LY);
-		if (ly == read(COINCIDENCE)) {
+		if (currentLine == read(COINCIDENCE)) {
 			//Set coincidence flag
 			stat = setBit(stat, 2);
 

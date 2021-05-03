@@ -40,10 +40,9 @@ namespace gbEmu {
 		void write(u16 address, u8 value);
 
 
-
 		void init();
 		void render(sf::RenderTarget& target);
-		void update(u32 cycles);
+		void update(s32 cycles);
 
 		void drawLine();
 		void drawBackground();
@@ -84,7 +83,7 @@ namespace gbEmu {
 		sf::Color shadesOfGrey[4];
 		sf::Color superGbShades[4];
 	
-		s16 scanlineCounter = 0;
+		s16 scanlineCounter = 456;
 		s16 scanlinesRendered = 0;
 
 		MMU* mmu;

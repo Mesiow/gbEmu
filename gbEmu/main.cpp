@@ -13,7 +13,7 @@
 
 int main(int arc, char* argv[]) {
 
-    sf::RenderWindow window(sf::VideoMode(160 * 3, 144 * 3), "gbEmu");
+    sf::RenderWindow window(sf::VideoMode(160 * 5, 144 * 5), "gbEmu");
     ImGui::SFML::Init(window);
 
    
@@ -35,12 +35,16 @@ int main(int arc, char* argv[]) {
 
         ImGui::SFML::Update(window, deltaClock.restart());
        
+       
+
         ui.update();
         ui.render();
-        
+
+        window.clear(sf::Color::Black);
         //gb.update();
 
-        window.clear(sf::Color::Transparent);
+       // window.clear(sf::Color::Transparent);
+        
 
         gb.render(window);
         ImGui::SFML::Render(window);

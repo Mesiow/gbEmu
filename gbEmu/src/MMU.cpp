@@ -48,6 +48,9 @@ namespace gbEmu {
 		//Disable bootrom
 		if (address == 0xFF50 && bootRomEnabled) {
 			bootRomEnabled = false;
+			memory[address] = value;
+
+			return;
 		}
 
 		//Read character from serial
@@ -82,7 +85,7 @@ namespace gbEmu {
 		//Not usable 0xFEA0 - 0xFEFF
 		else if (address >= 0xFEA0 && address <= 0xFEFF)
 			return;
-		
+
 		//DMA
 		else if (address == 0xFF46) {
 			dmaTransfer(value);

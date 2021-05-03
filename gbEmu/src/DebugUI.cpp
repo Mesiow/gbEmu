@@ -110,10 +110,19 @@ namespace gbEmu {
         ImGui::SetNextWindowSizeConstraints(ImVec2(100.f, 100.f), ImVec2(800.f, 800.f));
         ImGui::Begin("GPU");
         {
+
+            ImVec2 pos = ImGui::GetCursorScreenPos();
+            uint32_t tex = gb->ppu.bgLayer.getTexture()->getNativeHandle();
+
+            ImVec2 size = ImGui::GetWindowSize();
+            size.y -= 46;
+
+            ImGui::Image(tex, size /*ImVec2(0, 0), ImVec2(0.625, 0.5625)*/);
+            ImGui::End();
             //Tabs
 
 
-            ImGui::BeginTabBar("Options");
+           /* ImGui::BeginTabBar("Options");
             if (ImGui::TabItemButton("Display")) {
 
             }
@@ -126,7 +135,7 @@ namespace gbEmu {
             if (ImGui::TabItemButton("Sprites")) {
 
             }
-            ImGui::EndTabBar();
+            ImGui::EndTabBar();*/
 
 
 
