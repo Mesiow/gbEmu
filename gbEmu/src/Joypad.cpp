@@ -11,10 +11,6 @@ namespace gbEmu {
 
 	u8 Joypad::read(u16 address)
 	{
-		if (address == 0xFF00) {
-			//get joypad state
-		}
-
 		return mmu->read(address);
 	}
 

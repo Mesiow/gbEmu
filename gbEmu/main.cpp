@@ -14,6 +14,11 @@
 int main(int arc, char* argv[]) {
 
     sf::RenderWindow window(sf::VideoMode(160 * 3, 144 * 3), "gbEmu");
+
+    sf::Image icon;
+    icon.loadFromFile("icon.jpg");
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
     ImGui::SFML::Init(window);
 
    
