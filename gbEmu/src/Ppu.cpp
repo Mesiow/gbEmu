@@ -38,7 +38,7 @@ namespace gbEmu {
 		spritePixels.create(160, 144, sf::Color::Transparent);
 		spriteTexture.loadFromImage(spritePixels);
 
-		int scaleFactor = 5;
+		s32 scaleFactor = 3;
 
 		bgLayer = sf::Sprite(bgTexture);
 		bgLayer.setScale(scaleFactor, scaleFactor);
