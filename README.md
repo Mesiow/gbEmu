@@ -5,4 +5,9 @@
  - Current Stage: PPU
  - A learning project and not meant to be accurate or anything
 
-![](gifs/bios.gif)
+![](screenshotsngifs/bios.gif)
+
+# Working Games
+![](screenshotsngifs/sm.PNG)
+![](screenshotsngifs/tetris.PNG)
+![](screenshotsngifs/drmario.PNG)
