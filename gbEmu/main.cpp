@@ -30,29 +30,27 @@ int main(int arc, char* argv[]) {
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
-            ui.handleEvents(event);
+            //ImGui::SFML::ProcessEvent(event);
+            //ui.handleEvents(event);
+
+            gb.handleEvents(event);
 
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
         }
 
-        ImGui::SFML::Update(window, deltaClock.restart());
+        //ImGui::SFML::Update(window, deltaClock.restart());
        
        
 
-        ui.update();
-        ui.render();
+        //ui.update();
+        //ui.render();
+        gb.update();
 
         window.clear(sf::Color::Black);
-        //gb.update();
-        
-
         gb.render(window);
-        ImGui::SFML::Render(window);
-      
-
+        //ImGui::SFML::Render(window);
         window.display();
     }
 

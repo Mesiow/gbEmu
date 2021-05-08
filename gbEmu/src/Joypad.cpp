@@ -21,17 +21,19 @@ namespace gbEmu {
 
 	void Joypad::keyPressed(Key key)
 	{
-
+		
 	}
 
 	void Joypad::keyReleased(Key key)
 	{
+		state = setBit(state, (u8)key);
 	}
 
 	u8 Joypad::joypadState()
 	{
-
-		return 0;
+		u8 joy = mmu->memory[JOYPAD];
+		
+		return joy;
 	}
 
 	void Joypad::requestInterrupt()

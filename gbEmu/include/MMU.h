@@ -37,6 +37,7 @@ namespace gbEmu {
 	#define MAX_MEM 0x10000
 	#define ROM_SIZE 0x8000
 	struct Cartridge;
+	struct Joypad;
 	struct MMU {
 		MMU();
 
@@ -45,6 +46,8 @@ namespace gbEmu {
 
 		void write(u16 address, u8 value);
 		u8 read(u16 address);
+
+		void connectJoypad(Joypad* joy);
 
 		void handleBanking(u16 address, u8 value);
 		void enableRamBank(u16 address, u8 value);
@@ -70,5 +73,7 @@ namespace gbEmu {
 		bool romBanking = false;
 		bool ramBanking = false;
 		bool bootRomEnabled = false;
+
+		Joypad* joy;
 	};
 }

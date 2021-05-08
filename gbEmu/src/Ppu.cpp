@@ -223,7 +223,7 @@ namespace gbEmu {
 
 	void Ppu::drawSprites()
 	{
-		u8 lcdc = read(0xFF40);
+		u8 lcdc = read(LCDC);
 		u16 oamLocation = 0xFE00;
 
 		//Sprite size to display
@@ -238,16 +238,16 @@ namespace gbEmu {
 		//sprite data, 160 / 4 = 40 sprites total can be rendered.
 		u8 spriteSize = 4;
 		//Start from the right
-		for (size_t id = 40; id > 0; id--) {
+		for (s32 id = 39; id >= 0; id--) {
 			u16 offset = oamLocation + (id * spriteSize);
 
 			//Byte 0
 			//Sub 16 to determine actual y position
-			s32 ypos = read(offset) - 16;
+			s32 ypos = ((s32)read(offset)) - 16;
 
 			//Byte 1
 			//Sub 8 to determine actual x position
-			s32 xpos = read(offset + 1) - 8;
+			s32 xpos = ((s32)read(offset + 1)) - 8;
 
 			//Byte 2
 			//Tile Number used for fetching the graphics data
@@ -259,7 +259,7 @@ namespace gbEmu {
 			u8 flags = read(offset + 3);
 
 			//Check which sprite palette to use
-			u8 paletteNum = testBit(flags, 4);
+			u8 paletteNum= testBit(flags, 4);
 			u8 spritePalette = paletteNum ? palette1 : palette0;
 
 			if (sprite8x16) {
@@ -325,7 +325,7 @@ namespace gbEmu {
 			tileDataLocation = 0x8000;
 		}
 		else {
-			tileDataLocation = 0x8800;
+			tileDataLocation = 0x9000;
 			sign = true;
 		}
 
@@ -358,18 +358,18 @@ namespace gbEmu {
 		bool yflip = testBit(flags, 6);
 		bool xflip = testBit(flags, 5);
 
-		for (size_t y = 0; y < 8; y++) {
+		for (s32 y = 0; y < 8; y++) {
 			s32 offset = (tileId * 16) + address;
 
 			u8 hi = read(offset + (y * 2) + 1),
 				lo = read(offset + (y * 2));
 
-			for (size_t x = 0; x < 8; x++) {
-				s32 pixelX = xflip ? (startX + x) : (startX + 7 - x);
-				s32 pixelY = yflip ? (startY + 7 - y) : (startY + y);
+			for (s32 x = 0; x < 8; x++) {
+				s32 pixelX = (xflip) ? (startX + x) : (startX + 7 - x);
+				s32 pixelY = (yflip) ? (startY + 7 - y) : (startY + y);
 
-				s32 boundsX = spritePixels.getSize().x;
-				s32 boundsY = spritePixels.getSize().y;
+				u32 boundsX = spritePixels.getSize().x;
+				u32 boundsY = spritePixels.getSize().y;
 
 				if (pixelX < 0 || pixelX >= boundsX) continue;
 				if (pixelY < 0 || pixelY >= boundsY) continue;
@@ -380,7 +380,7 @@ namespace gbEmu {
 				sf::Color bgColor = bgPixels.getPixel(pixelX, pixelY);
 				
 				if (priority) {
-					if (bgColor != shadesOfGrey[0]) continue;
+					if (bgColor != superGbShades[0]) continue;
 				}
 				spritePixels.setPixel(pixelX, pixelY, color);
 			}

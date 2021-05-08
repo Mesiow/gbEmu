@@ -1,5 +1,6 @@
 #include "../include/MMU.h"
 #include "../include/Cartridge.h"
+#include "../include/Joypad.h"
 
 namespace gbEmu {
 
@@ -105,8 +106,11 @@ namespace gbEmu {
 			return bootrom[address];
 		}
 
+		//Joypad
 		if (address == 0xFF00) {
 			return 0xFF;
+			//return state of joypad
+			//return joy->joypadState();
 		}
 
 		//Switchable rom bank
@@ -123,6 +127,12 @@ namespace gbEmu {
 
 		return memory[address];
 	}
+
+	void MMU::connectJoypad(Joypad* joy)
+	{
+		this->joy = joy;
+	}
+
 	void MMU::handleBanking(u16 address, u8 value)
 	{
 		//Depending on the mem address where its trying to write 

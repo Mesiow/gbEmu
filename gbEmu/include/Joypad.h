@@ -6,12 +6,20 @@ namespace gbEmu {
 	#define JOYPAD_INT 4
 
 	enum class Button {
-		Select = 0,
+		Action = 0,
 		Directional
 	};
 
-	enum class Key {
-
+	enum class Key : u8{
+		ArrowRight,
+		ArrowLeft,
+		ArrowUp,
+		ArrowDown,
+		
+		A,
+		S,
+		LShift,
+		Enter
 	};
 
 	struct MMU;
@@ -28,6 +36,9 @@ namespace gbEmu {
 
 		void requestInterrupt();
 
+		u8 state; //holds the state of the 8 buttons
+
 		MMU* mmu;
+		Button buttons;
 	};
 }

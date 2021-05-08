@@ -5,11 +5,16 @@ namespace gbEmu {
     Gb::Gb()
         :mmu(), cpu(&mmu), ppu(&mmu), joypad(&mmu)
     {
-        //cart.load("roms/SUPERMAR.GBC");
+        mmu.connectJoypad(&joypad);
+        
+        //cart.load("roms/Kirby's Dream Land.gb");
+        //cart.load("roms/Pokemon Red.gb");
+       // cart.load("roms/SUPERMAR.GBC");
         //cart.load("roms/Dr. Mario.gb");
-        cart.load("roms/Tetris.GB");
+       // cart.load("roms/Tetris.GB");
         //cart.load("roms/ZELDA.gbc");
         //cart.load("test_roms/02-interrupts.gb");
+        cart.load("test_roms/ppu/dmg-acid2.gb");
         mmu.loadBios("roms/DMG_ROM.GB");
         mmu.loadCartridge(&cart);
 
@@ -37,5 +42,109 @@ namespace gbEmu {
     void Gb::render(sf::RenderTarget& target)
     {
         ppu.render(target);
+    }
+
+    void Gb::handleEvents(sf::Event& ev)
+    {
+        handleKeyReleased(ev);
+        handleKeyPressed(ev);
+    }
+
+    void Gb::handleKeyReleased(sf::Event& ev)
+    {
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::Right) {
+                joypad.keyReleased(Key::ArrowRight);
+            }
+        }
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::Left) {
+                joypad.keyReleased(Key::ArrowLeft);
+            }
+        }
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::Up) {
+                joypad.keyReleased(Key::ArrowUp);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::Down) {
+                joypad.keyReleased(Key::ArrowDown);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::S) {
+                joypad.keyReleased(Key::S);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::A) {
+                joypad.keyReleased(Key::A);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::LShift) {
+                joypad.keyReleased(Key::LShift);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyReleased) {
+            if (ev.key.code == sf::Keyboard::Enter) {
+                joypad.keyReleased(Key::Enter);
+            }
+        }
+    }
+
+    void Gb::handleKeyPressed(sf::Event& ev)
+    {
+        if (ev.type == sf::Event::KeyPressed) {
+            if (ev.key.code == sf::Keyboard::Right) {
+                joypad.keyPressed(Key::ArrowRight);
+            }
+        }
+        if (ev.type == sf::Event::KeyPressed) {
+            if (ev.key.code == sf::Keyboard::Left) {
+                joypad.keyPressed(Key::ArrowLeft);
+            }
+        }
+        if (ev.type == sf::Event::KeyPressed) {
+            if (ev.key.code == sf::Keyboard::Up) {
+                joypad.keyPressed(Key::ArrowUp);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyPressed) {
+            if (ev.key.code == sf::Keyboard::Down) {
+                joypad.keyPressed(Key::ArrowDown);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyPressed) {
+            if (ev.key.code == sf::Keyboard::S) {
+                joypad.keyPressed(Key::S);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyPressed) {
+            if (ev.key.code == sf::Keyboard::A) {
+                joypad.keyPressed(Key::A);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyPressed) {
+            if (ev.key.code == sf::Keyboard::LShift) {
+                joypad.keyPressed(Key::LShift);
+            }
+        }
+
+        if (ev.type == sf::Event::KeyPressed) {
+            if (ev.key.code == sf::Keyboard::Enter) {
+                joypad.keyPressed(Key::Enter);
+            }
+        }
     }
 }

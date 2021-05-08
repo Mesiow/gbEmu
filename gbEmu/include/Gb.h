@@ -12,6 +12,10 @@ namespace gbEmu {
 		void update();
 		void render(sf::RenderTarget& target);
 
+		void handleEvents(sf::Event& ev);
+		void handleKeyReleased(sf::Event &ev);
+		void handleKeyPressed(sf::Event &ev);
+
 		MMU mmu;
 		Cpu cpu;
 		Ppu ppu;
