@@ -29,7 +29,6 @@ namespace gbEmu {
 		SP = 0x0000;
 	}
 
-	//TODO: Pass interrupts test 02 (HALT #5)
 	u8 Cpu::clock()
 	{
 		if (!paused) {
@@ -1478,9 +1477,7 @@ namespace gbEmu {
 	}
 	u8 Cpu::op0x76()
 	{
-		if(interruptsEnabled)
-			halt = true;
-
+		halt = true;
 		return 0;
 	}
 	u8 Cpu::op0x77()
