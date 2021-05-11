@@ -12,7 +12,6 @@
 #include "include\Gb.h"
 
 int main(int arc, char* argv[]) {
-
     sf::RenderWindow window(sf::VideoMode(160 * 3, 144 * 3), "gbEmu");
 
     sf::Image icon;
@@ -48,7 +47,7 @@ int main(int arc, char* argv[]) {
         //ui.render();
         gb.update();
 
-        window.clear(sf::Color::Black);
+        window.clear();
         gb.render(window);
         //ImGui::SFML::Render(window);
         window.display();

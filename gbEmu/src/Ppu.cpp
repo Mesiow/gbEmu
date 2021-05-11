@@ -104,16 +104,17 @@ namespace gbEmu {
 	{
 		u8 lcdc = read(LCDC);
 
-		//If bit 0 is on, we render the background tiles,
-		if (testBit(lcdc, 0))
-			drawBackground();
+		if (testBit(lcdc, 7)) {
+			//If bit 0 is on, we render the background tiles,
+			if (testBit(lcdc, 0))
+				drawBackground();
 
-		if (testBit(lcdc, 5))
-			drawWindow();
+			if (testBit(lcdc, 5))
+				drawWindow();
 
-		if (testBit(lcdc, 1))
-			drawSprites();
-	
+			if (testBit(lcdc, 1))
+				drawSprites();
+		}
 	}
 
 	void Ppu::drawBackground()
@@ -139,11 +140,11 @@ namespace gbEmu {
 		// 3. Get the pixel color based on that coordinate relative to the 8x8 tile grid
 		// 4. Plot pixel in 160x144 display view
 
-		u8 y = currentScanline;
+		s32 y = (s32)currentScanline;
 		for (size_t x = 0; x < 160; ++x) {
 			//1. Get pixel x,y in overall background map, offset by scroll x and y
-			u16 mapx = (s32)scx + x;
-			u16 mapy = (s32)scy + y;
+			s32 mapx = (s32)scx + x;
+			s32 mapy = (s32)scy + y;
 
 			//Make sure coords loop around if exceeding 256 x 256 area
 			if (mapx >= 256) mapx = mapx - 256;
@@ -259,8 +260,8 @@ namespace gbEmu {
 			u8 flags = read(offset + 3);
 
 			//Check which sprite palette to use
-			u8 paletteNum= testBit(flags, 4);
-			u8 spritePalette = paletteNum ? palette1 : palette0;
+			bool paletteNum = testBit(flags, 4);
+			u8 spritePalette = (paletteNum) ? palette1 : palette0;
 
 			if (sprite8x16) {
 				// If in 8x16 mode, the tile pattern for the top is tileNum & 0xFE
@@ -494,7 +495,7 @@ namespace gbEmu {
 			LYC is used to compare a value to the LY register.
 			If they match, the match flag is set in the STAT register.
 		*/
-		if (currentLine == read(COINCIDENCE)) {
+		if ((currentLine == read(COINCIDENCE)) && mode == PpuMode::OAMScan) {
 			//Set coincidence flag
 			stat = setBit(stat, 2);
 

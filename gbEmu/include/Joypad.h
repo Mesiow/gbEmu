@@ -32,11 +32,14 @@ namespace gbEmu {
 		void keyPressed(Key key);
 		void keyReleased(Key key);
 
+		u8 getKeyBit(Key key);
+
 		u8 joypadState();
 
 		void requestInterrupt();
 
-		u8 state; //holds the state of the 8 buttons
+		u8 directionals = 0xF; //Directional button bits
+		u8 actions = 0xF; //Action button bits
 
 		MMU* mmu;
 		Button buttons;

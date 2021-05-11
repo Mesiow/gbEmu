@@ -35,11 +35,15 @@ namespace gbEmu {
 			//Check cart type (ROM only or MBC1)
 			u8 type = buf[0x147];
 
-			//MBC1
-			if (type == 0x01) {
-				mbc1 = true;
+			if (type == 0x0) {
+				memory = new u8[ROM_SIZE];
 			}
-			memory = new u8[MBC1_SIZE];
+			//MBC1
+			else if (type == 0x01) {
+				mbc1 = true;
+				memory = new u8[MBC1_SIZE];
+			}
+			
 
 			for (size_t i = 0; i < size; ++i) {
 				memory[i] = buf[i];

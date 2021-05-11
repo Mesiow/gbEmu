@@ -56,10 +56,9 @@ namespace gbEmu {
 
 		//Read character from serial
 		if (address == 0xFF02 && value == 0x81) {
-			//std::cout << read(0xFF01);
+			std::cout << read(0xFF01);
 			memory[0xFF01] = 0xFF;
 		}
-
 
 		//0x0000 - 0x3FFF (ROM) - not writeable
 		//0x4000 - 0x7FFF (Switchable ROM Bank) - not writeable
@@ -108,9 +107,9 @@ namespace gbEmu {
 
 		//Joypad
 		if (address == 0xFF00) {
-			return 0xFF;
+			//return 0xFF;
 			//return state of joypad
-			//return joy->joypadState();
+			return joy->joypadState();
 		}
 
 		//Switchable rom bank
