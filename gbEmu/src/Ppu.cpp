@@ -29,32 +29,18 @@ namespace gbEmu {
 		superGbShades[0x2] = sf::Color(173, 41, 33, 255);
 		superGbShades[0x3] = sf::Color(49, 24, 82, 255);
 
-		bgPixels.create(160, 144, sf::Color::White);
-		bgTexture.loadFromImage(bgPixels);
-
-		winPixels.create(160, 144, sf::Color::Transparent);
-		winTexture.loadFromImage(winPixels);
-
-		spritePixels.create(160, 144, sf::Color::Transparent);
-		spriteTexture.loadFromImage(spritePixels);
+		pixels.create(160, 144, sf::Color::White);
+		framebuffer.loadFromImage(pixels);
 
 		s32 scaleFactor = 3;
 
-		bgLayer = sf::Sprite(bgTexture);
-		bgLayer.setScale(scaleFactor, scaleFactor);
-
-		winLayer = sf::Sprite(winTexture);
-		winLayer.setScale(scaleFactor, scaleFactor);
-
-		spriteLayer = sf::Sprite(spriteTexture);
-		spriteLayer.setScale(scaleFactor, scaleFactor);
+		sprite = sf::Sprite(framebuffer);
+		sprite.setScale(scaleFactor, scaleFactor);
 	}
 
 	void Ppu::render(sf::RenderTarget& target)
 	{
-		target.draw(bgLayer);
-		target.draw(winLayer);
-		target.draw(spriteLayer);
+		target.draw(sprite);
 	}
 
 	void Ppu::update(s32 cycles)
@@ -214,7 +200,8 @@ namespace gbEmu {
 			tileXPixel = abs(tileXPixel - 7);
 
 			if (currentScanline < winy) {
-				winPixels.setPixel(x, y, sf::Color::Transparent);
+				//set window pixel
+				pixels.setPixel(x, y, sf::Color::Transparent);
 			}
 			else {
 				updateWindowTilePx(palette, displayX, displayY, tileXPixel, tileYPixel, tileId);
@@ -309,7 +296,7 @@ namespace gbEmu {
 			lo = read(offset + (tileY * 2));
 
 		sf::Color color = getPixelColor(palette, lo, hi, tileX);
-		bgPixels.setPixel(displayX, displayY, color);
+		pixels.setPixel(displayX, displayY, color);
 	}
 
 	void Ppu::updateWindowTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY, u8 tileId)
@@ -344,7 +331,7 @@ namespace gbEmu {
 			lo = read(offset + (tileY * 2));
 
 		sf::Color color = getPixelColor(palette, lo, hi, tileX);
-		winPixels.setPixel(displayX, displayY, color);
+		pixels.setPixel(displayX, displayY, color);
 	}
 
 	void Ppu::updateSpriteTilePx(u8 palette, s32 startX, s32 startY, u8 tileId, u8 flags)
@@ -378,12 +365,12 @@ namespace gbEmu {
 				sf::Color color = getPixelColor(palette, lo, hi, x, true);
 
 				//If color in bg/win is not white, hide the sprite pixel
-				sf::Color bgColor = bgPixels.getPixel(pixelX, pixelY);
+				sf::Color bgColor = pixels.getPixel(pixelX, pixelY);
 				
 				if (priority) {
 					if (bgColor != superGbShades[0]) continue;
 				}
-				spritePixels.setPixel(pixelX, pixelY, color);
+				pixels.setPixel(pixelX, pixelY, color);
 			}
 		}
 	}
@@ -526,8 +513,6 @@ namespace gbEmu {
 
 	void Ppu::bufferPixels()
 	{
-		bgTexture.loadFromImage(bgPixels);
-		winTexture.loadFromImage(winPixels);
-		spriteTexture.loadFromImage(spritePixels);
+		framebuffer.loadFromImage(pixels);
 	}
 }

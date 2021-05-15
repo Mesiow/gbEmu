@@ -67,6 +67,10 @@ namespace gbEmu {
 		void requestInterrupt(u8 interruptBit);
 		void bufferPixels();
 
+		sf::Image pixels;
+		sf::Texture framebuffer;
+		sf::Sprite sprite;
+
 		sf::Image bgPixels;
 		sf::Texture bgTexture;
 
