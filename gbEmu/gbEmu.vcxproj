@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Apu.cpp" />
     <ClCompile Include="src\Cartridge.cpp" />
     <ClCompile Include="src\DebugUI.cpp" />
     <ClCompile Include="main.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Apu.h" />
     <ClInclude Include="include\Cartridge.h" />
     <ClInclude Include="include\Cpu.h" />
     <ClInclude Include="include\DebugUI.h" />

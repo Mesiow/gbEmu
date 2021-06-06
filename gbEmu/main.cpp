@@ -22,7 +22,7 @@ int main(int arc, char* argv[]) {
 
    
     gbEmu::Gb gb;
-    gbEmu::DebugUI ui(&gb);
+   // gbEmu::DebugUI ui(&gb);
   
    
     sf::Clock deltaClock;

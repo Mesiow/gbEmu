@@ -58,10 +58,12 @@ namespace gbEmu {
 		if (address == 0xFF02 && value == 0x81) {
 			std::cout << read(0xFF01);
 			memory[0xFF01] = 0xFF;
+
+			return;
 		}
 
-		//0x0000 - 0x3FFF (ROM) - not writeable
-		//0x4000 - 0x7FFF (Switchable ROM Bank) - not writeable
+		////0x0000 - 0x3FFF (ROM) - not writeable
+		////0x4000 - 0x7FFF (Switchable ROM Bank) - not writeable
 		if (address >= 0x0000 && address <= 0x7FFF) {
 			//If game tries to write to rom,
 			//We need to figure out why and change banks accordingly
@@ -112,7 +114,7 @@ namespace gbEmu {
 			return joy->joypadState();
 		}
 
-		//Switchable rom bank
+		////Switchable rom bank
 		if (address >= 0x4000 && address <= 0x7FFF) {
 			//Access specific bank based on currentRomBank value
 			u16 newaddr = address - 0x4000;

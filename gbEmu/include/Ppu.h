@@ -23,6 +23,7 @@ namespace gbEmu {
 
 	#define WINDOWX 0xFF4B
 	#define WINDOWY 0xFF4A
+	#define OAM 0xFE00
 
 
 	enum class PpuMode : u8 {
@@ -45,18 +46,11 @@ namespace gbEmu {
 		void update(s32 cycles);
 
 		void drawLine();
-		void drawBackground();
-		void drawWindow();
+		void drawTiles();
 		void drawSprites();
 
-		void updateBackgroundTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY,
-			u8 tileId);
-		void updateWindowTilePx(u8 palette, s32 displayX, s32 displayY, s32 tileX, s32 tileY,
-			u8 tileId);
-		void updateSpriteTilePx(u8 palette, s32 startX, s32 startY, u8 tileId, u8 flags);
+		sf::Color getPixelColor(u8 colorNum, u16 palette, bool sprite = false);
 
-		sf::Color getPixelColor(u8 palette, u8 top, u8 bottom, s32 bit,
-			bool sprite = false);
 
 		void setLCDStatus();
 		bool isLCDEnabled();
@@ -71,21 +65,9 @@ namespace gbEmu {
 		sf::Texture framebuffer;
 		sf::Sprite sprite;
 
-		sf::Image bgPixels;
-		sf::Texture bgTexture;
-
-		sf::Image winPixels;
-		sf::Texture winTexture;
-
-		sf::Image spritePixels;
-		sf::Texture spriteTexture;
-
-		sf::Sprite bgLayer;
-		sf::Sprite winLayer;
-		sf::Sprite spriteLayer;
-
 		sf::Color shadesOfGrey[4];
 		sf::Color superGbShades[4];
+		sf::Color customShades[4];
 	
 		s16 scanlineCounter = 456;
 		s16 scanlinesRendered = 0;

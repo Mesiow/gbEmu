@@ -111,14 +111,14 @@ namespace gbEmu {
         ImGui::Begin("GPU");
         {
 
-            ImVec2 pos = ImGui::GetCursorScreenPos();
-            uint32_t tex = gb->ppu.bgLayer.getTexture()->getNativeHandle();
+            //ImVec2 pos = ImGui::GetCursorScreenPos();
+            //uint32_t tex = gb->ppu.bgLayer.getTexture()->getNativeHandle();
 
-            ImVec2 size = ImGui::GetWindowSize();
-            size.y -= 46;
+            //ImVec2 size = ImGui::GetWindowSize();
+            //size.y -= 46;
 
-            ImGui::Image(tex, size /*ImVec2(0, 0), ImVec2(0.625, 0.5625)*/);
-            ImGui::End();
+            //ImGui::Image(tex, size /*ImVec2(0, 0), ImVec2(0.625, 0.5625)*/);
+            //ImGui::End();
             //Tabs
 
 

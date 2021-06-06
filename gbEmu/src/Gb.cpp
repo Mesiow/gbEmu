@@ -9,13 +9,14 @@ namespace gbEmu {
         
         //cart.load("roms/Kirby's Dream Land.gb");
         //cart.load("roms/Pokemon Red.gb");
-        //cart.load("roms/SUPERMAR.GBC");
-        //cart.load("roms/Dr. Mario.gb");
+       // cart.load("roms/SUPERMAR.gbc");
+        cart.load("roms/Dr. Mario.gb");
         //cart.load("roms/Tetris.gb");
         //cart.load("roms/ZELDA.gbc");
         //cart.load("test_roms/02-interrupts.gb");
-        cart.load("test_roms/ppu/dmg-acid2.gb");
+        //cart.load("test_roms/ppu/dmg-acid2.gb");
         //cart.load("test_roms/cpu_instrs.gb");
+        //cart.load("test_roms/mbc/mbc1/bits_mode.gb");
         mmu.loadBios("roms/DMG_ROM.GB");
         mmu.loadCartridge(&cart);
 

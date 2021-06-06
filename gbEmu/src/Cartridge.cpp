@@ -39,12 +39,11 @@ namespace gbEmu {
 				memory = new u8[ROM_SIZE];
 			}
 			//MBC1
-			else if (type == 0x01) {
+			else if (type == 0x01 || type == 0x02 || type == 0x03) {
 				mbc1 = true;
 				memory = new u8[MBC1_SIZE];
 			}
 			
-
 			for (size_t i = 0; i < size; ++i) {
 				memory[i] = buf[i];
 			}
