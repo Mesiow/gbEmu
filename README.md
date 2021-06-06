@@ -1,7 +1,9 @@
 # Gameboy Emulator
  - Components: 
-    - CPU: passes blarggs cpu_instrs test (Working)
+    - CPU: Working
     - PPU: WIP
+    - Joypad: Working
+    - Audio: WIP
  - Current Stage: PPU
  - A learning project and not meant to be 100% accurate
 
