@@ -94,14 +94,12 @@ namespace gbEmu {
 	{
 		u8 lcdc = read(LCDC);
 
-		if (testBit(lcdc, 7)) {
-			//If bit 0 is on, we render the background tiles,
-			if (testBit(lcdc, 0))
-				drawTiles();
+		//If bit 0 is on, we render the background tiles,
+		if (testBit(lcdc, 0))
+			drawTiles();
 
-			if (testBit(lcdc, 1))
-				drawSprites();
-		}
+		if (testBit(lcdc, 1))
+			drawSprites();
 	}
 
 	void Ppu::drawTiles()
@@ -158,7 +156,7 @@ namespace gbEmu {
 
 		//Which 8 pixels of the current tile is the scanline on
 		u16 tileRow = (((u8)(ypos / 8)) * 32);
-
+	
 		for (s32 pixel = 0; pixel < 160; pixel++) {
 			u8 xpos = pixel + scx;
 
@@ -172,6 +170,7 @@ namespace gbEmu {
 			//which of 32 horizontal tiles does this xpos fall within
 			u16 tileCol = (xpos / 8);
 			s16 tileNum;
+			
 
 			//Get tile id
 			u16 tileAddress = backgroundAddress + tileRow + tileCol;
@@ -219,7 +218,6 @@ namespace gbEmu {
 
 			pixels.setPixel(pixel, ly, color);
 		}
-
 	}
 
 	void Ppu::drawSprites()
@@ -281,6 +279,10 @@ namespace gbEmu {
 					u16 colorAddress = testBit(attributes, 4) ? OBP1 : OBP0;
 					sf::Color color = getPixelColor(colorNum, read(colorAddress));
 
+					//if color is first in palette then is transparent for sprites
+					if (colorNum == 0)
+						continue;
+
 					s32 xPix = 0 - tilePixel;
 					xPix += 7;
 
@@ -295,54 +297,18 @@ namespace gbEmu {
 		}
 	}
 
-	sf::Color Ppu::getPixelColor(u8 colorNum, u16 palette, bool sprite)
+	sf::Color Ppu::getPixelColor(u8 colorNum, u8 palette, bool sprite)
 	{
-		//s32 hi = 0, lo = 0;
-		////which bits of the pal does the color id map to?
-		//switch (colorNum) {
-		//	case 0: hi = 1; lo = 0; break;
-		//	case 1: hi = 3; lo = 2; break;
-		//	case 2: hi = 5; lo = 4; break;
-		//	case 3: hi = 7; lo = 6; break;
-		//}
-
-		//s32 color = 0;
-		//color = testBit(palette, hi) << 1;
-		//color |= testBit(palette, lo);
-
-		//u8 color3 = (palette >> 6); //extract bits 7 & 6
-		//u8 color2 = (palette >> 4) & 0x3;
-		//u8 color1 = (palette >> 2) & 0x3;
-		//u8 color0 = (palette & 0x3);
-
-
-		////Get color code from the two bytes
-		/*u8 first = testBit(top, bit);
-		u8 second = testBit(bottom, bit);
-		u8 colorCode = (second << 1) | first;*/
-
-		//
-
 		u8 colorfrompal = (palette >> (2 * colorNum)) & 0x3;
 
-		if (colorfrompal == 0x0) {
-			if (sprite) {
-				return sf::Color::Transparent;
-			}
+		if (colorfrompal == 0)
 			return superGbShades[0];
-		}
-		else if (colorfrompal == 0x1) {
+		else if (colorfrompal == 1)
 			return superGbShades[1];
-		}
-		else if (colorfrompal == 0x2) {
+		else if (colorfrompal == 2)
 			return superGbShades[2];
-		}
-		else if (colorfrompal == 0x03) {
+		else if (colorfrompal == 3)
 			return superGbShades[3];
-		}
-		else {
-			return sf::Color(255, 0, 255);
-		}
 	}
 
 	void Ppu::setLCDStatus()

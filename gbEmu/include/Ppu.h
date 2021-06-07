@@ -49,7 +49,7 @@ namespace gbEmu {
 		void drawTiles();
 		void drawSprites();
 
-		sf::Color getPixelColor(u8 colorNum, u16 palette, bool sprite = false);
+		sf::Color getPixelColor(u8 colorNum, u8 palette, bool sprite = false);
 
 
 		void setLCDStatus();
