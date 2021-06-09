@@ -35,7 +35,7 @@ FFFF	FFFF	Interrupts Enable Register (IE)
 
 namespace gbEmu {
 	#define MAX_MEM 0x10000
-	#define ROM_SIZE 0x8000
+
 	struct Cartridge;
 	struct Joypad;
 	struct MMU {

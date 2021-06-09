@@ -24,7 +24,6 @@ namespace gbEmu {
 			rom.close();
 
 			bootRomEnabled = true;
-			//Load bootrom into memory
 			for (size_t i = 0; i < size; ++i) {
 				bootrom[i] = buf[i];
 			}
@@ -37,7 +36,7 @@ namespace gbEmu {
 		this->cart = cart;
 		u8 *cart_mem = this->cart->memory;
 		
-		for (size_t i = 0; i < ROM_SIZE; ++i) {
+		for (size_t i = 0; i < ROM_SIZE0; ++i) {
 			memory[i] = cart_mem[i];
 		}
 	}
@@ -141,7 +140,7 @@ namespace gbEmu {
 
 		//If address is between 0x0 and 0x2000, then it enables RAM 
 		//bank writing
-		if (address < 0x2000) {
+		if (address <= 0x1FFF) {
 			if (cart->mbc1) {
 				enableRamBank(address, value);
 			}
@@ -197,10 +196,11 @@ namespace gbEmu {
 		//handle MBC2 here
 		
 		
+		//MBC1
 		u8 nibble = value & 0xF;
 		if (nibble == 0xA)
 			ramBanking = true;
-		else if (nibble == 0x0)
+		else
 			ramBanking = false;
 	}
 
@@ -208,12 +208,23 @@ namespace gbEmu {
 	{
 		//MBC1
 
-		//lower 5 bits
-		u8 lo5 = value & 0x1F;
+		//And value with associated bitmask depending on
+		//rom size
+		u8 mask = 0xFF;
+		switch (cart->cartSize) {
+			case ROM_SIZE0: mask = 0x1; break;
+			case ROM_SIZE4: mask = 0x3; break;
+			case ROM_SIZE8: mask = 0x7; break;
+			case ROM_SIZE16: mask = 0xF; break;
+			case ROM_SIZE32: mask = 0x1F; break;
+		}
+
+		//AND with bitmask
+		u8 result = value & mask;
 
 		//Clear lower 5 bits
 		currentRomBank &= 0xE0; 
-		currentRomBank |= lo5;
+		currentRomBank |= result;
 
 		//if zero, must always be 1 or greater, so add 1 to it
 		if (currentRomBank == 0)
@@ -222,7 +233,7 @@ namespace gbEmu {
 
 	void MMU::switchHiRomBank(u8 value)
 	{
-		//bits 5 - 7
+		//clear first 5 bits
 		u8 hi = value & 0xE0;
 
 		//Clear bits 5 - 7

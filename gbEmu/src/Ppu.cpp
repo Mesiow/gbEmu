@@ -291,6 +291,12 @@ namespace gbEmu {
 					if ((ly < 0) || (ly > 143) || (pixel < 0) || (pixel > 159))
 						continue;
 
+					/*if (testBit(attributes, 7) == 1) {
+						if ((pixels.getPixel(pixel, ly).r != 255) || (pixels.getPixel(pixel, ly).g != 255)
+							|| (pixels.getPixel(pixel, ly).b != 255))
+							continue;
+					}*/
+
 					pixels.setPixel(pixel, ly, color);
 				}
 			}
@@ -313,6 +319,7 @@ namespace gbEmu {
 
 	void Ppu::setLCDStatus()
 	{
+
 		u8 stat = read(STAT);
 		if (!isLCDEnabled()) {
 			//Clear stat and reset scanline during lcd disabled
@@ -324,9 +331,9 @@ namespace gbEmu {
 			stat = resetBit(stat, 1);
 
 			write(STAT, stat);
-
 			return;
 		}
+		
 
 		u8 currentLine = read(LY);
 		PpuMode currentMode = (PpuMode)(stat & 0x3);
@@ -371,7 +378,7 @@ namespace gbEmu {
 
 		//Check if there is an interrupt request
 		//and we entered a new mode
-		if (reqInterrupt && (mode != currentMode)) {
+		if (reqInterrupt && (currentMode != mode)) {
 			requestInterrupt(1);
 		}
 
@@ -379,7 +386,7 @@ namespace gbEmu {
 			LYC is used to compare a value to the LY register.
 			If they match, the match flag is set in the STAT register.
 		*/
-		if ((currentLine == read(COINCIDENCE)) && mode == PpuMode::OAMScan) {
+		if ((currentLine == read(COINCIDENCE))) {
 			//Set coincidence flag
 			stat = setBit(stat, 2);
 
