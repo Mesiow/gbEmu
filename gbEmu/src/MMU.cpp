@@ -69,7 +69,7 @@ namespace gbEmu {
 			handleBanking(address, value);
 		}
 		
-		//8kb external cartridge ram
+		//external cartridge ram
 		else if (address >= 0xA000 && address <= 0xBFFF) {
 			if (ramBanking) {
 				u16 newaddr = address - 0xA000;
@@ -120,9 +120,13 @@ namespace gbEmu {
 			return cart->memory[newaddr + (currentRomBank * 0x4000)];
 		}
 		else if (address >= 0xA000 && address <= 0xBFFF) {
-			//Access specific ram bank based on currentRomBank value
-			u16 newaddr = address - 0xA000;
-			return cart->ramBanks[newaddr + (currentRamBank * 0x2000)];
+			if (ramBanking) {
+				//Access specific ram bank based on currentRomBank value
+				u16 newaddr = address - 0xA000;
+				return cart->ramBanks[newaddr + (currentRamBank * 0x2000)];
+			}
+			else
+				return 0xFF;
 		}
 
 		return memory[address];
@@ -141,18 +145,14 @@ namespace gbEmu {
 		//If address is between 0x0 and 0x2000, then it enables RAM 
 		//bank writing
 		if (address <= 0x1FFF) {
-			if (cart->mbc1) {
+			if (cart->mbc1 || cart->mbc3) {
 				enableRamBank(address, value);
 			}
 		}
 
-		
 		//If address is between 0x2000 and 0x4000, it is a ROM bank change.
 		else if (address >= 0x2000 && address <= 0x3FFF) {
-			if (cart->mbc1) {
-				//If game tries to write to 0x2000 - 0x3FFF then it changes
-				//the lower 5 bits of the current rom bank but not bits 5 and 6.
-
+			if (cart->mbc1 || cart->mbc3) {
 				switchLoRomBank(value);
 			}
 		}
@@ -162,7 +162,7 @@ namespace gbEmu {
 
 		else if (address >= 0x4000 && address <= 0x5FFF) {
 			//No rambank in mbc2, so always use rambank 0
-			if (cart->mbc1) {
+			if (cart->mbc1 || cart->mbc3) {
 				if (romBanking) {
 					//If game tries to write to 0x4000 - 0x5FFF then it changes
 					//bits 5 and 6  of the current rom bank but not bits 0 - 4
@@ -181,7 +181,7 @@ namespace gbEmu {
 		//This will change whether we are doing rom banking
 		//or ram banking with the above if statement
 		else if (address >= 0x6000 && address <= 0x7FFF) {
-			if (cart->mbc1);
+			if (cart->mbc1 || cart->mbc3);
 				switchRomRamMode(value);
 		}
 	}
@@ -206,42 +206,61 @@ namespace gbEmu {
 
 	void MMU::switchLoRomBank(u8 value)
 	{
-		//MBC1
 
-		//And value with associated bitmask depending on
-		//rom size
-		u8 mask = 0xFF;
-		switch (cart->cartSize) {
-			case ROM_SIZE0: mask = 0x1; break;
-			case ROM_SIZE4: mask = 0x3; break;
-			case ROM_SIZE8: mask = 0x7; break;
-			case ROM_SIZE16: mask = 0xF; break;
-			case ROM_SIZE32: mask = 0x1F; break;
+		if (cart->mbc1) {
+			//MBC1
+
+			//And value with associated bitmask depending on
+			//rom size
+			u8 mask = 0xFF;
+			switch (cart->cartSize) {
+				case ROM_SIZE0: mask = 0x1; break;
+				case ROM_SIZE4: mask = 0x3; break;
+				case ROM_SIZE8: mask = 0x7; break;
+				case ROM_SIZE16: mask = 0xF; break;
+				case ROM_SIZE32: mask = 0x1F; break;
+			}
+
+			//AND with bitmask
+			u8 result = value & mask;
+
+			//Clear lower 5 bits
+			currentRomBank &= 0xE0;
+			currentRomBank |= result;
+
+			//if zero, must always be 1 or greater, so add 1 to it
+			if (currentRomBank == 0)
+				currentRomBank++;
 		}
-
-		//AND with bitmask
-		u8 result = value & mask;
-
-		//Clear lower 5 bits
-		currentRomBank &= 0xE0; 
-		currentRomBank |= result;
-
-		//if zero, must always be 1 or greater, so add 1 to it
-		if (currentRomBank == 0)
-			currentRomBank++;
+		else if (cart->mbc3) {
+			if (value == 0x00)
+				currentRomBank = 1;
+			else
+				currentRomBank = value & 0x7F;
+		}
 	}
 
 	void MMU::switchHiRomBank(u8 value)
 	{
-		//clear first 5 bits
-		u8 hi = value & 0xE0;
 
-		//Clear bits 5 - 7
-		currentRomBank &= 0x1F;
-		currentRomBank |= hi;
+		if (cart->mbc1) {
+			//clear first 5 bits
+			u8 hi = value & 0xE0;
 
-		if (currentRomBank == 0)
-			currentRomBank++;
+			//Clear bits 5 - 7
+			currentRomBank &= 0x1F;
+			currentRomBank |= hi;
+
+			if (currentRomBank == 0)
+				currentRomBank++;
+		}
+		else if (cart->mbc3) {
+			/*
+				If the written value is in the range $08 - $0C, the corresponding 
+				RTC register is mapped to the 
+				External RAM region ($A000 - $BFFF) instead
+			*/
+		}
 	}
 
 	void MMU::switchRamBank(u8 value)

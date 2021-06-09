@@ -319,7 +319,6 @@ namespace gbEmu {
 
 	void Ppu::setLCDStatus()
 	{
-
 		u8 stat = read(STAT);
 		if (!isLCDEnabled()) {
 			//Clear stat and reset scanline during lcd disabled
