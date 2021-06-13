@@ -83,9 +83,13 @@ namespace gbEmu {
 			memory[address - 0x2000] = value;
 		}
 		
-		//Not usable 0xFEA0 - 0xFEFF
+		////Not usable 0xFEA0 - 0xFEFF
 		else if (address >= 0xFEA0 && address <= 0xFEFF)
 			return;
+
+		else if (address == 0xFF44) {
+			memory[address] = 0x00;
+		}
 
 		//DMA
 		else if (address == 0xFF46) {

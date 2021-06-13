@@ -69,19 +69,19 @@ namespace gbEmu {
 			//Register 0xFF44 is the current scanline
 			u8 currentScanline = read(LY);
 			currentScanline++;
-			write(LY, currentScanline);
+			mmu->memory[LY] = currentScanline;
 
 			//set counter back to 456(each scanline takes 456 t cycles)
 			scanlineCounter = 456;
 
 			
 			//VBlank period entered
-			if (currentScanline == 144 && isLCDEnabled()) {
+			if (currentScanline == 144) {
 				requestInterrupt(0);
 			}
 			////if past line 153, reset to 0
 			else if (currentScanline > 153) {
-				write(LY, 0);
+				mmu->memory[LY] = 0;
 			}
 			//draw current scanline
 			else if (currentScanline < 144) {
@@ -283,19 +283,17 @@ namespace gbEmu {
 					if (colorNum == 0)
 						continue;
 
-					s32 xPix = 0 - tilePixel;
-					xPix += 7;
 
-					s32 pixel = xpos + xPix;
+					s32 pixel = xpos + (7 - tilePixel);
 
 					if ((ly < 0) || (ly > 143) || (pixel < 0) || (pixel > 159))
 						continue;
 
-					/*if (testBit(attributes, 7) == 1) {
+					if (testBit(attributes, 7) == 1) {
 						if ((pixels.getPixel(pixel, ly).r != 255) || (pixels.getPixel(pixel, ly).g != 255)
 							|| (pixels.getPixel(pixel, ly).b != 255))
 							continue;
-					}*/
+					}
 
 					pixels.setPixel(pixel, ly, color);
 				}
@@ -323,12 +321,9 @@ namespace gbEmu {
 		if (!isLCDEnabled()) {
 			//Clear stat and reset scanline during lcd disabled
 			scanlineCounter = 456;
-			write(LY, 0);
+			mmu->memory[LY] = 0;
 
 			stat &= 0xFC;
-			stat = resetBit(stat, 0);
-			stat = resetBit(stat, 1);
-
 			write(STAT, stat);
 			return;
 		}
@@ -343,8 +338,8 @@ namespace gbEmu {
 		//In VBlank mode, set mode to 1
 		if (currentLine >= 144) {
 			mode = PpuMode::VBlank;
-
 			//Mode 1 is VBlank(set bit 0 for VBlank mode)
+			stat &= 0xFC;
 			stat = setBit(stat, 0);
 			stat = resetBit(stat, 1);
 			reqInterrupt = testBit(stat, 4);
@@ -356,6 +351,7 @@ namespace gbEmu {
 			//In mode 2 (OAM Scan)
 			if (scanlineCounter >= Oambounds) {
 				mode = PpuMode::OAMScan;
+				stat &= 0xFC;
 				stat = setBit(stat, 1);
 				stat = resetBit(stat, 0);
 				reqInterrupt = testBit(stat, 5);
@@ -363,12 +359,14 @@ namespace gbEmu {
 			//In mode 3 (Drawing)
 			else if (scanlineCounter >= Drawingbounds) {
 				mode = PpuMode::Drawing;
+				stat &= 0xFC;
 				stat = setBit(stat, 1);
 				stat = setBit(stat, 0);
 			}
 			else {
 				//In mode 0 (HBlank)
 				mode = PpuMode::HBlank;
+				stat &= 0xFC;
 				stat = resetBit(stat, 1);
 				stat = resetBit(stat, 0);
 				reqInterrupt = testBit(stat, 3);
@@ -377,7 +375,7 @@ namespace gbEmu {
 
 		//Check if there is an interrupt request
 		//and we entered a new mode
-		if (reqInterrupt && (currentMode != mode)) {
+		if (reqInterrupt && (mode != currentMode)) {
 			requestInterrupt(1);
 		}
 

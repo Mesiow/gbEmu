@@ -141,8 +141,6 @@ namespace gbEmu {
 						//Clear IF flag
 						IF = resetBit(IF, i);
 						write(0xFF0F, IF);
-
-						//Service Interrupt
 						serviceInterrupt(i);
 					}
 				}

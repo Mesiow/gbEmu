@@ -8,15 +8,22 @@ namespace gbEmu {
         mmu.connectJoypad(&joypad);
         
         //cart.load("roms/Kirby's Dream Land.gb");
-        cart.load("roms/Pokemon Red.gb");
-       // cart.load("roms/SUPERMAR.gbc");
+        //cart.load("roms/Pokemon Red.gb");
+        //cart.load("roms/SUPERMAR.gbc");
         //cart.load("roms/Dr. Mario.gb");
         //cart.load("roms/Tetris.gb");
         //cart.load("roms/ZELDA.gbc");
+        //cart.load("roms/fairylake.gb");
+
+        //Tests
         //cart.load("test_roms/02-interrupts.gb");
-        //cart.load("test_roms/ppu/dmg-acid2.gb");
+        cart.load("test_roms/ppu/dmg-acid2.gb");
+        //cart.load("test_roms/ppu/bg_m9800_d8800.gb");
+
         //cart.load("test_roms/cpu_instrs.gb");
         //cart.load("test_roms/mbc/mbc1/bits_mode.gb");
+        //cart.load("test_roms/instr_timing.gb");
+
         mmu.loadBios("roms/DMG_ROM.GB");
         mmu.loadCartridge(&cart);
 
@@ -27,7 +34,8 @@ namespace gbEmu {
     {
         s32 cycles_this_frame = 0;
         static s32 delta_cycles = 0;
-        //each scanline takes 456 t cycles. There are 154 scanlines per frame
+        //each scanline takes 456 t cycles.
+        //There are 154 scanlines per frame.
         //(456 * 154) = 70224
         while (cycles_this_frame < 70224) {
             u32 cycle = cpu.clock();
