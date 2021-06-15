@@ -12,6 +12,14 @@ namespace gbEmu {
 	using u32 = uint32_t;
 	using s32 = int32_t;
 
+	enum class Interrupts : u8 {
+		VBlank = 0x0,
+		LCD = 0x01,
+		Timer = 0x02,
+		Serial = 0x03,
+		Joypad = 0x04
+	};
+
 	/*
 		Return result of setting the bit of the value
 	*/

@@ -181,7 +181,7 @@ namespace gbEmu {
     {
         handleButtonPresses();
         if (running) {
-           gb->update();
+          //gb->update();
            // gb->cpu.clock();
          //   if (haltAtPos) { //Stop PC at this position for debugging
          //          if (gb->cpu.PC == 0x0100) {

@@ -471,7 +471,7 @@ namespace gbEmu {
 		if (condition) {
 			u16 address = fetchU16();
 			CALL(address);
-			return 8;
+			return 12;
 		}
 		PC += 2;
 		return 0;

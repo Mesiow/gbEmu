@@ -12,17 +12,21 @@ namespace gbEmu {
         //cart.load("roms/SUPERMAR.gbc");
         //cart.load("roms/Dr. Mario.gb");
         //cart.load("roms/Tetris.gb");
-        //cart.load("roms/ZELDA.gbc");
+       // cart.load("roms/ZELDA.gbc");
         //cart.load("roms/fairylake.gb");
+        //cart.load("roms/Tennis.gb");
 
         //Tests
         //cart.load("test_roms/02-interrupts.gb");
-        cart.load("test_roms/ppu/dmg-acid2.gb");
+        //cart.load("test_roms/ppu/dmg-acid2.gb");
         //cart.load("test_roms/ppu/bg_m9800_d8800.gb");
+        //cart.load("test_roms/numism.gb");
+        //cart.load("test_roms/statcount.gb");
 
         //cart.load("test_roms/cpu_instrs.gb");
         //cart.load("test_roms/mbc/mbc1/bits_mode.gb");
         //cart.load("test_roms/instr_timing.gb");
+        //cart.load("test_roms/mem_timing.gb");
 
         mmu.loadBios("roms/DMG_ROM.GB");
         mmu.loadCartridge(&cart);
@@ -30,14 +34,13 @@ namespace gbEmu {
         ppu.init();
     }
 
-    void Gb::update()
+    void Gb::update(float dt)
     {
         s32 cycles_this_frame = 0;
-        static s32 delta_cycles = 0;
         //each scanline takes 456 t cycles.
         //There are 154 scanlines per frame.
-        //(456 * 154) = 70224
-        while (cycles_this_frame < 70224) {
+        //(456 * 154) = 70224(maxCycles)
+        while (cycles_this_frame < maxCycles) {
             u32 cycle = cpu.clock();
             cycles_this_frame += cycle;
 
@@ -45,8 +48,12 @@ namespace gbEmu {
             ppu.update(cycles_this_frame);
             cpu.handleInterrupts();
         }
-        delta_cycles += cycles_this_frame - 70224;
         ppu.bufferPixels();
+
+      /*  if (dt < delayTime) {
+            std::this_thread::sleep_for(std::chrono::duration<float,
+                std::milli>(delayTime - dt));
+        }*/
     }
 
     void Gb::render(sf::RenderTarget& target)

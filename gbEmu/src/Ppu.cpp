@@ -34,6 +34,17 @@ namespace gbEmu {
 		customShades[0x2] = sf::Color(72, 163, 195, 255);
 		customShades[0x3] = sf::Color(29, 118, 167, 255);
 
+		kirokazeShades[0x0] = sf::Color(51, 44, 80, 255);
+		kirokazeShades[0x1] = sf::Color(70, 135, 143, 255);
+		kirokazeShades[0x2] = sf::Color(148, 227, 68, 255);
+		kirokazeShades[0x3] = sf::Color(226, 243, 228, 255);
+		
+		purpleDawnShades[0x0] = sf::Color(238, 253, 237, 255);
+		purpleDawnShades[0x1] = sf::Color(154, 123, 188, 255);
+		purpleDawnShades[0x2] = sf::Color(45, 117, 126, 255);
+		purpleDawnShades[0x3] = sf::Color(0, 27, 46, 255);
+
+
 		pixels.create(160, 144, sf::Color::White);
 		framebuffer.loadFromImage(pixels);
 
@@ -41,6 +52,8 @@ namespace gbEmu {
 
 		sprite = sf::Sprite(framebuffer);
 		sprite.setScale(scaleFactor, scaleFactor);
+
+		mode = PpuMode::OAMScan;
 	}
 
 	void Ppu::render(sf::RenderTarget& target)
@@ -48,46 +61,183 @@ namespace gbEmu {
 		target.draw(sprite);
 	}
 
-	void Ppu::update(s32 cycles)
+	void Ppu::update(s16 cycles)
 	{
-		setLCDStatus();
+		//setLCDStatus();
 
 		if (isLCDEnabled()) {
 			//subtract by the amount of clock cycles the last opcode took to execute
 			//to keep the graphics in sync with the cpu
-			scanlineCounter -= cycles;
+			scanlineCounter += cycles;
+			switch (mode) {
+				case PpuMode::HBlank:
+					handleHBlankMode();
+					break;
+				case PpuMode::VBlank:
+					handleVBlankMode(cycles);
+					break;
+				case PpuMode::OAMScan:
+					handleOAMMode();
+					break;
+				case PpuMode::LCDTransfer:
+					handleLCDTransferMode();
+					break;
+			}
 		}
 		else {
+			disableLCD();
 			return;
 		}
 
+		drawLine();
+		
+		////if negative move to next scanline
+		//if (scanlineCounter <= 0) {
+		//	//move onto the next scanline
 
-		//if negative move to next scanline
-		if (scanlineCounter <= 0) {
-			//move onto the next scanline
+		//	//Register 0xFF44 is the current scanline
+		//	u8 currentScanline = read(LY);
+		//	currentScanline++;
+		//	mmu->memory[LY] = currentScanline;
 
-			//Register 0xFF44 is the current scanline
-			u8 currentScanline = read(LY);
-			currentScanline++;
-			mmu->memory[LY] = currentScanline;
+		//	//set counter back to 456(each scanline takes 456 t cycles)
+		//	scanlineCounter = 456;
 
-			//set counter back to 456(each scanline takes 456 t cycles)
-			scanlineCounter = 456;
+		//	
+		//	//VBlank period entered
+		//	if (currentScanline == 144) {
+		//		requestInterrupt(0);
+		//	}
+		//	////if past line 153, reset to 0
+		//	else if (currentScanline > 153) {
+		//		mmu->memory[LY] = 0;
+		//	}
+		//	//draw current scanline
+		//	else if (currentScanline < 144) {
+		//		drawLine();
+		//	}
+		//}
+	}
 
-			
-			//VBlank period entered
-			if (currentScanline == 144) {
-				requestInterrupt(0);
+	void Ppu::handleHBlankMode()
+	{
+		if (scanlineCounter >= MIN_HBLANK_CYCLES) {
+			scanlineCounter -= MIN_HBLANK_CYCLES;
+
+			u8 ly = read(LY);
+			mmu->memory[LY] = ++ly;
+			compareLYandLYC();
+
+			if (ly == VBLANK_SCANLINE) {
+				mode = PpuMode::VBlank;
+
+				//change to mode 1(vblank)
+				u8 stat = read(STAT);
+				stat = setBit(stat, 0);
+				write(STAT, stat);
+
+				requestInterrupt(Interrupts::VBlank);
+				if (testBit(stat, 4)) {
+					requestInterrupt(Interrupts::LCD);
+				}
 			}
-			////if past line 153, reset to 0
-			else if (currentScanline > 153) {
-				mmu->memory[LY] = 0;
-			}
-			//draw current scanline
-			else if (currentScanline < 144) {
-				drawLine();
+			else {
+				mode = PpuMode::OAMScan;
+				u8 stat = read(STAT);
+				stat = setBit(stat, 1);
+				stat = resetBit(stat, 0);
+				write(STAT, stat);
+
+				if (testBit(stat, 5)) {
+					requestInterrupt(Interrupts::LCD);
+				}
 			}
 		}
+	}
+
+	void Ppu::handleVBlankMode(s16 cycles)
+	{
+		vblankCycles += cycles;
+		u8 ly = read(LY);
+
+		if (vblankCycles >= MAX_PPU_CYCLES) {
+			vblankCycles = 0;
+			if (ly < VBLANK_SCANLINE_MAX) {
+				mmu->memory[LY] = ++ly;
+			}
+			compareLYandLYC();
+		}
+
+		if (scanlineCounter >= VBLANK_CYCLES) {
+			vblankCycles = 0;
+			scanlineCounter = 0;
+
+			//Reset ly
+			mmu->memory[LY] = 0;
+			compareLYandLYC();
+
+			//Change to OAM mode
+			mode = PpuMode::OAMScan;
+			u8 stat = read(STAT);
+			stat = setBit(stat, 1);
+			stat = resetBit(stat, 0);
+			write(STAT, stat);
+
+			if (testBit(stat, 5)) {
+				requestInterrupt(Interrupts::LCD);
+			}
+		}
+	}
+
+	void Ppu::handleOAMMode()
+	{
+		if (scanlineCounter >= MIN_OAM_CYCLES) {
+			scanlineCounter -= MIN_OAM_CYCLES;
+
+			//Change to lcd transfer mode
+			mode = PpuMode::LCDTransfer;
+			u8 stat = read(STAT);
+			stat = setBit(stat, 1);
+			stat = setBit(stat, 0);
+			write(STAT, stat);
+		}
+	}
+
+	void Ppu::handleLCDTransferMode()
+	{
+		if (scanlineCounter >= MIN_LCD_TRANSFER_CYCLES) {
+			scanlineCounter -= MIN_LCD_TRANSFER_CYCLES;
+
+			
+
+			mode = PpuMode::HBlank;
+			u8 stat = read(STAT);
+			stat = resetBit(stat, 1);
+			stat = resetBit(stat, 0);
+			write(STAT, stat);
+
+			if (testBit(stat, 3)) {
+				requestInterrupt(Interrupts::LCD);
+			}
+		}
+	}
+
+	void Ppu::compareLYandLYC()
+	{
+		u8 ly = read(LY);
+		u8 lyc = read(COINCIDENCE);
+		u8 stat = read(STAT);
+
+		if (lyc == ly) {
+			stat = setBit(stat, 2);
+			if (testBit(stat, 6)) {
+				requestInterrupt(Interrupts::LCD);
+			}
+		}
+		else {
+			stat = resetBit(stat, 2);
+		}
+		write(STAT, stat);
 	}
 
 	void Ppu::drawLine()
@@ -313,89 +463,110 @@ namespace gbEmu {
 			return superGbShades[2];
 		else if (colorfrompal == 3)
 			return superGbShades[3];
+
+		/*if (colorfrompal == 0)
+			return purpleDawnShades[0];
+		else if (colorfrompal == 1)
+			return purpleDawnShades[1];
+		else if (colorfrompal == 2)
+			return purpleDawnShades[2];
+		else if (colorfrompal == 3)
+			return purpleDawnShades[3];*/
 	}
 
 	void Ppu::setLCDStatus()
 	{
+		//u8 stat = read(STAT);
+		//if (!isLCDEnabled()) {
+		//	//Clear stat and reset scanline during lcd disabled
+		//	scanlineCounter = 456;
+		//	mmu->memory[LY] = 0;
+
+		//	stat &= 0xFC;
+		//	write(STAT, stat);
+		//	return;
+		//}
+		//
+
+		//u8 currentLine = read(LY);
+		//PpuMode currentMode = getLCDMode();
+
+		//PpuMode mode = PpuMode::HBlank;
+		//bool reqInterrupt = false;
+
+		////In VBlank mode, set mode to 1
+		//if (currentLine >= 144) {
+		//	mode = PpuMode::VBlank;
+		//	//Mode 1 is VBlank(set bit 0 for VBlank mode)
+		//	stat &= 0xFC;
+		//	stat = setBit(stat, 0);
+		//	stat = resetBit(stat, 1);
+		//	reqInterrupt = testBit(stat, 4);
+		//}
+		//else {
+		//	s16	Oambounds = 456 - 80;
+		//	s16 Drawingbounds = Oambounds - 172;
+
+		//	//In mode 2 (OAM Scan)
+		//	if (scanlineCounter >= Oambounds) {
+		//		mode = PpuMode::OAMScan;
+		//		stat &= 0xFC;
+		//		stat = setBit(stat, 1);
+		//		stat = resetBit(stat, 0);
+		//		reqInterrupt = testBit(stat, 5);
+		//	}
+		//	//In mode 3 (Drawing)
+		//	else if (scanlineCounter >= Drawingbounds) {
+		//		mode = PpuMode::Drawing;
+		//		stat &= 0xFC;
+		//		stat = setBit(stat, 1);
+		//		stat = setBit(stat, 0);
+		//	}
+		//	else {
+		//		//In mode 0 (HBlank)
+		//		mode = PpuMode::HBlank;
+		//		stat &= 0xFC;
+		//		stat = resetBit(stat, 1);
+		//		stat = resetBit(stat, 0);
+		//		reqInterrupt = testBit(stat, 3);
+		//	}
+		//}
+
+		////Check if there is an interrupt request
+		////and we entered a new mode
+		//if (reqInterrupt && (mode != currentMode)) {
+		//	requestInterrupt(1);
+		//}
+
+		///*
+		//	LYC is used to compare a value to the LY register.
+		//	If they match, the match flag is set in the STAT register.
+		//*/
+		//if ((currentLine == read(COINCIDENCE))) {
+		//	//Set coincidence flag
+		//	stat = setBit(stat, 2);
+
+		//	//Request interrupt
+		//	if (testBit(stat, 6))
+		//		requestInterrupt(1);
+		//}
+		//else {
+		//	stat = resetBit(stat, 2);
+		//}
+		////Update lcd status
+		//write(STAT, stat);
+	}
+
+	void Ppu::disableLCD()
+	{
+		vblankCycles = 0;
+		scanlineCounter = 0;
+		mmu->memory[LY] = 0;
+
 		u8 stat = read(STAT);
-		if (!isLCDEnabled()) {
-			//Clear stat and reset scanline during lcd disabled
-			scanlineCounter = 456;
-			mmu->memory[LY] = 0;
-
-			stat &= 0xFC;
-			write(STAT, stat);
-			return;
-		}
-		
-
-		u8 currentLine = read(LY);
-		PpuMode currentMode = (PpuMode)(stat & 0x3);
-
-		PpuMode mode = PpuMode::HBlank;
-		bool reqInterrupt = false;
-
-		//In VBlank mode, set mode to 1
-		if (currentLine >= 144) {
-			mode = PpuMode::VBlank;
-			//Mode 1 is VBlank(set bit 0 for VBlank mode)
-			stat &= 0xFC;
-			stat = setBit(stat, 0);
-			stat = resetBit(stat, 1);
-			reqInterrupt = testBit(stat, 4);
-		}
-		else {
-			s16	Oambounds = 456 - 80;
-			s16 Drawingbounds = Oambounds - 172;
-
-			//In mode 2 (OAM Scan)
-			if (scanlineCounter >= Oambounds) {
-				mode = PpuMode::OAMScan;
-				stat &= 0xFC;
-				stat = setBit(stat, 1);
-				stat = resetBit(stat, 0);
-				reqInterrupt = testBit(stat, 5);
-			}
-			//In mode 3 (Drawing)
-			else if (scanlineCounter >= Drawingbounds) {
-				mode = PpuMode::Drawing;
-				stat &= 0xFC;
-				stat = setBit(stat, 1);
-				stat = setBit(stat, 0);
-			}
-			else {
-				//In mode 0 (HBlank)
-				mode = PpuMode::HBlank;
-				stat &= 0xFC;
-				stat = resetBit(stat, 1);
-				stat = resetBit(stat, 0);
-				reqInterrupt = testBit(stat, 3);
-			}
-		}
-
-		//Check if there is an interrupt request
-		//and we entered a new mode
-		if (reqInterrupt && (mode != currentMode)) {
-			requestInterrupt(1);
-		}
-
-		/*
-			LYC is used to compare a value to the LY register.
-			If they match, the match flag is set in the STAT register.
-		*/
-		if ((currentLine == read(COINCIDENCE))) {
-			//Set coincidence flag
-			stat = setBit(stat, 2);
-
-			//Request interrupt
-			if (testBit(stat, 6))
-				requestInterrupt(1);
-		}
-		else {
-			stat = resetBit(stat, 2);
-		}
-		//Update lcd status
+		stat &= 0xFC;
 		write(STAT, stat);
+		mode = PpuMode::HBlank;
 	}
 
 	bool Ppu::isLCDEnabled()
@@ -404,11 +575,17 @@ namespace gbEmu {
 		return testBit(lcdc, 7);
 	}
 
-	void Ppu::requestInterrupt(u8 interruptBit)
+	PpuMode Ppu::getLCDMode()
+	{
+		u8 stat = read(STAT);
+		return PpuMode(stat & 0x3);
+	}
+
+	void Ppu::requestInterrupt(Interrupts interrupt)
 	{
 		//interrupt request flag
 		u8 IF = read(0xFF0F);
-		IF = setBit(IF, interruptBit);
+		IF = setBit(IF, (u8)interrupt);
 		write(0xFF0F, IF);
 	}
 

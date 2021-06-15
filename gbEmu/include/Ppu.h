@@ -25,12 +25,20 @@ namespace gbEmu {
 	#define WINDOWY 0xFF4A
 	#define OAM 0xFE00
 
+	#define MAX_PPU_CYCLES  456
+	#define MIN_HBLANK_CYCLES 204
+	#define MIN_OAM_CYCLES 80
+	#define MIN_LCD_TRANSFER_CYCLES 172
+	#define VBLANK_CYCLES 4560
+	#define VBLANK_SCANLINE 144
+	#define VBLANK_SCANLINE_MAX 153
+
 
 	enum class PpuMode : u8 {
 		HBlank = 0,
 		VBlank,
 		OAMScan,
-		Drawing
+		LCDTransfer
 	};
 
 	struct MMU;
@@ -43,7 +51,13 @@ namespace gbEmu {
 
 		void init();
 		void render(sf::RenderTarget& target);
-		void update(s32 cycles);
+		void update(s16 cycles);
+
+		void handleHBlankMode();
+		void handleVBlankMode(s16 cycles);
+		void handleOAMMode();
+		void handleLCDTransferMode();
+		void compareLYandLYC();
 
 		void drawLine();
 		void drawTiles();
@@ -53,12 +67,16 @@ namespace gbEmu {
 
 
 		void setLCDStatus();
+		void disableLCD();
 		bool isLCDEnabled();
+		PpuMode getLCDMode();
+
+		
 
 		/*
 			Takes in bit of interrupt to request
 		*/
-		void requestInterrupt(u8 interruptBit);
+		void requestInterrupt(Interrupts interrupt);
 		void bufferPixels();
 
 		sf::Image pixels;
@@ -67,12 +85,17 @@ namespace gbEmu {
 
 		sf::Color shadesOfGrey[4];
 		sf::Color superGbShades[4];
+		sf::Color rusticShades[4];
+		sf::Color kirokazeShades[4];
+		sf::Color purpleDawnShades[4];
 		sf::Color customShades[4];
 	
-		s16 scanlineCounter = 456;
+		s32 vblankCycles = 0;
+		s16 scanlineCounter = 0;
 		s16 scanlinesRendered = 0;
 
+		PpuMode mode;
 		MMU* mmu;
-		bool disablePpu = false;
+	
 	};
 }
