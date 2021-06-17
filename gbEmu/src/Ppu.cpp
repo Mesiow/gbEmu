@@ -266,7 +266,7 @@ namespace gbEmu {
 		bool windowEnabled = false;
 
 		if (testBit(lcdc, 5)) {
-			if (wy <= read(LY))
+			if (read(LY) >= wy)
 				windowEnabled = true;
 		}
 
@@ -319,8 +319,7 @@ namespace gbEmu {
 
 			//which of 32 horizontal tiles does this xpos fall within
 			u16 tileCol = (xpos / 8);
-			s16 tileNum;
-			
+			u16 tileNum;
 
 			//Get tile id
 			u16 tileAddress = backgroundAddress + tileRow + tileCol;
@@ -341,7 +340,7 @@ namespace gbEmu {
 			}
 
 			//Find correct vertical line we're on to get tile data
-			u8 line = ypos % 8;
+			u8 line = (ypos % 8);
 			line *= 2; //each vertical line = 2 bytes
 			u8 data1 = read(tileLocation + line);
 			u8 data2 = read(tileLocation + line + 1);

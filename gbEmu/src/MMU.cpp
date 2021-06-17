@@ -39,6 +39,8 @@ namespace gbEmu {
 		for (size_t i = 0; i < ROM_SIZE0; ++i) {
 			memory[i] = cart_mem[i];
 		}
+
+		calcZeroBankNumber();
 	}
 
 	void MMU::write(u16 address, u8 value)
@@ -72,8 +74,7 @@ namespace gbEmu {
 		//external cartridge ram
 		else if (address >= 0xA000 && address <= 0xBFFF) {
 			if (ramBanking) {
-				u16 newaddr = address - 0xA000;
-				cart->ramBanks[newaddr + (currentRamBank * 0x2000)] = value;
+				writeRamBank(address, value);
 			}
 		}
 
@@ -110,11 +111,13 @@ namespace gbEmu {
 			return bootrom[address];
 		}
 
-		//Joypad
 		if (address == 0xFF00) {
-			//return 0xFF;
-			//return state of joypad
 			return joy->joypadState();
+		}
+
+		if ((address >= 0x0000 && address <= 0x3FFF) && romBanking) {
+			u16 newaddr = (0x4000 * zeroBankNum) + address;
+			return cart->memory[newaddr];
 		}
 
 		////Switchable rom bank
@@ -125,9 +128,7 @@ namespace gbEmu {
 		}
 		else if (address >= 0xA000 && address <= 0xBFFF) {
 			if (ramBanking) {
-				//Access specific ram bank based on currentRomBank value
-				u16 newaddr = address - 0xA000;
-				return cart->ramBanks[newaddr + (currentRamBank * 0x2000)];
+				return readRamBank(address);
 			}
 			else
 				return 0xFF;
@@ -208,6 +209,39 @@ namespace gbEmu {
 			ramBanking = false;
 	}
 
+	void MMU::writeRamBank(u16 address, u8 value)
+	{
+		//If ram is 2kb or 8kb address = (address - 0xA000) % ramSize
+		if (cart->ramSize == RAM_SIZE1 || cart->ramSize == RAM_SIZE2) {
+			u16 addr = (address - 0xA000) % cart->ramSize;
+			cart->ramBanks[addr] = value;
+		}
+		else if (cart->ramSize == RAM_SIZE3 && romBanking) {
+			u16 addr = address - 0xA000;
+			cart->ramBanks[addr + (currentRamBank * 0x2000)] = value;
+		}
+		else {
+			//Mode flag is 0
+			u16 addr = (address - 0xA000);
+			cart->ramBanks[addr] = value;
+		}
+	}
+
+	u8 MMU::readRamBank(u16 address)
+	{
+		if (cart->ramSize == RAM_SIZE1 || cart->ramSize == RAM_SIZE2) {
+			u16 addr = (address - 0xA000) % cart->ramSize;
+		}
+		else if (cart->ramSize == RAM_SIZE3 && romBanking) {
+			u16 addr = address - 0xA000;
+			return cart->ramBanks[addr + (currentRamBank * 0x2000)];
+		}
+		else {
+			u16 addr = (address - 0xA000);
+			return cart->ramBanks[addr];
+		}
+	}
+
 	void MMU::switchLoRomBank(u8 value)
 	{
 
@@ -232,9 +266,8 @@ namespace gbEmu {
 			currentRomBank &= 0xE0;
 			currentRomBank |= result;
 
-			//if zero, must always be 1 or greater, so add 1 to it
-			if (currentRomBank == 0)
-				currentRomBank++;
+			if (value == 0x00)
+				currentRomBank = 1;
 		}
 		else if (cart->mbc3) {
 			if (value == 0x00)
@@ -246,7 +279,6 @@ namespace gbEmu {
 
 	void MMU::switchHiRomBank(u8 value)
 	{
-
 		if (cart->mbc1) {
 			//clear first 5 bits
 			u8 hi = value & 0xE0;
@@ -297,5 +329,12 @@ namespace gbEmu {
 		u16 address = value << 8;
 		for (size_t i = 0; i < 0xA0; ++i)
 			write(0xFE00 + i, read(address + i));
+	}
+
+	void MMU::calcZeroBankNumber()
+	{
+		if (cart->cartSize <= ROM_SIZE32) {
+			zeroBankNum = 0;
+		}
 	}
 }

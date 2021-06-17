@@ -65,8 +65,6 @@ namespace gbEmu {
 
 		sf::Color getPixelColor(u8 colorNum, u8 palette, bool sprite = false);
 
-
-		void setLCDStatus();
 		void disableLCD();
 		bool isLCDEnabled();
 		PpuMode getLCDMode();

@@ -9,10 +9,10 @@ namespace gbEmu {
         
         //cart.load("roms/Kirby's Dream Land.gb");
         //cart.load("roms/Pokemon Red.gb");
-        //cart.load("roms/SUPERMAR.gbc");
+        cart.load("roms/SUPERMAR.gbc");
         //cart.load("roms/Dr. Mario.gb");
         //cart.load("roms/Tetris.gb");
-       // cart.load("roms/ZELDA.gbc");
+         //cart.load("roms/ZELDA.gbc");
         //cart.load("roms/fairylake.gb");
         //cart.load("roms/Tennis.gb");
 
