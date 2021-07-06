@@ -63,8 +63,6 @@ namespace gbEmu {
 
 	void Ppu::update(s16 cycles)
 	{
-		//setLCDStatus();
-
 		if (isLCDEnabled()) {
 			//subtract by the amount of clock cycles the last opcode took to execute
 			//to keep the graphics in sync with the cpu
@@ -86,37 +84,7 @@ namespace gbEmu {
 		}
 		else {
 			disableLCD();
-			return;
 		}
-
-		drawLine();
-		
-		////if negative move to next scanline
-		//if (scanlineCounter <= 0) {
-		//	//move onto the next scanline
-
-		//	//Register 0xFF44 is the current scanline
-		//	u8 currentScanline = read(LY);
-		//	currentScanline++;
-		//	mmu->memory[LY] = currentScanline;
-
-		//	//set counter back to 456(each scanline takes 456 t cycles)
-		//	scanlineCounter = 456;
-
-		//	
-		//	//VBlank period entered
-		//	if (currentScanline == 144) {
-		//		requestInterrupt(0);
-		//	}
-		//	////if past line 153, reset to 0
-		//	else if (currentScanline > 153) {
-		//		mmu->memory[LY] = 0;
-		//	}
-		//	//draw current scanline
-		//	else if (currentScanline < 144) {
-		//		drawLine();
-		//	}
-		//}
 	}
 
 	void Ppu::handleHBlankMode()
@@ -208,7 +176,7 @@ namespace gbEmu {
 		if (scanlineCounter >= MIN_LCD_TRANSFER_CYCLES) {
 			scanlineCounter -= MIN_LCD_TRANSFER_CYCLES;
 
-			
+			drawLine();
 
 			mode = PpuMode::HBlank;
 			u8 stat = read(STAT);
@@ -243,136 +211,99 @@ namespace gbEmu {
 	void Ppu::drawLine()
 	{
 		u8 lcdc = read(LCDC);
-
-		//If bit 0 is on, we render the background tiles,
-		if (testBit(lcdc, 0))
-			drawTiles();
+		if (testBit(lcdc, 0)) {
+			drawBackground(lcdc);
+			if (testBit(lcdc, 5)) {
+				u8 ly = read(LY);
+				u8 wy = read(WINDOWY);
+				if (ly >= wy)
+					drawWindow(lcdc, ly, wy);
+			}
+		}			
 
 		if (testBit(lcdc, 1))
-			drawSprites();
+			drawSprites(lcdc);
 	}
 
-	void Ppu::drawTiles()
+	void Ppu::drawBackground(u8 lcdc)
 	{
-		u8 lcdc = read(LCDC);
 		u8 scx = read(SCX);
 		u8 scy = read(SCY);
-		u8 wx = read(WINDOWX) - 7;
-		u8 wy = read(WINDOWY);
 
-		u16 tileData = 0;
-		u16 backgroundAddress = 0;
-		bool unsign = true;
-		bool windowEnabled = false;
+		u8 ly = read(LY);
+		bool unsign = testBit(lcdc, 4);
+		u8 bgPal = read(PALETTE);
+		u16 tileMap = testBit(lcdc, 3) ? 0x9C00 : 0x9800;
+		u16 tileData = unsign ? 0x8000 : 0x8800;
 
-		if (testBit(lcdc, 5)) {
-			if (read(LY) >= wy)
-				windowEnabled = true;
-		}
-
-		//Tile data
-		if (testBit(lcdc, 4)) {
-			tileData = 0x8000;
-		}
-		else {
-			tileData = 0x8800;
-			unsign = false;
-		}
-
-		//Background/Window memory (for TileID)
-		if (!windowEnabled) {
-			if (testBit(lcdc, 3)) {
-				backgroundAddress = 0x9C00;
-			}
-			else {
-				backgroundAddress = 0x9800;
-			}
-		}
-		else {
-			if (testBit(lcdc, 6)) {
-				backgroundAddress = 0x9C00;
-			}
-			else {
-				backgroundAddress = 0x9800;
-			}
-		}
-
-		//Current tile y position of the 32 vertical tiles
-		u8 ypos = 0;
-		if (!windowEnabled)
-			ypos = scy + read(LY);
-		else
-			ypos = read(LY) - wy;
-
-		//Which 8 pixels of the current tile is the scanline on
-		u16 tileRow = (((u8)(ypos / 8)) * 32);
-	
+		u8 xpos = 0;
+		u8 ypos = scy + ly;
+		u16 tileRow;
+		u16 tileLocation;
 		for (s32 pixel = 0; pixel < 160; pixel++) {
-			u8 xpos = pixel + scx;
+			xpos = pixel + scx;
+			ypos = scy + ly;
+			drawTile(unsign, tileMap, tileData, xpos, ypos, pixel,
+				bgPal, ly);
+		}
 
-			//translate current x to window space
-			if (windowEnabled) {
-				if (pixel >= wx) {
-					xpos = pixel - wx;
-				}
-			}
+	}
 
-			//which of 32 horizontal tiles does this xpos fall within
-			u16 tileCol = (xpos / 8);
-			u16 tileNum;
+	void Ppu::drawWindow(u8 lcdc, u8 ly, u8 wy)
+	{
+		u8 wx = read(WINDOWX);
+		if (wx <= 0x07)
+			wx -= wx;
+		else
+			wx -= 7;
 
-			//Get tile id
-			u16 tileAddress = backgroundAddress + tileRow + tileCol;
-			if (unsign) {
-				tileNum = (u8)read(tileAddress);
-			}
-			else {
-				tileNum = (s8)read(tileAddress);
-			}
+		bool unsign = testBit(lcdc, 4);
+		u16 winTileMap = testBit(lcdc, 6) ? 0x9C00 : 0x9800;
+		u16 tileData = unsign ? 0x8000 : 0x8800;
+		u8 bgPal = read(PALETTE);
 
-			//Where is tile id in memory
-			u16 tileLocation = tileData;
-			if (unsign) {
-				tileLocation += (tileNum * 16);
-			}
-			else {
-				tileLocation += ((tileNum + 128) * 16);
-			}
-
-			//Find correct vertical line we're on to get tile data
-			u8 line = (ypos % 8);
-			line *= 2; //each vertical line = 2 bytes
-			u8 data1 = read(tileLocation + line);
-			u8 data2 = read(tileLocation + line + 1);
-
-			//Pixel 0 in tile is bit 7 of data 1 and data 2
-			//Pixel 1 is bit 6 etc
-			s32 colorBit = xpos % 8;
-			colorBit -= 7;
-			colorBit *= -1;
-
-			//Combine data 2 and data 1 to get color id for this pixel
-			//in the tile
-			s32 colorNum = testBit(data2, colorBit);
-			colorNum <<= 1;
-			colorNum |= testBit(data1, colorBit);
-
-			//Now we have the color id to get the actual color
-			//from palette
-			sf::Color color = getPixelColor(colorNum, read(PALETTE));
-
-			u8 ly = read(LY);
-			if ((ly < 0) || (ly > 143) || (pixel < 0) || (pixel > 159))
-				continue;
-
-			pixels.setPixel(pixel, ly, color);
+		u16 tileMap;
+		u8 xpos = 0;
+		u8 ypos = 0;
+		u16 tileRow;
+		for (s32 pixel = wx; pixel < 160; pixel++) {
+			xpos = pixel - wx;
+			ypos = ly - wy;
+			drawTile(unsign, winTileMap, tileData, xpos, ypos, pixel,
+				bgPal, ly);
 		}
 	}
 
-	void Ppu::drawSprites()
+	void Ppu::drawTile(bool unsign, u16 tileMap, u16 tileData, u8 xpos, u8 ypos, u8 pixel, u8 bgPal, u8 ly)
 	{
-		u8 lcdc = read(LCDC);
+		u16 tileRow = ((ypos / 8) * 32);
+		if (unsign) {
+			u8 tileNum = read(tileMap + tileRow + (xpos / 8));
+			tileData += (tileNum * 16);
+		}
+		else {
+			s8 tileNum = read(tileMap + tileRow + (xpos / 8));
+			tileData += ((tileNum + 128) * 16);
+		}
 
+		u8 address = (ypos % 8) * 2;
+		u8 upper = read(tileData + address);
+		u8 lower = read(tileData + address + 1);
+
+		s32 colorbit = xpos % 8;
+		colorbit -= 7;
+		colorbit = -colorbit;
+
+		s32 colornum = testBit(lower, colorbit);
+		colornum <<= 1;
+		colornum |= testBit(upper, colorbit);
+
+		sf::Color color = getPixelColor(colornum, bgPal);
+		pixels.setPixel(pixel, ly, color);
+	}
+
+	void Ppu::drawSprites(u8 lcdc)
+	{
 		bool use8x16 = false;
 		if (testBit(lcdc, 2)) {
 			use8x16 = true;
@@ -406,7 +337,7 @@ namespace gbEmu {
 				}
 
 				line *= 2; //same as tiles
-				u16 dataAddress = (0x8000 + (tileLocation * 16)) + line;
+				u16 dataAddress = ((0x8000 + (tileLocation * 16)) + line);
 				u8 data1 = read(dataAddress);
 				u8 data2 = read(dataAddress + 1);
 
@@ -462,102 +393,11 @@ namespace gbEmu {
 			return superGbShades[2];
 		else if (colorfrompal == 3)
 			return superGbShades[3];
-
-		/*if (colorfrompal == 0)
-			return purpleDawnShades[0];
-		else if (colorfrompal == 1)
-			return purpleDawnShades[1];
-		else if (colorfrompal == 2)
-			return purpleDawnShades[2];
-		else if (colorfrompal == 3)
-			return purpleDawnShades[3];*/
-	}
-
-	void Ppu::setLCDStatus()
-	{
-		//u8 stat = read(STAT);
-		//if (!isLCDEnabled()) {
-		//	//Clear stat and reset scanline during lcd disabled
-		//	scanlineCounter = 456;
-		//	mmu->memory[LY] = 0;
-
-		//	stat &= 0xFC;
-		//	write(STAT, stat);
-		//	return;
-		//}
-		//
-
-		//u8 currentLine = read(LY);
-		//PpuMode currentMode = getLCDMode();
-
-		//PpuMode mode = PpuMode::HBlank;
-		//bool reqInterrupt = false;
-
-		////In VBlank mode, set mode to 1
-		//if (currentLine >= 144) {
-		//	mode = PpuMode::VBlank;
-		//	//Mode 1 is VBlank(set bit 0 for VBlank mode)
-		//	stat &= 0xFC;
-		//	stat = setBit(stat, 0);
-		//	stat = resetBit(stat, 1);
-		//	reqInterrupt = testBit(stat, 4);
-		//}
-		//else {
-		//	s16	Oambounds = 456 - 80;
-		//	s16 Drawingbounds = Oambounds - 172;
-
-		//	//In mode 2 (OAM Scan)
-		//	if (scanlineCounter >= Oambounds) {
-		//		mode = PpuMode::OAMScan;
-		//		stat &= 0xFC;
-		//		stat = setBit(stat, 1);
-		//		stat = resetBit(stat, 0);
-		//		reqInterrupt = testBit(stat, 5);
-		//	}
-		//	//In mode 3 (Drawing)
-		//	else if (scanlineCounter >= Drawingbounds) {
-		//		mode = PpuMode::Drawing;
-		//		stat &= 0xFC;
-		//		stat = setBit(stat, 1);
-		//		stat = setBit(stat, 0);
-		//	}
-		//	else {
-		//		//In mode 0 (HBlank)
-		//		mode = PpuMode::HBlank;
-		//		stat &= 0xFC;
-		//		stat = resetBit(stat, 1);
-		//		stat = resetBit(stat, 0);
-		//		reqInterrupt = testBit(stat, 3);
-		//	}
-		//}
-
-		////Check if there is an interrupt request
-		////and we entered a new mode
-		//if (reqInterrupt && (mode != currentMode)) {
-		//	requestInterrupt(1);
-		//}
-
-		///*
-		//	LYC is used to compare a value to the LY register.
-		//	If they match, the match flag is set in the STAT register.
-		//*/
-		//if ((currentLine == read(COINCIDENCE))) {
-		//	//Set coincidence flag
-		//	stat = setBit(stat, 2);
-
-		//	//Request interrupt
-		//	if (testBit(stat, 6))
-		//		requestInterrupt(1);
-		//}
-		//else {
-		//	stat = resetBit(stat, 2);
-		//}
-		////Update lcd status
-		//write(STAT, stat);
 	}
 
 	void Ppu::disableLCD()
 	{
+		lcdEnabled = false;
 		vblankCycles = 0;
 		scanlineCounter = 0;
 		mmu->memory[LY] = 0;

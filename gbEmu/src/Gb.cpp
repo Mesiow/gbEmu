@@ -9,7 +9,7 @@ namespace gbEmu {
         
         //cart.load("roms/Kirby's Dream Land.gb");
         //cart.load("roms/Pokemon Red.gb");
-        cart.load("roms/SUPERMAR.gbc");
+        //cart.load("roms/SUPERMAR.gbc");
         //cart.load("roms/Dr. Mario.gb");
         //cart.load("roms/Tetris.gb");
          //cart.load("roms/ZELDA.gbc");
@@ -18,7 +18,7 @@ namespace gbEmu {
 
         //Tests
         //cart.load("test_roms/02-interrupts.gb");
-        //cart.load("test_roms/ppu/dmg-acid2.gb");
+         cart.load("test_roms/ppu/dmg-acid2.gb");
         //cart.load("test_roms/ppu/bg_m9800_d8800.gb");
         //cart.load("test_roms/numism.gb");
         //cart.load("test_roms/statcount.gb");
@@ -41,7 +41,7 @@ namespace gbEmu {
         //There are 154 scanlines per frame.
         //(456 * 154) = 70224(maxCycles)
         while (cycles_this_frame < maxCycles) {
-            u32 cycle = cpu.clock();
+            s32 cycle = cpu.clock();
             cycles_this_frame += cycle;
 
             cpu.handleTimer(cycle);

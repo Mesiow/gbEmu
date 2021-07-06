@@ -60,8 +60,11 @@ namespace gbEmu {
 		void compareLYandLYC();
 
 		void drawLine();
-		void drawTiles();
-		void drawSprites();
+		void drawBackground(u8 lcdc);
+		void drawWindow(u8 lcdc, u8 ly, u8 wy);
+		void drawTile(bool unsign, u16 tileMap, u16 tileData, u8 xpos, u8 ypos,
+			u8 pixel, u8 bgPal, u8 ly);
+		void drawSprites(u8 lcdc);
 
 		sf::Color getPixelColor(u8 colorNum, u8 palette, bool sprite = false);
 
@@ -90,7 +93,7 @@ namespace gbEmu {
 	
 		s32 vblankCycles = 0;
 		s16 scanlineCounter = 0;
-		s16 scanlinesRendered = 0;
+		bool lcdEnabled = true;
 
 		PpuMode mode;
 		MMU* mmu;
